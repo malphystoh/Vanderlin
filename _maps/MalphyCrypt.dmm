@@ -1,0 +1,1078 @@
+//MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE
+"ar" = (
+/obj/structure/easel,
+/obj/structure/rack/rogue/shelf,
+/obj/item/canvas/twentythreeXtwentythree,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/indoors/cave)
+"bi" = (
+/obj/structure/flora/newtree/scorched,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"bw" = (
+/obj/structure/rack/rogue,
+/obj/structure/rogue/trophy/deer,
+/obj/structure/spider/stickyweb/solo,
+/obj/item/clothing/cloak/stabard/templar/astrata,
+/obj/item/clothing/cloak/cape/crusader,
+/obj/item/clothing/gloves/roguetown/plate,
+/obj/item/clothing/head/roguetown/roguehood/astrata,
+/obj/item/clothing/neck/roguetown/psycross/silver/astrata,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"cD" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass/maneater,
+/obj/structure/flora/roguegrass/maneater/real,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"cF" = (
+/obj/structure/gravemarker,
+/obj/structure/flora/roguegrass/maneater,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"dc" = (
+/obj/structure/spider/cocoon,
+/obj/item/clothing/shoes/roguetown/jester,
+/obj/item/clothing/under/roguetown/tights/jester,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"eY" = (
+/obj/structure/table/vtable,
+/obj/item/book/rogue/necra,
+/obj/item/clothing/suit/roguetown/shirt/robe/necra,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"fF" = (
+/obj/structure/fluff/walldeco/rpainting/forest,
+/turf/closed/wall/mineral/rogue/decostone/fluffstone/reddish,
+/area/rogue/indoors/cave)
+"gx" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass/bush/wall,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"gD" = (
+/obj/structure/spider/stickyweb/solo,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/indoors/cave)
+"hi" = (
+/obj/structure/spider/stickyweb,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/indoors/cave)
+"hL" = (
+/obj/structure/ladder,
+/obj/structure/spider/stickyweb/solo,
+/turf/open/transparent/openspace,
+/area/rogue/outdoors/rtfield)
+"hY" = (
+/obj/structure/bookcase/random,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"iN" = (
+/mob/living/simple_animal/hostile/retaliate/rogue/spider,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"jb" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/fluff/statue/gargoyle/moss,
+/turf/open/floor/rogue/grass,
+/area/rogue/outdoors/rtfield)
+"jh" = (
+/obj/structure/flora/roguegrass/maneater,
+/turf/open/floor/rogue/grass,
+/area/rogue/outdoors/rtfield)
+"jk" = (
+/turf/open/floor/rogue/grass,
+/area/rogue/outdoors/rtfield)
+"jy" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass/maneater,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"kb" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass/bush,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"kg" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguetree,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"ki" = (
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"ku" = (
+/obj/structure/fluff/walldeco/vinez,
+/turf/closed/wall/mineral/rogue/stone/moss,
+/area/rogue/outdoors/rtfield)
+"kB" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"kH" = (
+/obj/structure/fermenting_barrel/random,
+/obj/structure/rack/rogue/shelf,
+/obj/item/rogueore/silver,
+/obj/item/rogueore/silver,
+/obj/item/rogueore/silver,
+/obj/item/rogueore/silver,
+/obj/item/rogueore/silver,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/indoors/cave)
+"kJ" = (
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/outdoors/rtfield)
+"lF" = (
+/obj/structure/spider/stickyweb,
+/mob/living/simple_animal/hostile/retaliate/rogue/spider,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/outdoors/rtfield)
+"lS" = (
+/obj/structure/closet/crate/coffin,
+/obj/structure/closet/burial_shroud,
+/obj/item/roguegem/random,
+/obj/item/roguegem/random,
+/obj/item/roguegem/random,
+/turf/open/floor/rogue/carpet/lord/center,
+/area/rogue/indoors/cave)
+"mm" = (
+/obj/structure/giantfur/small,
+/turf/open/floor/rogue/carpet/lord/center,
+/area/rogue/indoors/cave)
+"mt" = (
+/obj/structure/chair/wood/rogue/chair_noble,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"nJ" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass/bush/wall,
+/obj/structure/flora/roguegrass/maneater,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"nM" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/newtree,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"od" = (
+/obj/structure/chair/bench/couchablack/r,
+/obj/structure/spider/stickyweb,
+/obj/item/rogue/instrument/harp,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"oU" = (
+/obj/structure/flora/roguegrass/bush,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"oZ" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass/bush,
+/obj/structure/flora/roguegrass/maneater,
+/turf/open/floor/rogue/grass,
+/area/rogue/outdoors/rtfield)
+"pj" = (
+/obj/structure/fluff/statue/knightalt/r,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/indoors/cave)
+"ps" = (
+/obj/machinery/light/rogue/firebowl/standing/blue,
+/turf/open/floor/rogue/carpet/lord/left,
+/area/rogue/indoors/cave)
+"pG" = (
+/obj/structure/fluff/statue/knightalt,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/indoors/cave)
+"qm" = (
+/obj/structure/table/wood/nice/decorated,
+/obj/item/quiver/arrows,
+/obj/item/roguecoin/silver/pile,
+/obj/item/roguecoin/silver/pile,
+/obj/item/gun/ballistic/revolver/grenadelauncher/bow/recurve,
+/obj/item/ammo_casing/caseless/rogue/arrow,
+/obj/item/ammo_casing/caseless/rogue/arrow,
+/obj/item/ammo_casing/caseless/rogue/arrow,
+/obj/item/ammo_casing/caseless/rogue/arrow,
+/obj/item/ammo_casing/caseless/rogue/arrow,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"qx" = (
+/obj/structure/fluff/walldeco/skullspike,
+/obj/structure/flora/roguegrass/bush/wall,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"qA" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass/maneater,
+/obj/structure/flora/roguegrass/maneater,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"qB" = (
+/obj/structure/ladder,
+/obj/machinery/light/rogue/wallfire/candle/blue/r,
+/obj/machinery/light/rogue/wallfire/candle/blue/l,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"rq" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/obj/structure/fluff/walldeco/skullspike,
+/obj/structure/flora/roguegrass/maneater,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"rs" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"rR" = (
+/obj/structure/fluff/clock/dense,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/indoors/cave)
+"rT" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass/bush/wall,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"rU" = (
+/obj/machinery/light/rogue/firebowl/standing/blue,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"sL" = (
+/obj/structure/spider/stickyweb,
+/obj/machinery/light/rogue/wallfire/candle/blue/r,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"tk" = (
+/obj/structure/spider/stickyweb,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/outdoors/rtfield)
+"tK" = (
+/obj/structure/fluff/walldeco/vinez,
+/obj/structure/fluff/walldeco/psybanner/red,
+/turf/closed/wall/mineral/rogue/stone/moss,
+/area/rogue/outdoors/rtfield)
+"tV" = (
+/obj/structure/fluff/walldeco/psybanner/red,
+/turf/closed/wall/mineral/rogue/decostone/fluffstone/reddish,
+/area/rogue/indoors/cave)
+"ui" = (
+/obj/structure/fluff/statue/knight/interior,
+/obj/structure/spider/stickyweb,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"uQ" = (
+/obj/structure/chair/bench/couchablack,
+/obj/item/natural/feather,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"uW" = (
+/turf/closed/wall/mineral/rogue/stonebrick/reddish,
+/area/rogue/indoors/cave)
+"wu" = (
+/obj/structure/spider/stickyweb,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"wU" = (
+/obj/structure/spider/stickyweb,
+/obj/structure/table/vtable/v2,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"xY" = (
+/obj/structure/flora/roguegrass/maneater,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"ya" = (
+/obj/structure/fluff/walldeco/moon,
+/turf/closed/wall/mineral/rogue/decostone/fluffstone/reddish,
+/area/rogue/indoors/cave)
+"ys" = (
+/obj/structure/flora/roguegrass,
+/obj/machinery/light/rogue/firebowl/standing/blue,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"yt" = (
+/obj/structure/fluff/statue/knight/r,
+/obj/structure/spider/stickyweb,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/outdoors/rtfield)
+"zm" = (
+/obj/structure/fluff/walldeco/skullspike,
+/obj/structure/flora/roguegrass/bush/wall,
+/obj/structure/flora/roguegrass/bush/wall,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"zX" = (
+/obj/structure/flora/newtree,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"Ao" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/fluff/walldeco/skullspike,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"Ax" = (
+/obj/structure/mineral_door/wood/fancywood,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/indoors/cave)
+"AH" = (
+/obj/structure/gravemarker,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"AT" = (
+/obj/structure/flora/newtree,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"Cf" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/obj/structure/fluff/statue/gargoyle/moss,
+/turf/open/floor/rogue/grass,
+/area/rogue/outdoors/rtfield)
+"Dp" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass/bush,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"DY" = (
+/obj/structure/flora/roguegrass,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"Eo" = (
+/obj/structure/mineral_door/wood/green,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/outdoors/rtfield)
+"Ff" = (
+/obj/structure/spider/stickyweb/solo,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"Fh" = (
+/obj/structure/flora/roguegrass/maneater,
+/obj/structure/flora/roguegrass/maneater,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"FH" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/obj/structure/gravemarker,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"FJ" = (
+/obj/structure/fluff/walldeco/skullspike,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"Gj" = (
+/obj/structure/mirror/fancy,
+/obj/structure/spider/stickyweb,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"GJ" = (
+/obj/machinery/light/rogue/firebowl/standing/blue,
+/turf/open/floor/rogue/carpet/lord/right,
+/area/rogue/indoors/cave)
+"HK" = (
+/obj/structure/fluff/walldeco/skullspike,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"HW" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/newtree/scorched,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"Jq" = (
+/turf/open/floor/rogue/carpet/lord/right,
+/area/rogue/indoors/cave)
+"Kj" = (
+/obj/structure/fluff/statue/knight,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/outdoors/rtfield)
+"Kt" = (
+/obj/structure/spider/stickyweb,
+/obj/machinery/light/rogue/wallfire/candle/blue/l,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"Ky" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/turf/open/floor/rogue/grass,
+/area/rogue/outdoors/rtfield)
+"KQ" = (
+/turf/open/floor/rogue/carpet/lord/left,
+/area/rogue/indoors/cave)
+"KS" = (
+/obj/structure/gravemarker,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"Li" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass/maneater/real,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"Mk" = (
+/obj/machinery/light/rogue/firebowl/standing/blue,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/outdoors/rtfield)
+"NU" = (
+/turf/closed/wall/mineral/rogue/decostone/fluffstone/reddish,
+/area/rogue/indoors/cave)
+"Ol" = (
+/obj/structure/flora/roguegrass/bush/wall,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"Or" = (
+/turf/closed/mineral/rogue,
+/area/rogue/indoors/cave)
+"Ot" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass/maneater/real,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"OA" = (
+/obj/structure/table/wood/nice/decorated,
+/obj/item/literary/apprentice,
+/obj/item/roguecoin/gold/pile,
+/obj/item/rogueweapon/shield/tower/metal,
+/obj/item/rogueweapon/sword/sabre/dec,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"Pq" = (
+/obj/structure/fluff/statue/knight/r,
+/obj/structure/spider/stickyweb,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"Ra" = (
+/obj/structure/roguemachine/musicbox,
+/obj/structure/spider/stickyweb,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"Rb" = (
+/obj/structure/spider/stickyweb,
+/obj/item/natural/fur/rous,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/indoors/cave)
+"Ru" = (
+/obj/structure/flora/roguegrass,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"RJ" = (
+/obj/structure/fluff/walldeco/painting/seraphina,
+/turf/closed/wall/mineral/rogue/decostone/fluffstone/reddish,
+/area/rogue/indoors/cave)
+"Sf" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/gravemarker,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"SM" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass/bush/wall,
+/turf/open/floor/rogue/grass,
+/area/rogue/outdoors/rtfield)
+"Tr" = (
+/obj/structure/fluff/wallclock/vampire/l,
+/mob/living/simple_animal/hostile/retaliate/rogue/spider,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"Uu" = (
+/obj/structure/spider/stickyweb,
+/obj/item/lockpick,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"UK" = (
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/indoors/cave)
+"Vq" = (
+/obj/structure/fluff/psycross/copper,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/indoors/cave)
+"Vu" = (
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"Vw" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass/maneater,
+/turf/open/floor/rogue/grass,
+/area/rogue/outdoors/rtfield)
+"We" = (
+/turf/open/floor/rogue/carpet/lord/center,
+/area/rogue/indoors/cave)
+"WA" = (
+/obj/structure/fermenting_barrel/random,
+/obj/structure/rack/rogue/shelf,
+/obj/item/rogueore/gold,
+/obj/item/rogueore/gold,
+/obj/item/rogueore/gold,
+/obj/item/rogueore/gold,
+/obj/item/rogueore/gold,
+/obj/item/rogueore/gold,
+/obj/item/rogueore/gold,
+/obj/item/rogueore/gold,
+/obj/item/rogueore/gold,
+/obj/item/rogueore/gold,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/indoors/cave)
+"Xo" = (
+/obj/structure/flora/roguegrass/maneater,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"Yw" = (
+/mob/living/carbon/human/species/skeleton/npc/warrior/skilled,
+/turf/open/floor/rogue/carpet/lord/center,
+/area/rogue/indoors/cave)
+"YE" = (
+/obj/structure/flora/roguegrass/bush/wall,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"YH" = (
+/obj/structure/spider/stickyweb,
+/obj/structure/table/vtable/v2,
+/obj/item/fishingrod/crafted,
+/obj/item/natural/bundle/cloth,
+/obj/item/natural/bundle/cloth,
+/obj/item/natural/bundle/fibers/full,
+/obj/item/needle/blessed,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"YO" = (
+/obj/structure/flora/roguetree/burnt,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"Zb" = (
+/mob/living/simple_animal/hostile/retaliate/rogue/spider,
+/turf/open/floor/rogue/carpet/green,
+/area/rogue/indoors/cave)
+"ZF" = (
+/obj/structure/table/vtable,
+/obj/item/clothing/ring/gold,
+/obj/item/natural/saddle,
+/obj/item/roguecoin/copper/pile,
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"ZS" = (
+/turf/open/floor/rogue/sandstone,
+/area/rogue/indoors/cave)
+"ZU" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass/maneater,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+
+(1,1,1) = {"
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+"}
+(2,1,1) = {"
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+"}
+(3,1,1) = {"
+Or
+Or
+NU
+uW
+uW
+uW
+uW
+NU
+uW
+uW
+uW
+uW
+NU
+Or
+Or
+"}
+(4,1,1) = {"
+Or
+Or
+NU
+bw
+Tr
+Kt
+eY
+tV
+hY
+ZS
+mt
+qm
+NU
+Or
+Or
+"}
+(5,1,1) = {"
+Or
+Or
+ya
+uQ
+hi
+hi
+wU
+fF
+rR
+UK
+UK
+Vq
+NU
+Or
+Or
+"}
+(6,1,1) = {"
+Or
+Or
+tV
+od
+hi
+Rb
+iN
+NU
+ar
+KQ
+KQ
+ps
+NU
+Or
+Or
+"}
+(7,1,1) = {"
+uW
+uW
+NU
+ui
+hi
+hi
+wu
+NU
+pG
+We
+We
+mm
+NU
+Or
+Or
+"}
+(8,1,1) = {"
+uW
+qB
+Ff
+wu
+hi
+gD
+Uu
+Ax
+UK
+We
+Yw
+lS
+NU
+Or
+Or
+"}
+(9,1,1) = {"
+uW
+uW
+NU
+Pq
+hi
+Zb
+wu
+NU
+pj
+We
+We
+We
+NU
+Or
+Or
+"}
+(10,1,1) = {"
+Or
+Or
+tV
+wu
+Rb
+hi
+wu
+NU
+kH
+Jq
+Jq
+GJ
+NU
+Or
+Or
+"}
+(11,1,1) = {"
+Or
+Or
+NU
+Gj
+hi
+hi
+ZF
+NU
+WA
+UK
+UK
+Vq
+NU
+Or
+Or
+"}
+(12,1,1) = {"
+Or
+Or
+RJ
+Ra
+dc
+sL
+YH
+tV
+hY
+ZS
+mt
+OA
+NU
+Or
+Or
+"}
+(13,1,1) = {"
+Or
+Or
+NU
+uW
+uW
+uW
+uW
+NU
+uW
+uW
+uW
+uW
+NU
+Or
+Or
+"}
+(14,1,1) = {"
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+"}
+(15,1,1) = {"
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+Or
+"}
+
+(1,1,2) = {"
+ki
+DY
+DY
+DY
+Ao
+DY
+jy
+ki
+jy
+DY
+DY
+Ol
+Ol
+DY
+ki
+"}
+(2,1,2) = {"
+ki
+Ol
+gx
+ki
+ki
+jy
+DY
+ki
+DY
+oZ
+Ru
+DY
+zm
+rT
+DY
+"}
+(3,1,2) = {"
+DY
+Ol
+Ol
+YE
+AH
+Xo
+HK
+YE
+nJ
+Ky
+FH
+kB
+Ol
+gx
+DY
+"}
+(4,1,2) = {"
+ki
+DY
+Ol
+YO
+Vu
+ki
+Ru
+nM
+YE
+gx
+rs
+HW
+ki
+Dp
+DY
+"}
+(5,1,2) = {"
+ki
+DY
+gx
+gx
+ki
+bi
+Ru
+Ru
+AT
+gx
+rs
+Li
+KS
+Xo
+DY
+"}
+(6,1,2) = {"
+ku
+ku
+ku
+ku
+ku
+ku
+rU
+ki
+Ol
+gx
+Dp
+DY
+jh
+jy
+DY
+"}
+(7,1,2) = {"
+ku
+Kj
+tk
+kJ
+Mk
+ku
+Cf
+Vu
+Xo
+DY
+ki
+ki
+Xo
+DY
+DY
+"}
+(8,1,2) = {"
+tK
+hL
+lF
+tk
+kJ
+Eo
+Ky
+Ot
+Xo
+ki
+ki
+jy
+DY
+kB
+DY
+"}
+(9,1,2) = {"
+ku
+yt
+tk
+kJ
+Mk
+ku
+jb
+DY
+ki
+DY
+ki
+DY
+kB
+kB
+ki
+"}
+(10,1,2) = {"
+ku
+ku
+ku
+ku
+ku
+ku
+ys
+DY
+ki
+Vu
+jk
+cD
+Vw
+kb
+DY
+"}
+(11,1,2) = {"
+kB
+DY
+gx
+Ol
+oU
+xY
+ki
+DY
+ki
+kg
+Ru
+rq
+Sf
+Ru
+DY
+"}
+(12,1,2) = {"
+DY
+kB
+Ol
+AT
+KS
+Vu
+oU
+jy
+Xo
+jy
+Ru
+rs
+Ru
+SM
+ki
+"}
+(13,1,2) = {"
+Xo
+FJ
+Ol
+gx
+DY
+DY
+ki
+ZU
+cF
+jy
+Vu
+zX
+Vu
+qx
+ki
+"}
+(14,1,2) = {"
+Xo
+Xo
+kB
+qA
+DY
+gx
+bi
+DY
+DY
+ki
+jy
+DY
+gx
+gx
+gx
+"}
+(15,1,2) = {"
+Fh
+ki
+kB
+jy
+jy
+Ol
+Ol
+ki
+Xo
+ki
+DY
+DY
+gx
+Ol
+ki
+"}

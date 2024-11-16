@@ -1,0 +1,746 @@
+//MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE
+"ar" = (
+/obj/structure/flora/newtree,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"aJ" = (
+/obj/structure/flora/roguegrass/bush/wall,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"aT" = (
+/turf/open/floor/rogue/grass/red,
+/area/rogue/under/cave)
+"bz" = (
+/obj/item/natural/hide,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"cE" = (
+/obj/structure/flora/roguegrass/maneater,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"do" = (
+/obj/structure/flora/roguegrass/bush,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"dw" = (
+/obj/item/natural/fur/rous,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/under/cave)
+"dy" = (
+/obj/item/natural/hide,
+/obj/item/natural/fibers,
+/obj/item/natural/fibers,
+/obj/item/natural/fibers,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"dR" = (
+/obj/item/natural/fur/rous,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"fb" = (
+/turf/closed/mineral/rogue,
+/area/rogue/under/cave)
+"ff" = (
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"hB" = (
+/turf/open/floor/rogue/grass,
+/area/rogue/outdoors/rtfield)
+"hG" = (
+/obj/item/natural/fibers,
+/obj/item/organ/guts,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"ih" = (
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"iY" = (
+/obj/item/natural/fibers,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"jl" = (
+/obj/structure/flora/roguegrass/bush,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/outdoors/rtfield)
+"kS" = (
+/turf/open/floor/rogue/grass/cold,
+/area/rogue/outdoors/rtfield)
+"kW" = (
+/obj/item/roguecoin/copper/pile,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"lx" = (
+/obj/item/organ/guts,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"lG" = (
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/under/cave)
+"lO" = (
+/obj/item/natural/fur/volf,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"mk" = (
+/mob/living/simple_animal/hostile/retaliate/rogue/wolf,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"ns" = (
+/obj/structure/flora/roguetree/evil,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"nX" = (
+/obj/structure/flora/roguegrass/bush,
+/turf/open/floor/rogue/grass,
+/area/rogue/outdoors/rtfield)
+"ou" = (
+/obj/item/rogueweapon/pitchfork,
+/obj/item/clothing/suit/roguetown/shirt/rags,
+/mob/living/simple_animal/hostile/retaliate/rogue/wolf,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/under/cave)
+"py" = (
+/obj/structure/fluff/nest,
+/mob/living/simple_animal/hostile/retaliate/rogue/wolf,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"uo" = (
+/obj/item/rogueweapon/axe/battle,
+/mob/living/simple_animal/hostile/retaliate/rogue/wolf,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/under/cave)
+"wo" = (
+/obj/item/rogueweapon/shield/tower/buckleriron,
+/obj/item/clothing/under/roguetown/chainlegs,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"wZ" = (
+/obj/structure/flora/roguegrass/bush/wall,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"AO" = (
+/obj/item/natural/fur/gote,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"AW" = (
+/obj/structure/flora/roguegrass/bush/wall,
+/turf/open/floor/rogue/grass/cold,
+/area/rogue/outdoors/rtfield)
+"Em" = (
+/obj/structure/flora/newtree,
+/turf/open/floor/rogue/grass/cold,
+/area/rogue/outdoors/rtfield)
+"Fb" = (
+/obj/item/natural/fibers,
+/obj/item/natural/fibers,
+/obj/item/natural/fibers,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"FE" = (
+/obj/item/natural/fur/volf,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/under/cave)
+"GG" = (
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"GO" = (
+/obj/structure/flora/roguegrass/maneater,
+/obj/structure/flora/roguegrass/bush,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"Hn" = (
+/obj/structure/flora/roguegrass/maneater,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/outdoors/rtfield)
+"Hp" = (
+/obj/structure/flora/newtree,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"HS" = (
+/obj/item/rogueweapon/flail/militia,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"HY" = (
+/obj/structure/flora/roguetree/evil,
+/turf/open/floor/rogue/grass,
+/area/rogue/outdoors/rtfield)
+"IS" = (
+/obj/item/natural/hide,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/under/cave)
+"Jc" = (
+/obj/item/natural/fur/gote,
+/obj/item/natural/fur/gote,
+/obj/item/natural/fur/gote,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/under/cave)
+"KJ" = (
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"PK" = (
+/obj/structure/fluff/nest,
+/mob/living/simple_animal/hostile/retaliate/rogue/wolf,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/under/cave)
+"PM" = (
+/obj/structure/flora/roguegrass/bush/wall,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"Rs" = (
+/obj/item/roguecoin/copper/pile,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/under/cave)
+"Sp" = (
+/obj/structure/flora/roguegrass/bush,
+/turf/open/floor/rogue/grass/cold,
+/area/rogue/outdoors/rtfield)
+"Tp" = (
+/turf/open/transparent/openspace,
+/area/rogue/outdoors/rtfield)
+"TP" = (
+/obj/structure/flora/newtree,
+/turf/open/floor/rogue/grass,
+/area/rogue/outdoors/rtfield)
+"TW" = (
+/obj/structure/flora/roguegrass/bush/wall,
+/turf/open/floor/rogue/grass,
+/area/rogue/outdoors/rtfield)
+"Up" = (
+/obj/item/roguecoin/copper/pile,
+/obj/item/roguecoin/silver/pile,
+/obj/item/roguegem/random,
+/obj/structure/fluff/nest,
+/obj/item/rogueweapon/mace/steel,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/under/cave)
+"Xb" = (
+/obj/item/natural/fur/cabbit,
+/turf/open/floor/rogue/grass/red,
+/area/rogue/under/cave)
+"Xq" = (
+/obj/item/natural/fur/mole,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/cave)
+"XQ" = (
+/obj/item/natural/fur/cabbit,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/under/cave)
+"YQ" = (
+/mob/living/simple_animal/hostile/retaliate/rogue/wolf,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/under/cave)
+"Zt" = (
+/obj/structure/flora/roguegrass/maneater,
+/turf/open/floor/rogue/grass,
+/area/rogue/outdoors/rtfield)
+
+(1,1,1) = {"
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+"}
+(2,1,1) = {"
+fb
+fb
+fb
+fb
+fb
+fb
+GG
+lG
+GG
+GG
+fb
+fb
+fb
+fb
+fb
+"}
+(3,1,1) = {"
+fb
+fb
+fb
+lG
+GG
+iY
+aT
+mk
+AO
+GG
+fb
+py
+Up
+fb
+fb
+"}
+(4,1,1) = {"
+fb
+fb
+GG
+uo
+fb
+lG
+Fb
+bz
+aT
+dR
+lx
+PK
+py
+GG
+fb
+"}
+(5,1,1) = {"
+fb
+fb
+Rs
+fb
+fb
+fb
+Xq
+aT
+aT
+IS
+fb
+fb
+lG
+GG
+fb
+"}
+(6,1,1) = {"
+fb
+fb
+GG
+aT
+aT
+fb
+lx
+lG
+Jc
+iY
+aT
+fb
+fb
+iY
+fb
+"}
+(7,1,1) = {"
+fb
+fb
+fb
+fb
+aT
+lG
+lG
+aT
+lG
+hG
+FE
+fb
+fb
+lG
+fb
+"}
+(8,1,1) = {"
+fb
+fb
+fb
+GG
+lG
+GG
+fb
+lG
+fb
+dy
+aT
+iY
+lG
+GG
+fb
+"}
+(9,1,1) = {"
+fb
+fb
+fb
+GG
+lG
+aT
+lG
+lO
+lG
+XQ
+lG
+lG
+ou
+kW
+fb
+"}
+(10,1,1) = {"
+fb
+fb
+lG
+GG
+lG
+lG
+lx
+dy
+Xb
+dw
+lG
+lG
+fb
+fb
+fb
+"}
+(11,1,1) = {"
+fb
+HS
+YQ
+GG
+aT
+lG
+iY
+lG
+lG
+lG
+lG
+GG
+fb
+fb
+fb
+"}
+(12,1,1) = {"
+fb
+Rs
+wo
+fb
+aT
+aT
+lG
+lG
+GG
+GG
+GG
+GG
+fb
+fb
+fb
+"}
+(13,1,1) = {"
+fb
+fb
+fb
+fb
+fb
+GG
+GG
+GG
+GG
+fb
+fb
+fb
+fb
+fb
+fb
+"}
+(14,1,1) = {"
+fb
+fb
+fb
+fb
+fb
+fb
+lG
+GG
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+"}
+(15,1,1) = {"
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+fb
+"}
+
+(1,1,2) = {"
+hB
+hB
+ih
+hB
+hB
+hB
+KJ
+KJ
+KJ
+KJ
+hB
+KJ
+hB
+KJ
+KJ
+"}
+(2,1,2) = {"
+hB
+ih
+ff
+ih
+kS
+nX
+KJ
+KJ
+KJ
+KJ
+hB
+ih
+ih
+KJ
+KJ
+"}
+(3,1,2) = {"
+hB
+ff
+hB
+hB
+hB
+hB
+hB
+hB
+kS
+Sp
+hB
+hB
+kS
+kS
+KJ
+"}
+(4,1,2) = {"
+kS
+TP
+GO
+kS
+kS
+kS
+Em
+hB
+hB
+ff
+ff
+hB
+TP
+KJ
+KJ
+"}
+(5,1,2) = {"
+hB
+hB
+ih
+hB
+hB
+hB
+TP
+ff
+Zt
+hB
+hB
+ns
+KJ
+KJ
+hB
+"}
+(6,1,2) = {"
+ff
+KJ
+KJ
+hB
+cE
+KJ
+hB
+ff
+TW
+AW
+TW
+hB
+hB
+hB
+KJ
+"}
+(7,1,2) = {"
+ff
+KJ
+hB
+KJ
+KJ
+ih
+ih
+aJ
+TW
+TW
+TW
+Hn
+nX
+hB
+KJ
+"}
+(8,1,2) = {"
+hB
+hB
+TP
+KJ
+Sp
+AW
+ih
+Tp
+ar
+wZ
+TW
+hB
+hB
+hB
+KJ
+"}
+(9,1,2) = {"
+hB
+hB
+hB
+hB
+kS
+AW
+Tp
+Tp
+Tp
+ih
+KJ
+hB
+ih
+ff
+hB
+"}
+(10,1,2) = {"
+KJ
+hB
+ff
+kS
+ih
+hB
+hB
+Tp
+PM
+PM
+KJ
+ff
+hB
+ff
+hB
+"}
+(11,1,2) = {"
+KJ
+hB
+nX
+hB
+ff
+ff
+ih
+ih
+TW
+hB
+KJ
+hB
+hB
+kS
+hB
+"}
+(12,1,2) = {"
+KJ
+KJ
+KJ
+hB
+ih
+ih
+hB
+hB
+hB
+hB
+KJ
+hB
+hB
+hB
+ih
+"}
+(13,1,2) = {"
+ff
+ih
+ar
+HY
+KJ
+KJ
+hB
+hB
+kS
+ar
+ih
+KJ
+cE
+jl
+hB
+"}
+(14,1,2) = {"
+KJ
+hB
+KJ
+kS
+Hp
+cE
+hB
+kS
+hB
+hB
+KJ
+hB
+ih
+KJ
+KJ
+"}
+(15,1,2) = {"
+KJ
+do
+ih
+kS
+hB
+KJ
+KJ
+KJ
+KJ
+hB
+KJ
+KJ
+hB
+hB
+KJ
+"}

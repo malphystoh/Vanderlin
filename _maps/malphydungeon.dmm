@@ -1,0 +1,848 @@
+//MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE
+"ai" = (
+/obj/structure/bed/rogue/shit,
+/turf/open/floor/rogue/greenstone,
+/area/rogue/outdoors/rtfield)
+"az" = (
+/obj/structure/fluff/statue/evil,
+/turf/open/floor/rogue/greenstone,
+/area/rogue/outdoors/rtfield)
+"cA" = (
+/obj/structure/bars/cemetery,
+/obj/structure/fluff/walldeco/vinez/offset,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"cU" = (
+/mob/living/carbon/human/species/skeleton/npc/warrior/skilled,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"dI" = (
+/obj/structure/pillory/reinforced,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"dW" = (
+/obj/machinery/light/rogue/firebowl/standing/blue,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"gk" = (
+/obj/structure/chair/wood/rogue/chair_noble/purple,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"gA" = (
+/obj/structure/fluff/walldeco/vinez/l,
+/turf/closed/wall/mineral/rogue/decostone/fluffstone/reddish,
+/area/rogue/under/town/basement)
+"gU" = (
+/obj/structure/chair/stool/rogue,
+/turf/open/floor/rogue/greenstone,
+/area/rogue/outdoors/rtfield)
+"gZ" = (
+/obj/structure/fluff/walldeco/vinez/r,
+/turf/open/floor/rogue/greenstone,
+/area/rogue/outdoors/rtfield)
+"jj" = (
+/obj/machinery/light/rogue/firebowl/standing,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"jn" = (
+/obj/structure/fluff/walldeco/vinez/l,
+/obj/structure/chair/stool/rogue,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"js" = (
+/obj/structure/fermenting_barrel/water,
+/obj/structure/fluff/walldeco/chains,
+/obj/machinery/light/rogue/wallfire/candle/blue/l,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"jQ" = (
+/obj/structure/fermenting_barrel/random,
+/obj/structure/fluff/walldeco/chains,
+/turf/open/floor/rogue/greenstone,
+/area/rogue/outdoors/rtfield)
+"kC" = (
+/obj/structure/fluff/walldeco/vinez/r,
+/obj/structure/bonepile,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"lw" = (
+/obj/structure/fluff/walldeco/vinez/offset,
+/obj/structure/fluff/dryingrack,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"mV" = (
+/obj/structure/table/vtable/v2,
+/obj/item/candle/skull/lit,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"mY" = (
+/obj/machinery/light/rogue/wallfire/candle/blue/r,
+/obj/machinery/light/rogue/firebowl/standing/blue,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"pJ" = (
+/obj/structure/rack/rogue,
+/obj/structure/rogue/trophy/deer,
+/obj/item/rope/chain,
+/obj/item/rope/chain,
+/obj/item/clothing/neck/roguetown/bevor,
+/obj/item/clothing/neck/roguetown/chaincoif,
+/obj/item/clothing/cloak/half/shadowcloak/cult,
+/obj/item/lockpick,
+/obj/item/lockpick,
+/obj/item/lockpick,
+/obj/item/lockpick,
+/obj/item/lockpickring,
+/obj/item/rogueweapon/polearm/woodstaff/quarterstaff/steel,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"qB" = (
+/obj/structure/fluff/walldeco/vinez/r,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"qI" = (
+/obj/structure/fluff/walldeco/skullspike,
+/turf/closed/wall/mineral/rogue/stone/moss,
+/area/rogue/outdoors/rtfield)
+"rp" = (
+/obj/structure/fluff/walldeco/vinez/r,
+/obj/structure/fluff/walldeco/skullspike,
+/obj/structure/bed/rogue/shit,
+/turf/open/floor/rogue/greenstone,
+/area/rogue/outdoors/rtfield)
+"sG" = (
+/obj/structure/table/vtable,
+/obj/item/roguecoin/copper/pile,
+/obj/item/roguegem/random,
+/obj/item/roguecoin/copper/pile,
+/obj/item/roguecoin/copper/pile,
+/obj/item/roguecoin/copper/pile,
+/obj/item/roguecoin/copper/pile,
+/obj/item/roguecoin/copper/pile,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"sY" = (
+/obj/structure/fluff/walldeco/skullspike,
+/obj/structure/fluff/walldeco/xylsmile,
+/obj/item/roguebin/trash,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"tl" = (
+/obj/structure/ladder,
+/obj/machinery/light/rogue/wallfire/candle/blue/r,
+/turf/closed/wall/mineral/rogue/decostone/fluffstone/reddish,
+/area/rogue/under/town/basement)
+"vz" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"vD" = (
+/obj/structure/fluff/statue/evil,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"wf" = (
+/obj/structure/fluff/walldeco/vinez/r,
+/obj/structure/flora/roguegrass,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"wg" = (
+/obj/structure/table/vtable/v2,
+/obj/item/roguestatue/gold/loot,
+/obj/item/clothing/ring/gold/rontz,
+/obj/item/roguecoin/silver/pile,
+/obj/item/roguegem/random,
+/obj/item/roguegem/random,
+/obj/item/roguegem/random,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"wL" = (
+/obj/machinery/light/rogue/firebowl/standing/blue,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"xO" = (
+/obj/structure/fluff/walldeco/xylfrown,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"yj" = (
+/obj/structure/fluff/walldeco/vinez/r,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"zq" = (
+/obj/structure/bars/bent,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"Am" = (
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"Bw" = (
+/obj/structure/flora/roguegrass,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"BE" = (
+/mob/living/carbon/human/species/zizombie/npc/ambush,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"BY" = (
+/obj/structure/fluff/statue/gargoyle/candles,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"Do" = (
+/turf/closed/wall/mineral/rogue/decostone/fluffstone/reddish,
+/area/rogue/under/town/basement)
+"DP" = (
+/obj/structure/bars/cemetery,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"Eb" = (
+/obj/item/clothing/mask/rogue/facemask/prisoner,
+/obj/structure/bonepile,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"Ew" = (
+/obj/structure/bars/passage,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"ED" = (
+/obj/machinery/light/rogue/wallfire/candle/blue/l,
+/obj/machinery/light/rogue/firebowl/standing/blue,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"FQ" = (
+/obj/structure/fluff/walldeco/skullspike,
+/turf/closed/wall/mineral/rogue/decostone/fluffstone/reddish,
+/area/rogue/under/town/basement)
+"GV" = (
+/obj/structure/chair/bench/throne,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"IH" = (
+/obj/structure/fluff/walldeco/vinez/r,
+/turf/closed/wall/mineral/rogue/stone/moss,
+/area/rogue/outdoors/rtfield)
+"IO" = (
+/obj/structure/table/vtable,
+/obj/item/roguecoin/copper/pile,
+/obj/item/roguestatue/iron,
+/turf/open/floor/rogue/greenstone,
+/area/rogue/outdoors/rtfield)
+"Lw" = (
+/obj/structure/table/vtable,
+/obj/item/candle/skull/lit,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"Ma" = (
+/mob/living/carbon/human/species/goblin/npc/cave,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"MN" = (
+/obj/structure/table/vtable/v2,
+/obj/item/rogueweapon/sword/sabre/scythe,
+/obj/item/organ/guts,
+/obj/item/needle/thorn,
+/obj/item/natural/bundle/cloth,
+/obj/item/natural/bundle/fibers/full,
+/obj/item/natural/bundle/silk,
+/turf/open/floor/rogue/greenstone,
+/area/rogue/outdoors/rtfield)
+"Ns" = (
+/obj/structure/fluff/walldeco/vinez/l,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"NR" = (
+/obj/structure/bonepile,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"Oe" = (
+/obj/structure/fluff/statue/gargoyle/candles,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"OW" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"PM" = (
+/obj/structure/chair/stool/rogue,
+/obj/item/rogue/instrument/drum,
+/turf/open/floor/rogue/greenstone,
+/area/rogue/outdoors/rtfield)
+"Qg" = (
+/obj/structure/kitchenspike,
+/obj/item/rogueweapon/surgery/scalpel,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"QG" = (
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"QT" = (
+/turf/open/floor/rogue/greenstone,
+/area/rogue/outdoors/rtfield)
+"Sb" = (
+/obj/machinery/light/rogue/campfire/longlived,
+/turf/open/floor/rogue/greenstone,
+/area/rogue/outdoors/rtfield)
+"Sd" = (
+/turf/closed/wall/mineral/rogue/stone/moss,
+/area/rogue/outdoors/rtfield)
+"So" = (
+/obj/structure/fluff/walldeco/xylfrown,
+/obj/structure/ladder,
+/turf/open/floor/rogue/greenstone,
+/area/rogue/outdoors/rtfield)
+"SC" = (
+/mob/living/carbon/human/species/zizombie/npc/ambush,
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"SH" = (
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/obj/structure/flora/roguegrass,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/outdoors/rtfield)
+"SV" = (
+/turf/open/floor/rogue/cobble/mossy,
+/area/rogue/under/town/basement)
+"Vt" = (
+/obj/structure/fluff/walldeco/skullspike,
+/turf/open/floor/rogue/greenstone,
+/area/rogue/outdoors/rtfield)
+"Vx" = (
+/obj/structure/fluff/walldeco/vinez/l,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"Vy" = (
+/obj/structure/bars/passage,
+/turf/open/floor/rogue/hexstone,
+/area/rogue/under/town/basement)
+"WP" = (
+/obj/structure/sacrificealtar,
+/obj/item/book/rogue/godofdreamsandnightmares,
+/obj/item/storage/backpack/rogue/satchel/black,
+/obj/item/clothing/neck/roguetown/elfears,
+/obj/item/rogueweapon/knife/dagger/steel/profane,
+/turf/open/floor/rogue/dirt/ambush,
+/area/rogue/under/town/basement)
+"YD" = (
+/obj/structure/fluff/walldeco/serpflag,
+/turf/closed/wall/mineral/rogue/decostone/fluffstone/reddish,
+/area/rogue/under/town/basement)
+"ZT" = (
+/obj/structure/mineral_door/wood/violet,
+/obj/structure/fluff/walldeco/skullspike,
+/turf/open/floor/rogue/greenstone,
+/area/rogue/outdoors/rtfield)
+
+(1,1,1) = {"
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+"}
+(2,1,1) = {"
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+"}
+(3,1,1) = {"
+QG
+QG
+Do
+Do
+Do
+Do
+Do
+Do
+Do
+Do
+Do
+Do
+Do
+QG
+QG
+"}
+(4,1,1) = {"
+QG
+QG
+Do
+js
+DP
+jn
+Qg
+BE
+wL
+Ns
+Vx
+ED
+Do
+QG
+QG
+"}
+(5,1,1) = {"
+QG
+QG
+Do
+xO
+Ew
+QG
+QG
+SV
+QG
+QG
+QG
+sG
+Do
+QG
+QG
+"}
+(6,1,1) = {"
+QG
+QG
+Do
+BE
+zq
+SV
+QG
+BY
+QG
+QG
+gk
+mV
+FQ
+QG
+QG
+"}
+(7,1,1) = {"
+QG
+QG
+Do
+Eb
+Vy
+QG
+QG
+QG
+QG
+QG
+QG
+wL
+Do
+QG
+QG
+"}
+(8,1,1) = {"
+QG
+QG
+gA
+cA
+DP
+dI
+QG
+vD
+SV
+GV
+cU
+WP
+YD
+QG
+QG
+"}
+(9,1,1) = {"
+QG
+QG
+Do
+pJ
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+wL
+FQ
+QG
+QG
+"}
+(10,1,1) = {"
+QG
+QG
+Do
+lw
+QG
+QG
+QG
+Oe
+QG
+QG
+gk
+Lw
+Do
+QG
+QG
+"}
+(11,1,1) = {"
+QG
+QG
+Do
+sY
+QG
+QG
+QG
+SV
+QG
+QG
+SV
+wg
+Do
+QG
+QG
+"}
+(12,1,1) = {"
+QG
+QG
+Do
+tl
+qB
+qB
+QG
+SC
+dW
+QG
+QG
+mY
+Do
+QG
+QG
+"}
+(13,1,1) = {"
+QG
+QG
+Do
+Do
+Do
+Do
+Do
+Do
+Do
+Do
+Do
+Do
+Do
+QG
+QG
+"}
+(14,1,1) = {"
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+"}
+(15,1,1) = {"
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+QG
+"}
+
+(1,1,2) = {"
+Bw
+Am
+Am
+Bw
+Am
+Bw
+Am
+Bw
+Am
+Am
+Bw
+Bw
+vz
+Am
+Am
+"}
+(2,1,2) = {"
+Bw
+Bw
+Am
+Bw
+wf
+Am
+wf
+wf
+wf
+Bw
+Bw
+Am
+Bw
+Am
+Bw
+"}
+(3,1,2) = {"
+Am
+Bw
+Sd
+Sd
+Sd
+Sd
+Sd
+Sd
+Sd
+Sd
+Sd
+Sd
+Sd
+Bw
+vz
+"}
+(4,1,2) = {"
+Am
+Am
+Sd
+jQ
+QT
+jj
+Am
+Am
+ai
+jj
+Am
+Am
+Sd
+Am
+Am
+"}
+(5,1,2) = {"
+Am
+Bw
+Sd
+IO
+QT
+NR
+Ma
+Am
+QT
+Am
+NR
+Am
+Sd
+Bw
+OW
+"}
+(6,1,2) = {"
+Bw
+Bw
+IH
+MN
+gU
+QT
+Am
+Am
+QT
+Am
+Am
+Am
+IH
+SH
+Bw
+"}
+(7,1,2) = {"
+Am
+Am
+IH
+NR
+Am
+QT
+Am
+PM
+QT
+Am
+Ma
+Am
+IH
+Am
+Bw
+"}
+(8,1,2) = {"
+Bw
+Am
+Sd
+az
+QT
+QT
+gU
+Sb
+gU
+QT
+QT
+ai
+Sd
+Am
+Bw
+"}
+(9,1,2) = {"
+Bw
+Bw
+IH
+Am
+Ma
+QT
+Am
+gU
+Am
+QT
+Am
+Am
+IH
+OW
+Bw
+"}
+(10,1,2) = {"
+Am
+Bw
+Sd
+ai
+QT
+QT
+Am
+QT
+Am
+QT
+Am
+Am
+Sd
+Bw
+vz
+"}
+(11,1,2) = {"
+Bw
+Am
+Sd
+jj
+QT
+Am
+Am
+QT
+Am
+QT
+Ma
+jj
+Sd
+Am
+Bw
+"}
+(12,1,2) = {"
+Bw
+Am
+Sd
+So
+gZ
+yj
+Am
+Vt
+Am
+rp
+Am
+kC
+Sd
+Am
+vz
+"}
+(13,1,2) = {"
+Bw
+Bw
+Sd
+Sd
+Sd
+Sd
+Sd
+ZT
+Sd
+qI
+Sd
+Sd
+Sd
+Bw
+Am
+"}
+(14,1,2) = {"
+Am
+Bw
+Bw
+Am
+Bw
+Am
+Am
+Am
+Bw
+Am
+Bw
+Bw
+Bw
+Am
+Am
+"}
+(15,1,2) = {"
+Am
+Bw
+Am
+Am
+Bw
+Am
+vz
+Am
+Am
+Bw
+vz
+Am
+vz
+Bw
+Am
+"}

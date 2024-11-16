@@ -52,6 +52,7 @@
 	var/setup_error		//What stopepd setting up the mode.
 
 	var/list/datum/mind/villains = list() //Murders Runtimes via shoving this into parent
+	var/list/datum/mind/liches = list()
 	var/list/datum/mind/vampires = list()
 	var/list/datum/mind/deathknights = list() // Ditto as villains mind list.
 	var/list/datum/mind/werewolves = list()
@@ -59,6 +60,7 @@
 	var/list/datum/mind/cultists = list()
 
 	var/list/datum/mind/pre_villains = list()
+	var/list/datum/mind/pre_liches = list()
 	var/list/datum/mind/pre_werewolves = list()
 	var/list/datum/mind/pre_vampires = list()
 	var/list/datum/mind/pre_bandits = list()
@@ -378,16 +380,13 @@
 //			if(player.client && player.client.whitelisted() && !player.client.blacklisted())
 			players += player
 			continue
-		if(player.client in SSrole_class_handler.drifter_wave_FULLY_entered_clients)
-			players += player
-			continue
 
 	// Shuffling, the players list is now ping-independent!!!
 	// Goodbye antag dante
 	players = shuffle(players)
 
 	for(var/mob/dead/new_player/player in players)
-		if(player.client && player.ready == PLAYER_READY_TO_PLAY || (player.client in SSrole_class_handler.drifter_wave_FULLY_entered_clients))
+		if(player.client && player.ready == PLAYER_READY_TO_PLAY)
 			if(check_pq)
 				if(get_playerquality(player.ckey) <= -10)
 					continue

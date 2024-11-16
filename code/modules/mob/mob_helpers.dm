@@ -714,12 +714,6 @@
 	if(!istype(M))
 		return FALSE
 	if(M.mind && M.mind.special_role)//If they have a mind and special role, they are some type of traitor or antagonist.
-		switch(SSticker.mode.config_tag)
-			if("monkey")
-				if(isliving(M))
-					var/mob/living/L = M
-					if(L.diseases && (locate(/datum/disease/transformation/jungle_fever) in L.diseases))
-						return 2
 		return TRUE
 	if(M.mind && LAZYLEN(M.mind.antag_datums)) //they have an antag datum!
 		return TRUE
@@ -934,3 +928,17 @@
 ///Can the mob see reagents inside of containers?
 /mob/proc/can_see_reagents()
 	return stat == DEAD || has_unlimited_silicon_privilege //Dead guys and silicons can always see reagents
+
+/mob/proc/get_role_title()
+	var/used_title
+	if(migrant_type)
+		var/datum/migrant_role/migrant = MIGRANT_ROLE(migrant_type)
+		used_title = migrant.name
+	else if(job)
+		var/datum/job/J = SSjob.GetJob(job)
+		if(!J)
+			return "unknown"
+		used_title = J.title
+		if(J.f_title)
+			used_title = J.f_title
+	return used_title

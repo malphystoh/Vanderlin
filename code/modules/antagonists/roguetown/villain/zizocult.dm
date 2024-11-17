@@ -615,9 +615,9 @@ GLOBAL_LIST_EMPTY(ritualslist)
 	center_requirement = /mob/living/carbon/human
 
 	n_req = /obj/item/bodypart/head
-	s_req = /obj/item/shard
-	e_req = /obj/item/shard
-	w_req = /obj/item/shard
+	s_req = /obj/item/natural/glass/shard
+	e_req = /obj/item/natural/glass/shard
+	w_req = /obj/item/natural/glass/shard
 
 	function = /proc/falseappearance
 
@@ -721,6 +721,12 @@ GLOBAL_LIST_EMPTY(ritualslist)
 	center_requirement = /obj/item/natural/cloth
 
 	function = /proc/criminalstool
+
+/obj/item/soap/cult
+	name = "accursed soap"
+	desc = "It is pulsating."
+	uses = 9
+	cleanspeed = 1
 
 /proc/criminalstool(mob/user, turf/C)
 	new /obj/item/soap/cult(C)

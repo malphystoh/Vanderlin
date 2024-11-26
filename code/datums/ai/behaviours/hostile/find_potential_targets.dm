@@ -59,3 +59,35 @@
 /// Returns the desired final target from the filtered list of targets
 /datum/ai_behavior/find_potential_targets/proc/pick_final_target(datum/ai_controller/controller, list/filtered_targets)
 	return pick(filtered_targets)
+
+
+/datum/ai_behavior/find_potential_targets/rat
+	vision_range = 2
+
+/datum/ai_behavior/find_potential_targets/spider
+	vision_range = 5
+
+/datum/ai_behavior/find_potential_targets/mimic
+	vision_range = 1
+
+/datum/ai_behavior/find_potential_targets/mimic/finish_action(datum/ai_controller/controller, succeeded, ...)
+	. = ..()
+	if (succeeded)
+		controller.CancelActions()
+		controller.pawn.icon_state = "mimicopen"
+
+
+/datum/ai_behavior/find_potential_targets/mole
+	vision_range = 9
+
+/datum/ai_behavior/find_potential_targets/troll
+	vision_range = 7
+
+/datum/ai_behavior/find_potential_targets/bog_troll
+	vision_range = 6
+
+/datum/ai_behavior/find_potential_targets/bog_troll/finish_action(datum/ai_controller/controller, succeeded, ...)
+	. = ..()
+	if (succeeded)
+		controller.CancelActions()
+		controller.pawn.icon_state = "Trolla"

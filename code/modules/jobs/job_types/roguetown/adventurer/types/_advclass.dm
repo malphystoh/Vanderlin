@@ -10,7 +10,8 @@
 	"Dwarf",
 	"Tiefling",
 	"Dark Elf",
-	"Aasimar"
+	"Aasimar",
+	"Half-Orc"
 	)
 	var/list/allowed_patrons
 	var/list/allowed_ages
@@ -106,5 +107,5 @@
 		H.change_stat(S, plus_factor)
 
 
-//Final proc in the set for really retarded shit
+//Final proc in the set for really dumb shit
 ///datum/advclass/proc/extra_slop_proc_ending(mob/living/carbon/human/H)

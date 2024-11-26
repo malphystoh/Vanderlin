@@ -18,6 +18,8 @@ GLOBAL_LIST_EMPTY(preference_patrons)
 	var/flaws = "This spagetti code"
 	///Strong that represents what this god views as sins
 	var/sins = "Codersocks"
+	/// What boons the god may offer:______qdel_list_wrapper(list/L)
+	var/boons = "Code errors"
 	/// Faith this god belongs to
 	var/datum/faith/associated_faith = /datum/faith
 	/// Whether or not we are accessible in preferences
@@ -32,3 +34,14 @@ GLOBAL_LIST_EMPTY(preference_patrons)
 	var/t2
 	/// Final tier spell
 	var/t3
+
+	///our traits thats applied by set_patron and removed when changed
+	var/list/added_traits
+
+/datum/patron/proc/on_gain(mob/living/pious)
+	for(var/trait in added_traits)
+		ADD_TRAIT(pious, trait, "[type]")
+
+/datum/patron/proc/on_remove(mob/living/pious)
+	for(var/trait in added_traits)
+		REMOVE_TRAIT(pious, trait, "[type]")

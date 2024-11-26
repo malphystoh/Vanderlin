@@ -71,3 +71,26 @@
 			found += single_locate
 	if(found.len)
 		return pick(found)
+
+
+/datum/ai_behavior/find_and_set/dead_bodies
+
+/datum/ai_behavior/find_and_set/dead_bodies/search_tactic(datum/ai_controller/controller, locate_paths, search_range)
+	var/list/found = list()
+	for(var/mob/living/mob in oview(search_range, controller.pawn))
+		if(mob.stat == CONSCIOUS)
+			continue
+		found |= mob
+	if(!length(found))
+		return null
+	return pick(found)
+
+/datum/ai_behavior/find_and_set/dead_bodies/bog_troll/finish_action(datum/ai_controller/controller, succeeded, ...)
+	. = ..()
+	if(succeeded)
+		controller.pawn.icon_state = "Trolla"
+
+/datum/ai_behavior/find_and_set/dead_bodies/mimic/finish_action(datum/ai_controller/controller, succeeded, ...)
+	. = ..()
+	if(succeeded)
+		controller.pawn.icon_state = "mimicopen"

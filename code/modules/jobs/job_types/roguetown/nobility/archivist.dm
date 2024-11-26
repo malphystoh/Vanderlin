@@ -1,6 +1,6 @@
 /datum/job/roguetown/archivist
 	title = "Archivist"
-	tutorial = "A well-traveled and well-learned seeker of knowledge, the Archivist's mind has been touched by Noc himself. They settled in Rockhill some time ago, coming to the Isle of Enigma with the hope of unraveling its mysteries. If they can expand their library and teach the masses, Grimoria may yet enter a new age of enlightenment."
+	tutorial = "A well-traveled and well-learned seeker of knowledge, the Archivist's mind has been touched by Noc himself. They settled in Rockhill some time ago, coming to the Isle of Enigma with the hope of unraveling its mysteries. If they can expand their library and teach the masses, Psydonia may yet enter a new age of enlightenment."
 	flag = ARCHIVIST
 	department_flag = NOBLEMEN
 	faction = "Station"
@@ -52,6 +52,7 @@
 		H.grant_language(/datum/language/celestial)
 		H.grant_language(/datum/language/hellspeak)
 		H.grant_language(/datum/language/oldpsydonic)
+		H.grant_language(/datum/language/orcish)
 		H.mind?.adjust_skillrank(/datum/skill/misc/reading, 6, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/misc/riding, 2, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/craft/alchemy, 3, TRUE)

@@ -117,7 +117,7 @@ GLOBAL_LIST_EMPTY(chosen_names)
 	var/musicvol = 50
 	var/mastervol = 50
 
-	var/anonymize = FALSE
+	var/anonymize = TRUE
 
 	var/lastclass
 
@@ -299,7 +299,7 @@ GLOBAL_LIST_EMPTY(chosen_names)
 				dat += "<a href='?_src_=prefs;preference=name;task=input'>[real_name]</a> <a href='?_src_=prefs;preference=name;task=random'>\[R\]</a>"
 
 			dat += "<BR>"
-			dat += "<b>Race:</b> <a href='?_src_=prefs;preference=species;task=input'>[pref_species.name]</a>[spec_check(user) ? "" : " (!)"]<BR>"
+			dat += "<b>Species:</b> <a href='?_src_=prefs;preference=species;task=input'>[pref_species.name]</a>[spec_check(user) ? "" : " (!)"]<BR>"
 //			dat += "<a href='?_src_=prefs;preference=species;task=random'>Random Species</A> "
 //			dat += "<a href='?_src_=prefs;preference=toggle_random;random_type=[RANDOM_SPECIES]'>Always Random Species: [(randomise[RANDOM_SPECIES]) ? "Yes" : "No"]</A><br>"
 
@@ -1682,6 +1682,8 @@ Slots: [job.spawn_positions]</span>
 						to_chat(user, "<font color='purple'>Flawed aspects: [selected_patron.flaws]</font>")
 						to_chat(user, "<font color='purple'>Likely Worshippers: [selected_patron.worshippers]</font>")
 						to_chat(user, "<font color='red'>Considers these to be Sins: [selected_patron.sins]</font>")
+						to_chat(user, "<font color='white'>Blessed with boon(s): [selected_patron.boons]</font>")
+
 
 				if("hair")
 					var/new_hair
@@ -1833,7 +1835,7 @@ Slots: [job.spawn_positions]</span>
 							continue
 						crap += bla
 
-					var/result = input(user, "Select a race", "Roguetown") as null|anything in crap
+					var/result = input(user, "Select a species", "Roguetown") as null|anything in crap
 
 					if(result)
 						//var/newtype = GLOB.species_list[result]
@@ -2064,13 +2066,13 @@ Slots: [job.spawn_positions]</span>
 						domhand = 1
 				if("family")
 					var/list/famtree_options_list = list(FAMILY_NONE, FAMILY_PARTIAL, FAMILY_NEWLYWED, FAMILY_FULL, "EXPLAIN THIS TO ME")
-					var/new_family = input(user, "Do you have relatives in rockhill?", "The Major Houses of Rockhill") as null|anything in famtree_options_list
+					var/new_family = input(user, "Do you have relatives in the kingdom?", "The Major Houses") as null|anything in famtree_options_list
 					if(new_family == "EXPLAIN THIS TO ME")
 						to_chat(user, span_purple("\
 						--[FAMILY_NONE] will disable this feature.<br>\
 						--[FAMILY_PARTIAL] will assign you as a progeny of a local house based on your species. This feature will instead assign you as a aunt or uncle to a local family if your older than ADULT.<br>\
 						--[FAMILY_NEWLYWED] assigns you a spouse without adding you to a family. Setspouse will prioritize pairing you with another newlywed with the same name as your setspouse.<br>\
-						--[FAMILY_FULL] will attempt to assign you as matriarch or patriarch of one of the local houses of rockhill. Setspouse will will prevent \
+						--[FAMILY_FULL] will attempt to assign you as matriarch or patriarch of one of the local houses of the kingdom/town. Setspouse will will prevent \
 						players with the setspouse = None from matching with you unless their name equals your setspouse."))
 
 					else if(new_family)
@@ -2398,7 +2400,7 @@ Slots: [job.spawn_positions]</span>
 //	character.accessory = accessory
 	character.detail = detail
 	character.socks = socks
-	character.patron = selected_patron
+	character.set_patron(selected_patron)
 	character.backpack = backpack
 
 	character.jumpsuit_style = jumpsuit_style
@@ -2422,7 +2424,9 @@ Slots: [job.spawn_positions]</span>
 		var/list/L = get_player_curses(parent.ckey)
 		if(L)
 			for(var/X in L)
-				ADD_TRAIT(character, curse2trait(X), TRAIT_GENERIC)
+				var/curse = curse2trait(X)
+				if (curse)
+					ADD_TRAIT(character, curse2trait(X), TRAIT_GENERIC)
 
 	if("tail_lizard" in pref_species.default_features)
 		character.dna.species.mutant_bodyparts |= "tail_lizard"

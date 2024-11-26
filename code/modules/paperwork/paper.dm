@@ -164,7 +164,7 @@
 		user << browse(dat, "window=reading;size=500x400;can_close=1;can_minimize=0;can_maximize=0;can_resize=1;titlebar=0;border=0")
 		onclose(user, "reading", src)
 	else
-		return "<span class='warning'>I'm too far away to read it.</span>"
+		return span_warning("I'm too far away to read it.")
 
 /*
 	if(in_range(user, src) || isobserver(user))
@@ -177,6 +177,17 @@
 	else
 		return "<span class='warning'>You're too far away to read it.</span>"
 */
+
+/obj/item/paper/proc/format_browse(t, mob/user)
+	user << browse_rsc('html/book.png')
+	var/dat = {"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">
+			<html><head><style type=\"text/css\">
+			body { background-image:url('book.png');background-repeat: repeat; }</style></head><body scroll=yes>"}
+	dat += "[t]<br>"
+	dat += "<a href='?src=[REF(src)];close=1' style='position:absolute;right:50px'>Close</a>"
+	dat += "</body></html>"
+	user << browse(dat, "window=reading;size=500x400;can_close=1;can_minimize=0;can_maximize=0;can_resize=1;titlebar=0;border=0")
+
 /obj/item/paper/verb/rename()
 	set name = "Rename paper"
 	set hidden = 1
@@ -381,16 +392,6 @@
 			playsound(src, 'sound/items/write.ogg', 100, FALSE)
 			format_browse(info_links, usr)
 			update_icon_state()
-
-/obj/item/paper/proc/format_browse(t, mob/user)
-	user << browse_rsc('html/book.png')
-	var/dat = {"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">
-			<html><head><style type=\"text/css\">
-			body { background-image:url('book.png');background-repeat: repeat; }</style></head><body scroll=yes>"}
-	dat += "[t]<br>"
-	dat += "<a href='?src=[REF(src)];close=1' style='position:absolute;right:50px'>Close</a>"
-	dat += "</body></html>"
-	user << browse(dat, "window=reading;size=500x400;can_close=1;can_minimize=0;can_maximize=0;can_resize=1;titlebar=0;border=0")
 
 /obj/item/paper/attackby(obj/item/P, mob/living/carbon/human/user, params)
 	if(resistance_flags & ON_FIRE)

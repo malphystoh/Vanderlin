@@ -4,7 +4,6 @@
 #define TRAIT_ZJUMP 					"High Jumping"
 #define TRAIT_NOSEGRAB 				"Intimidating"
 #define TRAIT_NUTCRACKER 				"Nutcracker"
-#define TRAIT_SEEPRICES				"Golden Blood"
 #define TRAIT_STRONGBITE				"Strong Bite"
 #define TRAIT_HATEWOMEN				"Ladykiller"
 #define TRAIT_GOODLOVER				"Fabled Lover"
@@ -23,17 +22,12 @@
 #define TRAIT_NOSLEEP				"Fatal Insomnia" //for thralls
 #define TRAIT_FASTSLEEP 			"Fast Sleeper"
 #define TRAIT_NUDIST					"Nudist" //you can't wear most clothes
-#define TRAIT_KNEESTINGER_IMMUNITY		"Blessing of Dendor"
-#define TRAIT_RETARD_ANATOMY			"Inhumen Anatomy" //can't wear hats and shoes
+#define TRAIT_INHUMANE_ANATOMY			"Inhumen Anatomy" //can't wear hats and shoes
 #define TRAIT_NASTY_EATER 				"Inhumen Digestion" //can eat rotten food, organs, poison berries, and drink murky water
 #define TRAIT_NOFALLDAMAGE1 		"Minor fall damage immunity"
 #define TRAIT_DEATHSIGHT "Veiled Whispers" // Is notified when a player character dies, but not told exactly where or how.
-#define TRAIT_ROT_EATER				"Blessing of Pestra" //can eat rotten food
-#define TRAIT_ORGAN_EATER				"Blessing of Graggar"
-#define TRAIT_SOUL_EXAMINE				"Blessing of Necra" //can check bodies to see if they have departed
 #define TRAIT_CYCLOPS_LEFT				"Cyclops (Left)" //poked left eye
 #define TRAIT_CYCLOPS_RIGHT				"Cyclops (Right)" //poked right eye
-#define TRAIT_LEECHIMMUNE				"Unleechable" //leeches wont attach in bog squares
 #define TRAIT_ASSASSIN					"Assassin Training" //used for the assassin drifter's unique mechanics.
 #define TRAIT_BARDIC_TRAINING			"Bardic Training"
 #define TRAIT_GRAVEROBBER				"Graverobber"	// Prevents getting the cursed debuff when unearthing a grave, but permanent -1 LUC to whoever has it.
@@ -41,10 +35,22 @@
 #define TRAIT_MIRACULOUS_FORAGING		"Miracle Foraging"	// makes bushes much more generous
 #define TRAIT_MISSING_NOSE				"Missing Nose" //halved stamina regeneration
 #define TRAIT_DISFIGURED				"Disfigured"
-#define TRAIT_SPELLCOCKBLOCK			"Bewitched" //prevents spellcasting
+#define TRAIT_SPELLBLOCK				"Bewitched" //prevents spellcasting
 #define TRAIT_ANTIMAGIC					"Anti-Magic"
 #define TRAIT_ANTISCRYING				"Anti-Scrying"
 #define TRAIT_SHOCKIMMUNE				"Shock Immunity"
+
+// Divine patron trait bonuses:
+#define TRAIT_SOUL_EXAMINE				"Blessing of Necra"  //can check bodies to see if they have departed
+#define TRAIT_ROT_EATER					"Blessing of Pestra" //can eat rotten food
+#define TRAIT_KNEESTINGER_IMMUNITY		"Blessing of Dendor" //Can move through kneestingers.
+#define TRAIT_LEECHIMMUNE				"Unleechable" //leeches wont attach in bog squares + Abyssor boon.
+#define TRAIT_SEEPRICES				    "Golden Blood" //See prices + Xylix boon
+
+// Inhumen patron trait bonuses:
+#define TRAIT_ORGAN_EATER				"Blessing of Graggar"//Can eat organs (duh.)
+#define TRAIT_CRACKHEAD					"Blessing of Baotha" //No overdose on drugs.
+#define TRAIT_CABAL                     "Of the Cabal" //Zizo cultists recognize each other too
 
 #define TRAIT_BASHDOORS "bashdoors"
 #define TRAIT_NOMOOD "no_mood"
@@ -54,13 +60,12 @@
 #define TRAIT_VAMPMANSION "vampiremansion"
 #define TRAIT_VAMP_DREAMS "vamp_dreams"
 #define TRAIT_INHUMENCAMP "inhumencamp"
-#define TRAIT_LIMPDICK "limp_dick"
 #define TRAIT_INTRAINING "intraining" //allows certain roles to bypass the average skill limitation of training dummies
 #define TRAIT_STEELHEARTED "steelhearted" //no bad mood from dismembering or seeing this
 #define TRAIT_IWASREVIVED "iwasrevived" //prevents PQ gain from reviving the same person twice
 #define TRAIT_IWASUNZOMBIFIED "iwasunzombified" //prevents PQ gain from curing a zombie twice
 #define TRAIT_ZIZOID_HUNTED "zizoidhunted" // Used to signal character has been marked by death by the Zizoid cult
-#define TRAIT_CABAL "Of the Cabal" //Zizo cultists recognize each other too
+
 
 // JOB RELATED TRAITS
 
@@ -91,11 +96,12 @@ GLOBAL_LIST_INIT(roguetraits, list(
 	TRAIT_NOSLEEP = span_warning("I can't sleep."),
 	TRAIT_NUDIST = "I <b>refuse</b> to wear clothes. They are a hindrance to my freedom.",
 	TRAIT_KNEESTINGER_IMMUNITY = "I am immune to the shock of kneestingers.",
-	TRAIT_RETARD_ANATOMY = "My anatomy is inhumen, preventing me from wearing hats and shoes.",
+	TRAIT_INHUMANE_ANATOMY = "My anatomy is inhumen, preventing me from wearing hats and shoes.",
 	TRAIT_NASTY_EATER = span_dead("I can eat bad food, and water that would be toxic to humen will not affect me."),
 	TRAIT_NOFALLDAMAGE1 = span_warning("I can easily handle minor falls."),
 	TRAIT_ROT_EATER = span_necrosis("I can eat rotten food."),
 	TRAIT_ORGAN_EATER = span_bloody("I can eat organs and raw flesh."),
+	TRAIT_CRACKHEAD = span_love("I can use drugs as much as I want!"),
 	TRAIT_SOUL_EXAMINE = span_deadsay("I know when someone's soul has departed."),
 	TRAIT_CYCLOPS_LEFT = span_warning("My left eye has been poked out..."),
 	TRAIT_CYCLOPS_RIGHT = span_warning("My right eye has been poked out..."),
@@ -105,13 +111,13 @@ GLOBAL_LIST_INIT(roguetraits, list(
 	TRAIT_GRAVEROBBER = "Necra favors my grim deeds, I can unearth graves without being cursed by her.",
 	TRAIT_MISSING_NOSE = span_warning("I struggle to breathe."),
 	TRAIT_DISFIGURED = span_warning("No one can recognize me..."),
-	TRAIT_SPELLCOCKBLOCK = span_warning("I cannot cast any spells."),
+	TRAIT_SPELLBLOCK = span_warning("I cannot cast any spells."),
 	TRAIT_ANTIMAGIC = "I am immune to most forms of magic.",
 	TRAIT_ANTISCRYING = "I am immune to most forms of magical divination.",
 	TRAIT_SHOCKIMMUNE = "I am immune to electrical shocks.",
 	TRAIT_INTRAINING = "I'm going to be a knight someday! I can use training dummies more effectively than others.",
 	TRAIT_MALUMFIRE = "My hands are blessed by Malum to forge items of superb quality.",
-	TRAIT_DEATHSIGHT = span_info("I can feel when someone nearby draws the Undermaiden's attention."),
+	TRAIT_DEATHSIGHT = span_info("I can feel when someone nearby draws the Undermaiden's attention, a tiny voice whispering 'Someone has died,' in my ear."),
 	TRAIT_CABAL = span_info("In secret, I have studied the ways of Her ascension, and know of others of the Cabal."),
 	))
 

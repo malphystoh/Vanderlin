@@ -38,7 +38,7 @@ GLOBAL_LIST_EMPTY(ritualslist)
 	var/datum/game_mode/chaosmode/C = SSticker.mode
 	var/mob/living/carbon/human/H = owner.current
 	C.cultists |= owner
-	H.patron = GLOB.patronlist[/datum/patron/inhumen/zizo]
+	H.set_patron(/datum/patron/inhumen/zizo)
 
 	owner.special_role = "Zizoid Lackey"
 	H.cmode_music = 'sound/music/combat_cult.ogg'
@@ -538,7 +538,7 @@ GLOBAL_LIST_EMPTY(ritualslist)
 		H.base_intents = list(INTENT_HELP, INTENT_DISARM, INTENT_GRAB, /datum/intent/simple/claw)
 		H.update_a_intents()
 		H.cmode_music = 'sound/music/combat_cult.ogg'
-		H.patron = GLOB.patronlist[/datum/patron/inhumen/zizo]
+		H.set_patron(/datum/patron/inhumen/zizo)
 		var/obj/item/organ/eyes/eyes = H.getorganslot(ORGAN_SLOT_EYES)
 		if(eyes)
 			eyes.Remove(H,1)
@@ -898,11 +898,7 @@ GLOBAL_LIST_EMPTY(ritualslist)
 		ADD_TRAIT(user, TRAIT_NOPAIN, TRAIT_GENERIC)
 		to_chat(H.mind, "<span class='notice'>I no longer feel pain, but it has come at a terrible cost.</span>")
 		H.change_stat("strength", -2)
-		H.change_stat("constitution", -2)
-		if(H.gender == FEMALE)
-			H.change_stat("constitution", -1)
-		else
-			ADD_TRAIT(user, TRAIT_LIMPDICK, TRAIT_GENERIC)
+		H.change_stat("constitution", -3)
 		break
 
 /datum/ritual/fleshform

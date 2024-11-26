@@ -114,7 +114,7 @@ GLOBAL_LIST_EMPTY(vampire_objects)
 			H.set_species(/datum/species/elf/snow) //setspecies randomizes body
 		H.after_creation()
 	H.equipOutfit(/datum/outfit/job/roguetown/vamplord)
-	H.patron = GLOB.patronlist[/datum/patron/psydon] //Servant forever of he who is forgotten.
+	H.set_patron(/datum/patron/psydon) //Servant forever of he who is forgotten.
 
 	return TRUE
 
@@ -573,7 +573,7 @@ GLOBAL_LIST_EMPTY(vampire_objects)
 	if(user.mind.special_role != "Vampire Lord")
 		to_chat(user, "Only the master of the nite can operate this!")
 		return
-	var/choice = input(user,"What to do?", "STONEKEEP") as anything in useoptions|null
+	var/choice = input(user,"What to do?", "Vanderlin") as anything in useoptions|null
 	switch(choice)
 		if("Grow Power")
 			if(lord.vamplevel == 4)

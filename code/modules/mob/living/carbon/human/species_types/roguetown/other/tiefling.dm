@@ -18,7 +18,9 @@
 	Many tieflings resign to seeking a solitary and nomadic life, huddled in groups outside the watchful eyes of others. \
 	They also tend to be extremely perceptive and paranoid, as luck is rarely on their side. \
 	Oddly positioned scales, hollow bones, and other varying oddities that may appear in a tiefling's biology \
-	make them considerably fragile. If to make matters worse, their hellish progenitors have left them a destiny of misfortune. "
+	make them considerably fragile. If to make matters worse, their hellish progenitors have left them a destiny of misfortune. \
+	\
+	THIS IS A DISCRIMINATED SPECIES. EXPECT A MORE DIFFICULT EXPERIENCE. PLAY AT YOUR OWN RISK."
 
 	skin_tone_wording = "Progenitor"
 
@@ -120,6 +122,7 @@
 		"Vaquero" = SKIN_COLOR_VAQUERO,
 		"Zanguine" = SKIN_COLOR_ZANGUINE,
 		"Ash" = SKIN_COLOUR_ASH,
+		"Arlenneth" = SKIN_COLOR_ARLENNETH,
 	))
 
 /datum/species/tieberian/get_hairc_list()

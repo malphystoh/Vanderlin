@@ -232,7 +232,7 @@
 	force_wielded = DAMAGE_SPEAR+2
 	throwforce = DAMAGE_SPEAR
 	name = "simple spear"
-	desc = "With this weapon, the tribes of humenity became the chosen people of the Forgotten God."
+	desc = "With this weapon, the tribes of humenity became the chosen people of Psydon."
 	icon_state = "stonespear"
 	minstr = 6
 	max_blade_int = 50
@@ -363,7 +363,7 @@
 /obj/item/rogueweapon/polearm/spear/hoplite
 	force = DAMAGE_SPEARPLUS
 	name = "ancient spear"
-	desc = "A humble spear with a bronze head, a rare survivor from the battles long past that nearly destroyed Grimoria."
+	desc = "A humble spear with a bronze head, a rare survivor from the battles long past that nearly destroyed Psydonia."
 	icon_state = "bronzespear"
 	max_blade_int = 300
 	max_integrity = INTEGRITY_STRONG
@@ -372,7 +372,7 @@
 
 /obj/item/rogueweapon/polearm/spear/hoplite/winged // Winged version has +1 weapon defence and sells for a bit more, but is identical otherwise
 	name = "ancient winged spear"
-	desc = "A spear with a winged bronze head, a rare survivor from the battles long past that nearly destroyed Grimoria."
+	desc = "A spear with a winged bronze head, a rare survivor from the battles long past that nearly destroyed Psydonia."
 	icon_state = "bronzespear_winged"
 	wdefense = ULTMATE_PARRY
 	sellprice = 150 // A noble collector would love to get his/her hands on one of these spears

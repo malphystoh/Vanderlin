@@ -1,6 +1,6 @@
 /datum/advclass/pilgrim/rare/preacher
 	name = "Preacher"
-	tutorial = "A devout follower of the Forgotten God, you came to this land with nothing more than the clothes on your back and the faith in your heart. Sway these nonbelievers to the right path!"
+	tutorial = "A devout follower of Psydon, you came to this land with nothing more than the clothes on your back and the faith in your heart. Sway these nonbelievers to the right path!"
 	allowed_sexes = list(MALE, FEMALE)
 	allowed_races = list(
 		"Humen",
@@ -33,4 +33,4 @@
 		if(!H.has_language(/datum/language/oldpsydonic))
 			H.grant_language(/datum/language/oldpsydonic)
 			to_chat(H, "<span class='info'>I can speak Old Psydonic with ,m before my speech.</span>")
-		H.patron = GLOB.patronlist[/datum/patron/psydon]
+		H.set_patron(/datum/patron/psydon)

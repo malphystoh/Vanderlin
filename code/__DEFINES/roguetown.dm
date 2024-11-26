@@ -1,11 +1,11 @@
 //used in various places
-#define ALL_RACES_LIST			list("human", "dwarf", "elf", "tiefling", "aasimar", "orc", "zizombie")
+#define ALL_RACES_LIST			list("human", "dwarf", "elf", "tiefling", "aasimar", "halforc", "orc", "zizombie")
 
-#define ALL_PLAYER_RACES_BY_NAME		list("Humen", "Half-Elf", "Dark Elf", "Elf", "Dwarf","Tiefling", "Aasimar")
+#define ALL_PLAYER_RACES_BY_NAME		list("Humen", "Half-Elf", "Dark Elf", "Elf", "Dwarf","Tiefling", "Half-Orc", "Aasimar")
 
-#define ALL_TEMPLE_PATRONS 		list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/eora, /datum/patron/divine/necra, /datum/patron/divine/pestra)
+#define ALL_TEMPLE_PATRONS 		list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/eora, /datum/patron/divine/necra, /datum/patron/divine/pestra, /datum/patron/divine/dendor)
 #define ALL_CLERIC_PATRONS 		list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/eora, /datum/patron/divine/necra, /datum/patron/divine/pestra, /datum/patron/divine/dendor)
-#define ALL_TEMPLAR_PATRONS 	list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/eora, /datum/patron/divine/necra, /datum/patron/divine/pestra)
+#define ALL_TEMPLAR_PATRONS 	list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/eora, /datum/patron/divine/necra, /datum/patron/divine/pestra, /datum/patron/divine/dendor)
 
 #define PLATEHIT "plate"
 #define CHAINHIT "chain"
@@ -112,7 +112,8 @@ GLOBAL_LIST_EMPTY(job_respawn_delays)
 #define CTAG_MERCENARY		"CAT_MERCENARY"
 #define CTAG_GARRISON		"CAT_GARRISON"
 #define CTAG_ADEPT			"CAT_ADEPT" // Used for Adept class selection
-
+#define CTAG_SQUIRE 		"CAT_SQUIRE" // Squire Love, Classes, as above.
+#define CTAG_HEIR			"CAT_HEIR"
 /*
 	Defines for the triumph buy datum categories
 */

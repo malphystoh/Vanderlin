@@ -5,7 +5,8 @@
 	allowed_races = list(
 		"Humen",
 		"Half-Elf",
-		"Tiefling"
+		"Tiefling",
+		"Half-Orc"
 	)
 	outfit = /datum/outfit/job/roguetown/adventurer/barbarian
 	min_pq = 0
@@ -63,5 +64,4 @@
 	ADD_TRAIT(H, TRAIT_NOSTINK, TRAIT_GENERIC)
 	if(H.dna?.species)
 		H.dna.species.soundpack_m = new /datum/voicepack/male/warrior()
-	if(H.patron != /datum/patron/divine/ravox)
-		H.patron = GLOB.patronlist[/datum/patron/divine/ravox]
+

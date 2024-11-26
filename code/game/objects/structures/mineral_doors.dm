@@ -155,7 +155,7 @@
 		if(HAS_TRAIT(user, TRAIT_BASHDOORS))
 			if(locked)
 				user.visible_message(span_warning("[user] bashes into [src]!"))
-				take_damage(200, "brute", "melee", 1)
+				take_damage(200, "brute", "blunt", 1)
 			else
 				playsound(src, 'sound/combat/hits/onwood/woodimpact (1).ogg', 100)
 				force_open()
@@ -164,18 +164,14 @@
 		if(HAS_TRAIT(user, TRAIT_ROTMAN))
 			if(locked)
 				user.visible_message(span_warning("The deadite bashes into [src]!"))
-				take_damage(50, "brute", "melee", 1)
+				take_damage(50, "brute", "blunt", 1)
 			else
 				playsound(src, 'sound/combat/hits/onwood/woodimpact (1).ogg', 90)
 				force_open()
 				user.visible_message(span_warning("The deadite smashes through [src]!"))
 			return
 		if(locked)
-			playsound(src, rattlesound, 90)
-			var/oldx = pixel_x
-			animate(src, pixel_x = oldx+1, time = 0.5)
-			animate(pixel_x = oldx-1, time = 0.5)
-			animate(pixel_x = oldx, time = 0.5)
+			door_rattle()
 			return
 		if(TryToSwitchState(AM))
 			if(swing_closed)
@@ -202,7 +198,7 @@
 		if( user.used_intent.type == /datum/intent/unarmed/claw )
 			user.changeNext_move(CLICK_CD_MELEE)
 			to_chat(user, "<span class='warning'>The deadite claws at the door!!</span>")
-			take_damage(40, "brute", "melee", 1)
+			take_damage(40, "brute", "slash", 1)
 			return
 		if(isliving(user))
 			var/mob/living/L = user
@@ -288,6 +284,13 @@
 /obj/structure/mineral_door/update_icon()
 	icon_state = "[base_state][door_opened ? "open":""]"
 
+/obj/structure/mineral_door/proc/door_rattle()
+	playsound(src, rattlesound, 100)
+	var/oldx = pixel_x
+	animate(src, pixel_x = oldx+1, time = 0.5)
+	animate(pixel_x = oldx-1, time = 0.5)
+	animate(pixel_x = oldx, time = 0.5)
+
 /obj/structure/mineral_door/examine(mob/user)
 	. = ..()
 	if(repairable)
@@ -301,10 +304,13 @@
 			. += span_notice("An additional [initial(cast_repair_cost_second.name)] is needed to finish repairs.")
 
 /obj/structure/mineral_door/attackby(obj/item/I, mob/user)
+	user.changeNext_move(CLICK_CD_FAST)
 	if(istype(I, /obj/item/roguekey) || istype(I, /obj/item/keyring))
+		if(!locked)
+			to_chat(user, span_warning("It won't turn this way. Try turning to the right."))
+			door_rattle()
+			return
 		trykeylock(I, user)
-//	else if(user.used_intent.type != INTENT_HARM)
-//		return attack_hand(user)
 	if(istype(I, /obj/item/lockpick))
 		trypicklock(I, user)
 	else
@@ -312,6 +318,19 @@
 			repairdoor(I,user)
 		else
 			return ..()
+
+/obj/structure/mineral_door/attack_right(mob/user)
+	user.changeNext_move(CLICK_CD_FAST)
+	var/obj/item = user.get_active_held_item()
+	if(istype(item, /obj/item/roguekey) || istype(item, /obj/item/keyring))
+		if(locked)
+			to_chat(user, span_warning("It won't turn this way. Try turning to the left."))
+			door_rattle()
+			return
+		trykeylock(item, user)
+		return
+	else
+		return ..()
 
 /obj/structure/mineral_door/proc/repairdoor(obj/item/I, mob/user)
 	if(brokenstate)
@@ -381,11 +400,7 @@
 				break
 			else
 				if(user.cmode)
-					playsound(src, rattlesound, 100)
-					var/oldx = pixel_x
-					animate(src, pixel_x = oldx+1, time = 0.5)
-					animate(pixel_x = oldx-1, time = 0.5)
-					animate(pixel_x = oldx, time = 0.5)
+					door_rattle()
 		return
 	else
 		var/obj/item/roguekey/K = I
@@ -393,19 +408,8 @@
 			lock_toggle(user, is_right)
 			return
 		else
-			playsound(src, rattlesound, 100)
-			var/oldx = pixel_x
-			animate(src, pixel_x = oldx+1, time = 0.5)
-			animate(pixel_x = oldx-1, time = 0.5)
-			animate(pixel_x = oldx, time = 0.5)
+			door_rattle()
 		return
-
-/obj/structure/mineral_door/attack_right(mob/user)
-	if(istype(user.get_active_held_item(), /obj/item/roguekey))
-		var/obj/item/roguekey/held = user.get_active_held_item()
-		trykeylock(held, user, TRUE)
-		return
-	. = ..()
 
 /obj/structure/mineral_door/proc/trypicklock(obj/item/I, mob/user)
 	if(door_opened || isSwitchingStates)
@@ -461,7 +465,7 @@
 					continue
 			else
 				playsound(loc, 'sound/items/pickbad.ogg', 40, TRUE)
-				I.take_damage(1, BRUTE, "melee")
+				I.take_damage(1, BRUTE, "blunt")
 				to_chat(user, span_warning("Clack."))
 				continue
 		return
@@ -469,16 +473,17 @@
 /obj/structure/mineral_door/proc/lock_toggle(mob/user, is_right = FALSE)
 	if(isSwitchingStates || door_opened)
 		return
-	if(locked && is_right)
+	if(locked)
 		user.visible_message(span_warning("[user] unlocks [src]."), \
 			span_notice("I unlock [src]."))
 		playsound(src, unlocksound, 100)
 		locked = 0
-	else if(!is_right && !locked)
+	else
 		user.visible_message(span_warning("[user] locks [src]."), \
 			span_notice("I lock [src]."))
 		playsound(src, locksound, 100)
 		locked = 1
+
 
 /obj/structure/mineral_door/setAnchored(anchorvalue) //called in default_unfasten_wrench() chain
 	. = ..()
@@ -670,9 +675,14 @@
 	icon_state = base_state
 
 /obj/structure/mineral_door/wood/deadbolt/attack_right(mob/user)
-	if(istype(user.get_active_held_item(), /obj/item/roguekey))
-		var/obj/item/roguekey/held = user.get_active_held_item()
-		trykeylock(held, user, TRUE)
+	user.changeNext_move(CLICK_CD_FAST)
+	var/obj/item = user.get_active_held_item()
+	if(istype(item, /obj/item/roguekey) || istype(item, /obj/item/keyring))
+		if(locked)
+			to_chat(user, span_warning("It won't turn this way. Try turning to the left."))
+			door_rattle()
+			return
+		trykeylock(item, user)
 		return
 	if(door_opened || isSwitchingStates)
 		return
@@ -719,9 +729,14 @@
 	smeltresult = null
 
 /obj/structure/mineral_door/wood/donjon/stone/attack_right(mob/user)
-	if(istype(user.get_active_held_item(), /obj/item/roguekey))
-		var/obj/item/roguekey/held = user.get_active_held_item()
-		trykeylock(held, user, TRUE)
+	user.changeNext_move(CLICK_CD_FAST)
+	var/obj/item = user.get_active_held_item()
+	if(istype(item, /obj/item/roguekey) || istype(item, /obj/item/keyring))
+		if(locked)
+			to_chat(user, span_warning("It won't turn this way. Try turning to the left."))
+			door_rattle()
+			return
+		trykeylock(item, user)
 		return
 	return
 
@@ -734,9 +749,14 @@
 	..()
 
 /obj/structure/mineral_door/wood/donjon/attack_right(mob/user)
-	if(istype(user.get_active_held_item(), /obj/item/roguekey))
-		var/obj/item/roguekey/held = user.get_active_held_item()
-		trykeylock(held, user, TRUE)
+	user.changeNext_move(CLICK_CD_FAST)
+	var/obj/item = user.get_active_held_item()
+	if(istype(item, /obj/item/roguekey) || istype(item, /obj/item/keyring))
+		if(locked)
+			to_chat(user, span_warning("It won't turn this way. Try turning to the left."))
+			door_rattle()
+			return
+		trykeylock(item, user)
 		return
 	if(door_opened || isSwitchingStates)
 		return

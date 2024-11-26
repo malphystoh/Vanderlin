@@ -1,5 +1,5 @@
 
-/mob/living/proc/run_armor_check(def_zone = null, attack_flag = "melee", absorb_text = null, soften_text = null, armor_penetration, penetrated_text, damage, blade_dulling)
+/mob/living/proc/run_armor_check(def_zone = null, attack_flag = "blunt", absorb_text = null, soften_text = null, armor_penetration, penetrated_text, damage, blade_dulling)
 	var/armor = getarmor(def_zone, attack_flag, damage, armor_penetration, blade_dulling)
 
 	//the if "armor" check is because this is used for everything on /living, including humans
@@ -105,15 +105,13 @@
 /mob/living/hitby(atom/movable/AM, skipcatch, hitpush = TRUE, blocked = FALSE, datum/thrownthing/throwingdatum, damage_type = "blunt")
 	if(istype(AM, /obj/item))
 		var/obj/item/I = AM
-		var/dtype = BRUTE
 		var/zone = ran_zone(BODY_ZONE_CHEST, 65)//Hits a random part of the body, geared towards the chest
 		SEND_SIGNAL(I, COMSIG_MOVABLE_IMPACT_ZONE, src, zone)
-		dtype = I.damage_type
 		if(!blocked)
 			var/armor = run_armor_check(zone, damage_type, "", "",I.armor_penetration, damage = I.throwforce)
 			next_attack_msg.Cut()
 			var/nodmg = FALSE
-			if(!apply_damage(I.throwforce, dtype, zone, armor))
+			if(!apply_damage(I.throwforce, damage_type, zone, armor))
 				nodmg = TRUE
 				next_attack_msg += " <span class='warning'>Armor stops the damage.</span>"
 			if(!nodmg)

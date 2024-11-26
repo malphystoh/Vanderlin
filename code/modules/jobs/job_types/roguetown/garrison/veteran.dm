@@ -31,7 +31,7 @@
 
 /datum/outfit/job/roguetown/veteran/pre_equip(mob/living/carbon/human/H)
 	..()
-	head = /obj/item/clothing/head/roguetown/helmet
+	head = /obj/item/clothing/head/roguetown/helmet/leather
 	pants = /obj/item/clothing/under/roguetown/trou/leather
 	cloak = /obj/item/clothing/cloak/half/vet
 	shirt = /obj/item/clothing/suit/roguetown/shirt/undershirt/guardsecond
@@ -44,12 +44,12 @@
 	backl = /obj/item/storage/backpack/rogue/satchel
 	backpack_contents = list(/obj/item/rogueweapon/knife/dagger/steel/special = 1, /obj/item/signal_horn = 1)
 	if(H.mind)
-		H.mind?.adjust_skillrank(/datum/skill/combat/axesmaces, 4, TRUE)
+		H.mind?.adjust_skillrank(/datum/skill/combat/axesmaces, 5, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/combat/bows, 3, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/combat/crossbows, 3, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/combat/wrestling, 4, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/combat/unarmed, 3, TRUE)
-		H.mind?.adjust_skillrank(/datum/skill/combat/swords, 5, TRUE)
+		H.mind?.adjust_skillrank(/datum/skill/combat/swords, 6, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/combat/polearms, 4, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/combat/whipsflails, 3, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/combat/knives, 3, TRUE)

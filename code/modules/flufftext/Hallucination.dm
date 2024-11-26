@@ -89,12 +89,6 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 	var/image_layer = MOB_LAYER
 	var/active = TRUE //qdelery
 
-/obj/effect/hallucination/singularity_pull()
-	return
-
-/obj/effect/hallucination/singularity_act()
-	return
-
 /obj/effect/hallucination/simple/Initialize(mapload, mob/living/carbon/T)
 	. = ..()
 	target = T
@@ -137,18 +131,6 @@ GLOBAL_LIST_INIT(hallucination_list, list(
 		target.client.images.Remove(current_image)
 	active = FALSE
 	return ..()
-
-/obj/effect/hallucination/simple/clown
-	image_icon = 'icons/mob/animal.dmi'
-	image_state = "clown"
-
-/obj/effect/hallucination/simple/clown/Initialize(mapload, mob/living/carbon/T, duration)
-	. = ..(loc, T)
-	name = pick(GLOB.clown_names)
-	QDEL_IN(src,duration)
-
-/obj/effect/hallucination/simple/clown/scary
-	image_state = "scary_clown"
 
 /datum/hallucination/battle
 

@@ -35,7 +35,6 @@
 #include "anchored_mobs.dm"
 #include "component_tests.dm"
 #include "reagent_id_typos.dm"
-#include "reagent_mod_procs.dm"
 #include "reagent_recipe_collisions.dm"
 #include "resist.dm"
 #include "spawn_humans.dm"
@@ -44,7 +43,7 @@
 #include "subsystem_init.dm"
 #include "surgeries.dm"
 #include "timer_sanity.dm"
-// #include "create_and_destroy.dm" // this goes last just in case. however it's mega-broken right now
+//#include "create_and_destroy.dm" // this goes last just in case. however it's mega-broken right now
 #include "unit_test.dm"
 
 #undef TEST_ASSERT

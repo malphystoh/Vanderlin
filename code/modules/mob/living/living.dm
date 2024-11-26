@@ -653,6 +653,7 @@
 		else
 			to_chat(src, "<span class='warning'>I fail to get up!</span>")
 	update_cone_show()
+	SEND_SIGNAL(src, COMSIG_LIVING_SET_RESTING, rest)
 
 /mob/living/proc/update_resting()
 	update_rest_hud_icon()
@@ -690,6 +691,7 @@
 	update_stat()
 	med_hud_set_health()
 	med_hud_set_status()
+	SEND_SIGNAL(src, COMSIG_LIVING_HEALTH_UPDATE)
 
 //Proc used to resuscitate a mob, for full_heal see fully_heal()
 /mob/living/proc/revive(full_heal = FALSE, admin_revive = FALSE)
@@ -748,7 +750,6 @@
 	setCloneLoss(0, 0)
 	remove_CC(FALSE)
 	set_disgust(0)
-	radiation = 0
 	set_nutrition(NUTRITION_LEVEL_FED + 50)
 	bodytemperature = BODYTEMP_NORMAL
 	set_blindness(0)
@@ -1326,21 +1327,6 @@
 		mind.transfer_to(new_mob)
 	else
 		new_mob.key = key
-
-/mob/living/rad_act(amount)
-	. = ..()
-
-	if(!amount || (amount < RAD_MOB_SKIN_PROTECTION) || HAS_TRAIT(src, TRAIT_RADIMMUNE))
-		return
-
-	amount -= RAD_BACKGROUND_RADIATION // This will always be at least 1 because of how skin protection is calculated
-
-	var/blocked = getarmor(null, "rad")
-
-	if(amount > RAD_BURN_THRESHOLD)
-		apply_damage(log(amount)*2, BURN, null, blocked)
-
-	apply_effect((amount*RAD_MOB_COEFFICIENT)/max(1, (radiation**2)*RAD_OVERDOSE_REDUCTION), EFFECT_IRRADIATE, blocked)
 
 /mob/living/anti_magic_check(magic = TRUE, holy = FALSE, tinfoil = FALSE, chargecost = 1, self = FALSE)
 	. = ..()

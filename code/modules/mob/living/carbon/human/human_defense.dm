@@ -101,7 +101,7 @@
 
 
 /mob/living/carbon/human/bullet_act(obj/projectile/P, def_zone = BODY_ZONE_CHEST)
-	if(istype(P, /obj/projectile/beam)||istype(P, /obj/projectile/bullet))
+	if(istype(P, /obj/projectile/bullet))
 		if((P.damage_type == BURN) || (P.damage_type == BRUTE))
 			if(!P.nodamage && P.damage < src.health && isliving(P.firer))
 				retaliate(P.firer)
@@ -193,7 +193,7 @@
 			return TRUE
 	return FALSE
 
-/mob/living/carbon/human/hitby(atom/movable/AM, skipcatch = FALSE, hitpush = TRUE, blocked = FALSE, datum/thrownthing/throwingdatum)
+/mob/living/carbon/human/hitby(atom/movable/AM, skipcatch = FALSE, hitpush = TRUE, blocked = FALSE, datum/thrownthing/throwingdatum, damage_type = "blunt")
 	if(dna && dna.species)
 		var/spec_return = dna.species.spec_hitby(AM, src)
 		if(spec_return)
@@ -262,21 +262,6 @@
 
 	// the attacked_by code varies among species
 	return dna.species.spec_attacked_by(I, user, affecting, used_intent, src, useder)
-
-
-/mob/living/carbon/human/attack_hulk(mob/living/carbon/human/user)
-	. = ..()
-	if(!.)
-		return
-	var/hulk_verb = pick("smash","pummel")
-	if(check_shields(user, 15, "the [hulk_verb]ing"))
-		return
-	..()
-	playsound(loc, user.dna.species.attack_sound, 25, TRUE, -1)
-	visible_message("<span class='danger'>[user] [hulk_verb]ed [src]!</span>", \
-					"<span class='danger'>[user] [hulk_verb]ed [src]!</span>", "<span class='hear'>I hear a sickening sound of flesh hitting flesh!</span>", null, user)
-	to_chat(user, "<span class='danger'>I [hulk_verb] [src]!</span>")
-	adjustBruteLoss(15)
 
 /mob/living/carbon/human/attack_hand(mob/user)
 	if(..())	//to allow surgery to return properly.
@@ -348,7 +333,7 @@
 		var/obj/item/bodypart/affecting = get_bodypart(ran_zone(dam_zone))
 		if(!affecting)
 			affecting = get_bodypart(BODY_ZONE_CHEST)
-		var/armor = run_armor_check(affecting, "melee", armor_penetration = M.a_intent.penfactor, damage = damage)
+		var/armor = run_armor_check(affecting, M.damage_type, armor_penetration = M.a_intent.penfactor, damage = damage)
 		next_attack_msg.Cut()
 
 		var/nodmg = FALSE
@@ -611,16 +596,6 @@
 	for(var/obj/item/I in inventory_items_to_kill)
 		I.acid_act(acidpwr, acid_volume)
 	return 1
-
-///Overrides the point value that the mob is worth
-/mob/living/carbon/human/singularity_act()
-	. = 20
-	if(mind)
-		if((mind.assigned_role == "Station Engineer") || (mind.assigned_role == "Chief Engineer") )
-			. = 100
-		if(mind.assigned_role == "Clown")
-			. = rand(-1000, 1000)
-	..() //Called afterwards because getting the mind after getting gibbed is sketchy
 
 /mob/living/carbon/human/help_shake_act(mob/living/carbon/M)
 	if(!istype(M))

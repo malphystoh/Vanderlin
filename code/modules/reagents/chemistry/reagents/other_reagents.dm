@@ -148,12 +148,9 @@
 /datum/reagent/water/reaction_obj(obj/O, reac_volume)
 	O.extinguish()
 	O.acid_level = 0
-	// Monkey cube
-	if(istype(O, /obj/item/reagent_containers/food/snacks/monkeycube))
-		var/obj/item/reagent_containers/food/snacks/monkeycube/cube = O
-		cube.Expand()
 
-	else if(istype(O, /obj/item/roguebin))
+
+	if(istype(O, /obj/item/roguebin))
 		var/obj/item/roguebin/RB = O
 		if(!RB.kover)
 			if(RB.reagents)
@@ -496,14 +493,6 @@
 	race = /datum/species/zombie //Not the infectious kind. The days of xenobio zombie outbreaks are long past.
 	taste_description = "brai...nothing in particular"
 
-//DANGEROUS RACES
-/datum/reagent/mutationtoxin/shadow
-	name = "Shadow Mutation Toxin"
-	description = "A dark toxin."
-	color = "#5EFF3B" //RGB: 94, 255, 59
-	race = /datum/species/shadow
-	taste_description = "the night"
-
 #undef MUT_MSG_IMMEDIATE
 #undef MUT_MSG_EXTENDED
 #undef MUT_MSG_ABOUT2TURN
@@ -724,12 +713,7 @@
 	description = "A jade-green metallic chemical element in the actinide series, weakly radioactive."
 	reagent_state = SOLID
 	color = "#5E9964" //this used to be silver, but liquid uranium can still be green and it's more easily noticeable as uranium like this so why bother?
-	taste_description = "the inside of a reactor"
-	var/irradiation_level = 1
-
-/datum/reagent/uranium/on_mob_life(mob/living/carbon/M)
-	M.apply_effect(irradiation_level/M.metabolism_efficiency,EFFECT_IRRADIATE,0)
-	..()
+	taste_description = "like metal."
 
 /datum/reagent/uranium/reaction_turf(turf/T, reac_volume)
 	if(reac_volume >= 3)
@@ -744,7 +728,6 @@
 	reagent_state = SOLID
 	color = "#00CC00" // ditto
 	taste_description = "the colour blue and regret"
-	irradiation_level = 2*REM
 
 /datum/reagent/bluespace
 	name = "Bluespace Dust"
@@ -1358,6 +1341,13 @@
 	color = "#60A584" // rgb: 96, 165, 132
 	taste_description = "cool salt"
 
+/datum/reagent/charcoal
+	name = "Charcoal"
+	description = "Burnt wood."
+	reagent_state = SOLID
+	color = "#020202" // rgb: 96, 165, 132
+	taste_description = "ash"
+
 /datum/reagent/lye
 	name = "Lye"
 	description = "Also known as sodium hydroxide. As a profession making this is somewhat underwhelming."
@@ -1410,17 +1400,6 @@
 		var/obj/item/organ/zombie_infection/nodamage/ZI = new()
 		ZI.Insert(H)
 	..()
-
-/datum/reagent/magillitis
-	name = "Magillitis"
-	description = "An experimental serum which causes rapid muscular growth in Hominidae. Side-affects may include hypertrichosis, violent outbursts, and an unending affinity for bananas."
-	reagent_state = LIQUID
-	color = "#00f041"
-
-/datum/reagent/magillitis/on_mob_life(mob/living/carbon/M)
-	..()
-	if((ismonkey(M) || ishuman(M)) && current_cycle >= 10)
-		M.gorillize()
 
 /datum/reagent/growthserum
 	name = "Growth Serum"

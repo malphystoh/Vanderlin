@@ -64,7 +64,7 @@
 			if(!islava(newloc) && !L.on_fire)
 				L.update_fire()
 
-/turf/open/lava/hitby(atom/movable/AM, skipcatch, hitpush, blocked, datum/thrownthing/throwingdatum)
+/turf/open/lava/hitby(atom/movable/AM, skipcatch, hitpush, blocked, datum/thrownthing/throwingdatum, damage_type = "blunt")
 	if(burn_stuff(AM))
 		START_PROCESSING(SSobj, src)
 		playsound(src, 'sound/misc/lava_death.ogg', 100, FALSE)
@@ -72,12 +72,6 @@
 /turf/open/lava/process()
 	if(!burn_stuff())
 		STOP_PROCESSING(SSobj, src)
-
-/turf/open/lava/singularity_act()
-	return
-
-/turf/open/lava/singularity_pull(S, current_size)
-	return
 
 /turf/open/lava/get_smooth_underlay_icon(mutable_appearance/underlay_appearance, turf/asking_turf, adjacency_dir)
 	underlay_appearance.icon = 'icons/turf/floors.dmi'

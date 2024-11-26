@@ -155,54 +155,7 @@
 			if(statpanel("Status"))
 				stat("Confessions sent: [GLOB.confessors.len]")
 
-	return //RTchange
-/*
-	if(statpanel("Status"))
-//		stat(null, "Intent: [used_intent]")
-//		stat(null, "Move Mode: [m_intent]")
-		if (internal)
-			if (!internal.air_contents)
-				qdel(internal)
-			else
-				stat("Internal Atmosphere Info", internal.name)
-				stat("Tank Pressure", internal.air_contents.return_pressure())
-				stat("Distribution Pressure", internal.distribute_pressure)
-
-		if(mind)
-			var/datum/antagonist/changeling/changeling = mind.has_antag_datum(/datum/antagonist/changeling)
-			if(changeling)
-				stat("Chemical Storage", "[changeling.chem_charges]/[changeling.chem_storage]")
-				stat("Absorbed DNA", changeling.absorbedcount)
-
-	//NINJACODE
-	if(istype(wear_armor, /obj/item/clothing/suit/space/space_ninja)) //Only display if actually a ninja.
-		var/obj/item/clothing/suit/space/space_ninja/SN = wear_armor
-		if(statpanel("SpiderOS"))
-			stat("SpiderOS Status:","[SN.s_initialized ? "Initialized" : "Disabled"]")
-			stat("Current Time:", "[station_time_timestamp()]")
-			if(SN.s_initialized)
-				//Suit gear
-				stat("Energy Charge:", "[round(SN.cell.charge/100)]%")
-				stat("Smoke Bombs:", "\Roman [SN.s_bombs]")
-				//Ninja status
-				stat("Fingerprints:", "[md5(dna.uni_identity)]")
-				stat("Unique Identity:", "[dna.unique_enzymes]")
-				stat("Overall Status:", "[stat > 1 ? "dead" : "[health]% healthy"]")
-				stat("Nutrition Status:", "[nutrition]")
-				stat("Oxygen Loss:", "[getOxyLoss()]")
-				stat("Toxin Levels:", "[getToxLoss()]")
-				stat("Burn Severity:", "[getFireLoss()]")
-				stat("Brute Trauma:", "[getBruteLoss()]")
-				stat("Radiation Levels:","[radiation] rad")
-				stat("Body Temperature:","[bodytemperature-T0C] degrees C ([bodytemperature*1.8-459.67] degrees F)")
-
-				//Diseases
-				if(diseases.len)
-					stat("Viruses:", null)
-					for(var/thing in diseases)
-						var/datum/disease/D = thing
-						stat("*", "[D.name], Type: [D.spread_text], Stage: [D.stage]/[D.max_stages], Possible Cure: [D.cure_text]")
- */
+	return
 
 /mob/living/carbon/human/show_inv(mob/user)
 	user.set_machine(src)
@@ -425,13 +378,8 @@
 			to_chat(C, "<span class='unconscious'>I feel a breath of fresh air... which is a sensation you don't recognise...</span>")
 
 /mob/living/carbon/human/cuff_resist(obj/item/I)
-	if(dna && dna.check_mutation(HULK))
-		say(pick(";RAAAAAAAARGH!", ";HNNNNNNNNNGGGGGGH!", ";GWAAAAAAAARRRHHH!", "NNNNNNNNGGGGGGGGHH!", ";AAAAAAARRRGH!" ), forced = "hulk")
-		if(..(I, cuff_break = FAST_CUFFBREAK))
-			dropItemToGround(I, silent = FALSE)
-	else
-		if(..())
-			dropItemToGround(I)
+	if(..())
+		dropItemToGround(I)
 
 /mob/living/carbon/human/proc/clean_blood(datum/source, strength)
 	if(strength < CLEAN_STRENGTH_BLOOD)
@@ -467,11 +415,6 @@
 /mob/living/carbon/human/canUseTopic(atom/movable/M, be_close=FALSE, no_dexterity=FALSE, no_tk=FALSE)
 	if(!(mobility_flags & MOBILITY_UI))
 		to_chat(src, "<span class='warning'>I can't do that right now!</span>")
-		return FALSE
-	if(!Adjacent(M) && (M.loc != src))
-		if((be_close == FALSE) || (!no_tk && (dna.check_mutation(TK) && tkMaxRangeCheck(src, M))))
-			return TRUE
-		to_chat(src, "<span class='warning'>I am too far away!</span>")
 		return FALSE
 	return TRUE
 
@@ -636,9 +579,6 @@
 	spill_embedded_objects()
 	set_heartattack(FALSE)
 	drunkenness = 0
-	for(var/datum/mutation/human/HM in dna.mutations)
-		if(HM.quality != POSITIVE)
-			dna.remove_mutation(HM.name)
 	..()
 
 /mob/living/carbon/human/check_weakness(obj/item/weapon, mob/living/attacker)
@@ -676,8 +616,6 @@
 	. = ..()
 	VV_DROPDOWN_OPTION("", "---------")
 	VV_DROPDOWN_OPTION(VV_HK_COPY_OUTFIT, "Copy Outfit")
-	VV_DROPDOWN_OPTION(VV_HK_MOD_MUTATIONS, "Add/Remove Mutation")
-	VV_DROPDOWN_OPTION(VV_HK_MOD_QUIRKS, "Add/Remove Quirks")
 	VV_DROPDOWN_OPTION(VV_HK_MAKE_MONKEY, "Make Monkey")
 	VV_DROPDOWN_OPTION(VV_HK_MAKE_CYBORG, "Make Cyborg")
 	VV_DROPDOWN_OPTION(VV_HK_MAKE_SLIME, "Make Slime")
@@ -690,47 +628,6 @@
 		if(!check_rights(R_SPAWN))
 			return
 		copy_outfit()
-	if(href_list[VV_HK_MOD_MUTATIONS])
-		if(!check_rights(R_SPAWN))
-			return
-
-		var/list/options = list("Clear"="Clear")
-		for(var/x in subtypesof(/datum/mutation/human))
-			var/datum/mutation/human/mut = x
-			var/name = initial(mut.name)
-			options[dna.check_mutation(mut) ? "[name] (Remove)" : "[name] (Add)"] = mut
-
-		var/result = input(usr, "Choose mutation to add/remove","Mutation Mod") as null|anything in sortList(options)
-		if(result)
-			if(result == "Clear")
-				dna.remove_all_mutations()
-			else
-				var/mut = options[result]
-				if(dna.check_mutation(mut))
-					dna.remove_mutation(mut)
-				else
-					dna.add_mutation(mut)
-	if(href_list[VV_HK_MOD_QUIRKS])
-		if(!check_rights(R_SPAWN))
-			return
-
-		var/list/options = list("Clear"="Clear")
-		for(var/x in subtypesof(/datum/quirk))
-			var/datum/quirk/T = x
-			var/qname = initial(T.name)
-			options[has_quirk(T) ? "[qname] (Remove)" : "[qname] (Add)"] = T
-
-		var/result = input(usr, "Choose quirk to add/remove","Quirk Mod") as null|anything in sortList(options)
-		if(result)
-			if(result == "Clear")
-				for(var/datum/quirk/q in roundstart_quirks)
-					remove_quirk(q.type)
-			else
-				var/T = options[result]
-				if(has_quirk(T))
-					remove_quirk(T)
-				else
-					add_quirk(T,TRUE)
 	if(href_list[VV_HK_MAKE_MONKEY])
 		if(!check_rights(R_SPAWN))
 			return
@@ -951,17 +848,8 @@
 /mob/living/carbon/human/species/ethereal
 	race = /datum/species/ethereal
 
-/mob/living/carbon/human/species/shadow
-	race = /datum/species/shadow
-
-/mob/living/carbon/human/species/shadow/nightmare
-	race = /datum/species/shadow/nightmare
-
 /mob/living/carbon/human/species/snail
 	race = /datum/species/snail
-
-/mob/living/carbon/human/species/vampire
-	race = /datum/species/vampire
 
 /mob/living/carbon/human/species/zombie
 	race = /datum/species/zombie

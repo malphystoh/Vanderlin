@@ -20,7 +20,8 @@
 #define TRAIT_CRITICAL_WEAKNESS		"Critical Weakness"
 #define TRAIT_MANIAC_AWOKEN			"Awoken"
 #define TRAIT_NOROGSTAM				"Indefatigable" //for ai
-#define TRAIT_NOSLEEP				"Nite Creacher" //for thralls
+#define TRAIT_NOSLEEP				"Fatal Insomnia" //for thralls
+#define TRAIT_FASTSLEEP 			"Fast Sleeper"
 #define TRAIT_NUDIST					"Nudist" //you can't wear most clothes
 #define TRAIT_KNEESTINGER_IMMUNITY		"Blessing of Dendor"
 #define TRAIT_RETARD_ANATOMY			"Inhumen Anatomy" //can't wear hats and shoes
@@ -51,9 +52,9 @@
 #define TRAIT_BANDITCAMP "banditcamp"
 #define TRAIT_KNOWBANDITS "knowbandits"
 #define TRAIT_VAMPMANSION "vampiremansion"
+#define TRAIT_VAMP_DREAMS "vamp_dreams"
 #define TRAIT_INHUMENCAMP "inhumencamp"
 #define TRAIT_LIMPDICK "limp_dick"
-#define TRAIT_SEXPASS "sexpass"
 #define TRAIT_INTRAINING "intraining" //allows certain roles to bypass the average skill limitation of training dummies
 #define TRAIT_STEELHEARTED "steelhearted" //no bad mood from dismembering or seeing this
 #define TRAIT_IWASREVIVED "iwasrevived" //prevents PQ gain from reviving the same person twice
@@ -372,8 +373,10 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 #define SHAMEBRERO_TRAIT "shamebrero"
 #define CHRONOSUIT_TRAIT "chronosuit"
 #define LOCKED_HELMET_TRAIT "locked-helmet"
-#define NINJA_SUIT_TRAIT "ninja-suit"
 #define ANTI_DROP_IMPLANT_TRAIT "anti-drop-implant"
 #define SLEEPING_CARP_TRAIT "sleeping_carp"
 #define MADE_UNCLONEABLE "made-uncloneable"
 #define TIMESTOP_TRAIT "timestop"
+#define ADVENTURER_TRAIT "adventurer"
+
+#define TRAIT_I_AM_INVISIBLE_ON_A_BOAT "invisible_on_tram"

@@ -43,12 +43,6 @@
 
 /turf/closed/wall/proc/dismantle_wall(devastated=0, explode=0)
 	playsound(src, 'sound/blank.ogg', 100, TRUE)
-
-	for(var/obj/O in src.contents) //Eject contents!
-		if(istype(O, /obj/structure/sign/poster))
-			var/obj/structure/sign/poster/P = O
-			P.roll_and_drop(src)
-
 	ScrapeAway()
 
 /turf/closed/wall/ex_act(severity, target)
@@ -84,20 +78,6 @@
 		playsound(src, 'sound/blank.ogg', 100, TRUE)
 		dismantle_wall(1)
 		return
-
-/turf/closed/wall/attack_hulk(mob/user)
-	..()
-	if(prob(hardness))
-		playsound(src, 'sound/blank.ogg', 100, TRUE)
-		user.say(pick(";RAAAAAAAARGH!", ";HNNNNNNNNNGGGGGGH!", ";GWAAAAAAAARRRHHH!", "NNNNNNNNGGGGGGGGHH!", ";AAAAAAARRRGH!" ), forced = "hulk")
-		dismantle_wall(1)
-	else
-		playsound(src, 'sound/blank.ogg', 50, TRUE)
-		add_dent(WALL_DENT_HIT)
-		user.visible_message("<span class='danger'>[user] smashes \the [src]!</span>", \
-					"<span class='danger'>I smash \the [src]!</span>", \
-					"<span class='hear'>I hear a booming smash!</span>")
-	return TRUE
 
 /turf/closed/wall/attack_hand(mob/user)
 	. = ..()
@@ -156,17 +136,6 @@
 	return FALSE
 
 /turf/closed/wall/proc/try_wallmount(obj/item/W, mob/user, turf/T)
-	//check for wall mounted frames
-	if(istype(W, /obj/item/wallframe))
-		var/obj/item/wallframe/F = W
-		if(F.try_build(src, user))
-			F.attach(src, user)
-		return TRUE
-	//Poster stuff
-	else if(istype(W, /obj/item/poster))
-		place_poster(W,user)
-		return TRUE
-
 	return FALSE
 
 /turf/closed/wall/proc/try_decon(obj/item/I, mob/user, turf/T)

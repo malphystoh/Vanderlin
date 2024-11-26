@@ -39,20 +39,19 @@
 		Stun(50)
 
 	if(mind)
+		mind.sleep_adv.add_stress_cycle(get_stress_amount())
 		for(var/datum/antagonist/A in mind.antag_datums)
 			A.on_life(src)
 
-	if(!IS_IN_STASIS(src))
-		if(stat < 3) //not dead
-			for(var/datum/mutation/human/HM in dna.mutations) // Handle active genes
-				HM.on_life()
-
 		if(mode == AI_OFF)
+			handle_vamp_dreams()
 			if(stat)
 				if(health > 0)
 					if(has_status_effect(/datum/status_effect/debuff/sleepytime))
-						tiredness = 0
 						remove_status_effect(/datum/status_effect/debuff/sleepytime)
+						remove_stress(/datum/stressevent/sleepytime)
+						if(mind)
+							mind.sleep_adv.advance_cycle()
 						var/datum/game_mode/chaosmode/C = SSticker.mode
 						if(istype(C))
 							if(mind)
@@ -149,10 +148,6 @@
 	else
 		SEND_SIGNAL(src, COMSIG_CLEAR_MOOD_EVENT, "brain_damage")
 	return ..()
-
-/mob/living/carbon/human/handle_mutations_and_radiation()
-	if(!dna || !dna.species.handle_mutations_and_radiation(src))
-		..()
 
 /mob/living/carbon/human/handle_environment(datum/gas_mixture/environment)
 	dna.species.handle_environment(environment, src)
@@ -373,6 +368,25 @@
 		Unconscious(80)
 	// Tissues die without blood circulation
 	adjustBruteLoss(2)
+
+/mob/living/carbon/human/proc/handle_vamp_dreams()
+	if(!HAS_TRAIT(src, TRAIT_VAMP_DREAMS))
+		return
+	if(!mind)
+		return
+	if(!has_status_effect(/datum/status_effect/debuff/vamp_dreams))
+		return
+	if(!eyesclosed)
+		return
+	if(mobility_flags & MOBILITY_STAND)
+		return
+	if(!istype(loc, /obj/structure/closet/crate/coffin))
+		return
+	var/obj/structure/closet/crate/coffin/coffin = loc
+	if(coffin.opened)
+		return
+	remove_status_effect(/datum/status_effect/debuff/vamp_dreams)
+	mind.sleep_adv.advance_cycle()
 
 #undef THERMAL_PROTECTION_HEAD
 #undef THERMAL_PROTECTION_CHEST

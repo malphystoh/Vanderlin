@@ -57,7 +57,7 @@
 		if(!apply_damage(P.damage, P.damage_type, def_zone, armor))
 			nodmg = TRUE
 			next_attack_msg += " <span class='warning'>Armor stops the damage.</span>"
-		apply_effects(P.stun, P.knockdown, P.unconscious, P.irradiate, P.slur, P.stutter, P.eyeblur, P.drowsy, armor, P.stamina, P.jitter, P.paralyze, P.immobilize)
+		apply_effects(P.stun, 0, 0, 0,0, 0, 0, 0, armor, 0, P.jitter, P.paralyze, 0)
 		if(!nodmg)
 			if(P.dismemberment)
 				check_projectile_dismemberment(P, def_zone,armor)
@@ -102,15 +102,15 @@
 	else
 		return 0
 
-/mob/living/hitby(atom/movable/AM, skipcatch, hitpush = TRUE, blocked = FALSE, datum/thrownthing/throwingdatum)
+/mob/living/hitby(atom/movable/AM, skipcatch, hitpush = TRUE, blocked = FALSE, datum/thrownthing/throwingdatum, damage_type = "blunt")
 	if(istype(AM, /obj/item))
 		var/obj/item/I = AM
 		var/dtype = BRUTE
 		var/zone = ran_zone(BODY_ZONE_CHEST, 65)//Hits a random part of the body, geared towards the chest
 		SEND_SIGNAL(I, COMSIG_MOVABLE_IMPACT_ZONE, src, zone)
-		dtype = I.damtype
+		dtype = I.damage_type
 		if(!blocked)
-			var/armor = run_armor_check(zone, "melee", "", "",I.armor_penetration, damage = I.throwforce)
+			var/armor = run_armor_check(zone, damage_type, "", "",I.armor_penetration, damage = I.throwforce)
 			next_attack_msg.Cut()
 			var/nodmg = FALSE
 			if(!apply_damage(I.throwforce, dtype, zone, armor))
@@ -349,12 +349,6 @@
 							"<span class='danger'>I avoid [M.name]'s bite!</span>", "<span class='hear'>I hear the sound of jaws snapping shut!</span>", COMBAT_MESSAGE_RANGE, M)
 			to_chat(M, "<span class='warning'>My bite misses [src]!</span>")
 	return FALSE
-/mob/living/attack_hulk(mob/living/carbon/human/user)
-	..()
-	if(HAS_TRAIT(user, TRAIT_PACIFISM))
-		to_chat(user, "<span class='warning'>I don't want to hurt [src]!</span>")
-		return FALSE
-	return TRUE
 
 /mob/living/ex_act(severity, target, origin)
 	if(origin && istype(origin, /datum/spacevine_mutation) && isvineimmune(src))
@@ -387,8 +381,6 @@
 							"<span class='danger'>I avoid [M.name]'s bite!</span>", "<span class='hear'>I hear the sound of jaws snapping shut!</span>", COMBAT_MESSAGE_RANGE, M)
 			to_chat(M, "<span class='warning'>My bite misses [src]!</span>")
 	return FALSE
-
-//Looking for irradiate()? It's been moved to radiation.dm under the rad_act() for mobs.
 
 /mob/living/acid_act(acidpwr, acid_volume)
 	take_bodypart_damage(acidpwr * min(1, acid_volume * 0.1))

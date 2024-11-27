@@ -51,11 +51,7 @@
 /obj/structure/table/wood/nice/decorated_alt,
 /obj/item/roguecoin/gold,
 /obj/item/rogueore/gold,
-/obj/structure/closet/crate/chest/gold,
-/turf/open/floor/rogue/carpet,
-/area/rogue/outdoors/caves)
-"jN" = (
-/mob/living/simple_animal/hostile/retaliate/rogue/minotaur/axe/female,
+/obj/effect/landmark/chest_or_mimic,
 /turf/open/floor/rogue/carpet,
 /area/rogue/outdoors/caves)
 "kv" = (
@@ -104,7 +100,7 @@
 /obj/structure/table/wood/nice/decorated_alt,
 /obj/item/roguecoin/gold,
 /obj/item/roguestatue/gold/loot,
-/obj/structure/closet/crate/chest/gold,
+/obj/effect/landmark/chest_or_mimic,
 /turf/open/floor/rogue/carpet,
 /area/rogue/outdoors/caves)
 "te" = (
@@ -119,14 +115,14 @@
 /obj/structure/table/wood/nice/decorated_alt,
 /obj/item/roguecoin/gold,
 /obj/item/roguestatue/gold,
-/obj/structure/closet/crate/chest/gold,
+/obj/effect/landmark/chest_or_mimic,
 /turf/open/floor/rogue/carpet,
 /area/rogue/outdoors/caves)
 "uc" = (
 /obj/structure/table/wood/nice/decorated_alt,
 /obj/item/roguecoin/gold,
 /obj/item/clothing/ring/gold,
-/obj/structure/closet/crate/chest/gold,
+/obj/effect/landmark/chest_or_mimic,
 /turf/open/floor/rogue/carpet,
 /area/rogue/outdoors/caves)
 "vp" = (
@@ -146,10 +142,6 @@
 /area/rogue/outdoors/caves)
 "yG" = (
 /turf/open/water/swamp,
-/area/rogue/outdoors/caves)
-"Ac" = (
-/mob/living/simple_animal/hostile/retaliate/rogue/minotaur/axe,
-/turf/open/floor/rogue/tile/checkeralt,
 /area/rogue/outdoors/caves)
 "AE" = (
 /mob/living/simple_animal/hostile/retaliate/rogue/trufflepig,
@@ -223,7 +215,7 @@
 /obj/structure/table/wood/nice/decorated_alt,
 /obj/item/roguecoin/gold,
 /obj/item/reagent_containers/glass/cup/golden,
-/obj/structure/closet/crate/chest/gold,
+/obj/effect/landmark/chest_or_mimic,
 /turf/open/floor/rogue/carpet,
 /area/rogue/outdoors/caves)
 "Vz" = (
@@ -234,7 +226,7 @@
 /obj/structure/table/wood/nice/decorated_alt,
 /obj/item/roguecoin/gold,
 /obj/item/ingot/gold,
-/obj/structure/closet/crate/chest/gold,
+/obj/effect/landmark/chest_or_mimic,
 /turf/open/floor/rogue/carpet,
 /area/rogue/outdoors/caves)
 "Yf" = (
@@ -245,7 +237,6 @@
 /obj/item/clothing/mask/rogue/facemask/goldmask,
 /obj/item/roguecoin/gold/pile,
 /obj/item/storage/belt/rogue/leather/plaquegold,
-/obj/structure/closet/crate/chest/gold,
 /obj/item/reagent_containers/food/snacks/rogue/cheddar/aged,
 /obj/item/reagent_containers/food/snacks/rogue/cheddar/aged,
 /obj/item/lockpick,
@@ -254,6 +245,7 @@
 /obj/item/lockpick,
 /obj/item/lockpick,
 /obj/item/lockpickring,
+/obj/effect/landmark/chest_or_mimic,
 /turf/open/floor/rogue/carpet,
 /area/rogue/outdoors/caves)
 "YH" = (
@@ -537,7 +529,7 @@ Yf
 vp
 Yf
 vp
-Ac
+Yf
 vp
 Yf
 vp
@@ -554,7 +546,7 @@ kv
 vp
 vp
 Yi
-jN
+vp
 vp
 kv
 xS

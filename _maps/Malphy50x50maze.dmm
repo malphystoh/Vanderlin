@@ -138,10 +138,6 @@
 /area/rogue/under/town/caverogue)
 "C" = (
 /obj/structure/table/wood/nice/decorated,
-/obj/item/reagent_containers/food/snacks/rogue/cheese/gote,
-/obj/item/reagent_containers/food/snacks/rogue/cheese/gote,
-/obj/item/reagent_containers/food/snacks/rogue/cheese/gote,
-/obj/item/reagent_containers/food/snacks/rogue/cheese/gote,
 /obj/item/reagent_containers/food/snacks/rogue/cheddar/aged,
 /obj/item/reagent_containers/food/snacks/rogue/cheddarwedge/aged,
 /turf/open/floor/rogue/blocks/stonered,

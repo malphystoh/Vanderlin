@@ -32,7 +32,6 @@
 /turf/open/floor/rogue/grass/red,
 /area/rogue/outdoors/rtfield)
 "dc" = (
-/obj/structure/spider/cocoon,
 /obj/item/clothing/shoes/roguetown/jester,
 /obj/item/clothing/under/roguetown/tights/jester,
 /turf/open/floor/rogue/sandstone,

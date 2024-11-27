@@ -11,8 +11,33 @@
 /obj/item/reagent_containers/glass/cup/skull,
 /turf/open/floor/rogue/blocks/stonered,
 /area/rogue/under/town/caverogue)
+"d" = (
+/obj/item/clothing/ring/silver/noc,
+/turf/open/floor/rogue/blocks/stonered,
+/area/rogue/under/town/caverogue)
+"e" = (
+/obj/effect/landmark/chest_or_mimic,
+/obj/item/roguecoin/gold/pile,
+/turf/open/floor/rogue/blocks/stonered/tiny,
+/area/rogue/under/town/caverogue)
+"f" = (
+/mob/living/simple_animal/hostile/retaliate/rogue/bigrat,
+/obj/item/roguecoin/silver/pile,
+/obj/structure/closet/crate/chest,
+/turf/open/floor/rogue/blocks/stonered/tiny,
+/area/rogue/under/town/caverogue)
+"g" = (
+/obj/structure/closet/crate/chest,
+/obj/item/roguecoin/copper/pile,
+/turf/open/floor/rogue/blocks/stonered/tiny,
+/area/rogue/under/town/caverogue)
 "h" = (
 /mob/living/carbon/human/species/zizombie/npc/militiamen,
+/turf/open/floor/rogue/blocks/stonered/tiny,
+/area/rogue/under/town/caverogue)
+"i" = (
+/obj/item/roguecoin/copper/pile,
+/obj/structure/closet/crate/chest,
 /turf/open/floor/rogue/blocks/stonered/tiny,
 /area/rogue/under/town/caverogue)
 "j" = (
@@ -38,6 +63,7 @@
 /obj/structure/rack/rogue/shelf/biggest,
 /obj/item/rogueweapon/mace/goden/steel/warhammer,
 /obj/item/clothing/head/roguetown/helmet/horned,
+/obj/item/clothing/ring/gold/ravox,
 /turf/open/floor/rogue/blocks/stonered,
 /area/rogue/under/town/caverogue)
 "p" = (
@@ -101,16 +127,23 @@
 /obj/item/reagent_containers/food/snacks/rogue/friedrat/plated,
 /turf/open/floor/rogue/blocks/stonered/tiny,
 /area/rogue/under/town/caverogue)
+"A" = (
+/obj/structure/closet/crate/chest,
+/obj/item/roguecoin/gold/pile,
+/turf/open/floor/rogue/blocks/stonered/tiny,
+/area/rogue/under/town/caverogue)
 "B" = (
 /obj/machinery/light/rogue/torchholder/r,
 /turf/open/floor/rogue/blocks/stonered,
 /area/rogue/under/town/caverogue)
 "C" = (
 /obj/structure/table/wood/nice/decorated,
-/obj/item/reagent_containers/food/snacks/store/cheesewheel,
-/obj/item/reagent_containers/food/snacks/store/cheesewheel,
-/obj/item/reagent_containers/food/snacks/store/cheesewheel,
-/obj/item/reagent_containers/food/snacks/store/cheesewheel,
+/obj/item/reagent_containers/food/snacks/rogue/cheese/gote,
+/obj/item/reagent_containers/food/snacks/rogue/cheese/gote,
+/obj/item/reagent_containers/food/snacks/rogue/cheese/gote,
+/obj/item/reagent_containers/food/snacks/rogue/cheese/gote,
+/obj/item/reagent_containers/food/snacks/rogue/cheddar/aged,
+/obj/item/reagent_containers/food/snacks/rogue/cheddarwedge/aged,
 /turf/open/floor/rogue/blocks/stonered,
 /area/rogue/under/town/caverogue)
 "D" = (
@@ -123,17 +156,39 @@
 /turf/open/floor/rogue/blocks/stonered,
 /area/rogue/under/town/caverogue)
 "E" = (
-/mob/living/simple_animal/hostile/retaliate/rogue/minotaur,
-/turf/open/floor/rogue/blocks/stonered,
+/obj/item/roguecoin/silver/pile,
+/obj/structure/closet/crate/chest,
+/turf/open/floor/rogue/blocks/stonered/tiny,
 /area/rogue/under/town/caverogue)
 "F" = (
 /mob/living/simple_animal/hostile/retaliate/rogue/spider,
 /obj/structure/spider/stickyweb,
 /turf/open/floor/rogue/blocks/stonered/tiny,
 /area/rogue/under/town/caverogue)
+"G" = (
+/mob/living/simple_animal/hostile/retaliate/rogue/bigrat,
+/obj/item/roguecoin/copper/pile,
+/obj/structure/closet/crate/chest,
+/turf/open/floor/rogue/blocks/stonered/tiny,
+/area/rogue/under/town/caverogue)
+"H" = (
+/obj/structure/closet/crate/chest,
+/obj/item/roguecoin/silver/pile,
+/turf/open/floor/rogue/blocks/stonered/tiny,
+/area/rogue/under/town/caverogue)
+"I" = (
+/obj/machinery/light/rogue/torchholder/l,
+/obj/structure/fermenting_barrel/beer,
+/turf/open/floor/rogue/blocks/stonered,
+/area/rogue/under/town/caverogue)
 "J" = (
 /obj/structure/bed/rogue/hay,
 /turf/open/floor/rogue/blocks/stonered,
+/area/rogue/under/town/caverogue)
+"K" = (
+/obj/effect/landmark/chest_or_mimic,
+/obj/item/roguecoin/silver/pile,
+/turf/open/floor/rogue/blocks/stonered/tiny,
 /area/rogue/under/town/caverogue)
 "L" = (
 /obj/machinery/light/rogue/torchholder/l,
@@ -145,7 +200,12 @@
 /turf/open/floor/rogue/blocks/stonered,
 /area/rogue/under/town/caverogue)
 "N" = (
-/turf/closed/indestructible/rock,
+/turf/closed/mineral/rogue/bedrock,
+/area/rogue/under/town/caverogue)
+"O" = (
+/obj/effect/landmark/chest_or_mimic,
+/obj/item/roguecoin/copper/pile,
+/turf/open/floor/rogue/blocks/stonered/tiny,
 /area/rogue/under/town/caverogue)
 "P" = (
 /turf/closed/wall/mineral/rogue/decostone/fluffstone/reddish,
@@ -162,14 +222,37 @@
 /mob/living/simple_animal/hostile/rogue/orc/spear,
 /turf/open/floor/rogue/blocks/stonered,
 /area/rogue/under/town/caverogue)
+"T" = (
+/mob/living/simple_animal/hostile/retaliate/rogue/bigrat,
+/obj/effect/landmark/chest_or_mimic,
+/turf/open/floor/rogue/blocks/stonered/tiny,
+/area/rogue/under/town/caverogue)
 "U" = (
 /mob/living/simple_animal/hostile/rogue/orc/orc_marauder/spear,
 /turf/open/floor/rogue/blocks/stonered,
 /area/rogue/under/town/caverogue)
 "V" = (
 /obj/machinery/light/rogue/torchholder/r,
-/obj/structure/toilet/greyscale,
+/obj/structure/toilet,
 /turf/open/floor/rogue/blocks/stonered,
+/area/rogue/under/town/caverogue)
+"W" = (
+/obj/structure/giantfur/small,
+/turf/open/floor/rogue/blocks/stonered,
+/area/rogue/under/town/caverogue)
+"X" = (
+/mob/living/simple_animal/hostile/retaliate/rogue/minotaur/axe,
+/turf/open/floor/rogue/blocks/stonered,
+/area/rogue/under/town/caverogue)
+"Y" = (
+/mob/living/carbon/human/species/zizombie/npc/GRENZEL,
+/turf/open/floor/rogue/blocks/stonered/tiny,
+/area/rogue/under/town/caverogue)
+"Z" = (
+/mob/living/simple_animal/hostile/retaliate/rogue/bigrat,
+/obj/effect/landmark/chest_or_mimic,
+/obj/item/roguecoin/copper/pile,
+/turf/open/floor/rogue/blocks/stonered/tiny,
 /area/rogue/under/town/caverogue)
 
 (1,1,1) = {"
@@ -230,7 +313,7 @@ a
 a
 a
 P
-n
+G
 a
 a
 a
@@ -324,7 +407,7 @@ a
 a
 a
 a
-a
+Y
 P
 N
 "}
@@ -394,7 +477,7 @@ P
 a
 P
 a
-n
+T
 P
 a
 a
@@ -478,7 +561,7 @@ a
 a
 a
 a
-a
+O
 P
 a
 a
@@ -488,7 +571,7 @@ N
 N
 a
 P
-a
+e
 P
 P
 m
@@ -718,7 +801,7 @@ P
 a
 a
 P
-a
+K
 P
 P
 P
@@ -740,7 +823,7 @@ a
 P
 a
 P
-a
+O
 a
 N
 "}
@@ -834,7 +917,7 @@ a
 a
 a
 a
-a
+i
 P
 a
 P
@@ -1029,7 +1112,7 @@ P
 P
 a
 P
-a
+O
 a
 a
 a
@@ -1096,7 +1179,7 @@ P
 b
 a
 P
-a
+K
 P
 a
 P
@@ -1141,7 +1224,7 @@ P
 a
 a
 P
-n
+Z
 a
 P
 a
@@ -1166,7 +1249,7 @@ a
 P
 a
 P
-a
+O
 P
 a
 a
@@ -1270,7 +1353,7 @@ a
 P
 a
 P
-a
+A
 a
 a
 a
@@ -1346,7 +1429,7 @@ P
 P
 P
 P
-a
+H
 a
 a
 P
@@ -1390,7 +1473,7 @@ P
 a
 a
 P
-R
+I
 l
 j
 D
@@ -1416,7 +1499,7 @@ a
 P
 a
 P
-a
+g
 P
 N
 "}
@@ -1448,7 +1531,7 @@ l
 l
 l
 P
-l
+d
 P
 a
 a
@@ -1500,7 +1583,7 @@ s
 l
 l
 L
-l
+W
 P
 a
 P
@@ -1549,8 +1632,8 @@ y
 l
 l
 l
-E
 l
+X
 l
 J
 P
@@ -1748,7 +1831,7 @@ P
 a
 P
 P
-a
+K
 P
 a
 a
@@ -1840,7 +1923,7 @@ N
 N
 a
 P
-n
+f
 P
 P
 P
@@ -1865,7 +1948,7 @@ a
 a
 P
 a
-a
+H
 P
 P
 a
@@ -1904,7 +1987,7 @@ a
 P
 a
 P
-a
+A
 P
 P
 P
@@ -2167,30 +2250,7 @@ a
 a
 P
 P
-a
-a
-P
-a
-a
-a
-a
-a
-a
-a
-a
-a
-a
-a
-a
-a
-a
-P
-P
-a
-a
-a
-a
-a
+E
 a
 P
 a
@@ -2198,6 +2258,29 @@ a
 a
 a
 a
+a
+a
+a
+a
+a
+a
+a
+a
+a
+P
+P
+a
+a
+a
+a
+a
+a
+P
+a
+a
+a
+a
+O
 N
 "}
 (40,1,1) = {"
@@ -2262,7 +2345,7 @@ a
 a
 a
 P
-a
+O
 a
 a
 a
@@ -2320,7 +2403,7 @@ a
 a
 a
 P
-a
+O
 a
 P
 P
@@ -2398,7 +2481,7 @@ a
 a
 P
 P
-a
+O
 P
 a
 P
@@ -2620,7 +2703,7 @@ N
 N
 a
 P
-a
+O
 a
 P
 P

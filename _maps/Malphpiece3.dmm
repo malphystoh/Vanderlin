@@ -40,7 +40,6 @@
 /obj/structure/fluff/walldeco/vinez/l,
 /obj/machinery/light/rogue/wallfire/candle/blue/l,
 /turf/open/floor/rogue/cobblerock/alt,
-/turf/open/floor/rogue/cobblerock/alt,
 /area/rogue/outdoors/caves)
 "o" = (
 /obj/machinery/light/rogue/wallfire/candle/blue/l,
@@ -65,7 +64,6 @@
 /turf/open/floor/rogue/cobblerock/alt,
 /area/rogue/outdoors/caves)
 "w" = (
-/mob/living/simple_animal/hostile/rogue/skeleton,
 /obj/item/clothing/suit/roguetown/shirt/tunic/blue,
 /obj/item/roguegem/blue,
 /obj/item/clothing/shoes/roguetown/boots,
@@ -76,6 +74,8 @@
 /obj/item/clothing/head/roguetown/hatblu,
 /obj/item/clothing/cloak/raincloak/blue,
 /obj/item/clothing/gloves/roguetown/leather/black,
+/mob/living/carbon/human/species/skeleton/npc/no_equipment,
+/obj/effect/mapping_helpers/floor_clothing_equipper,
 /turf/open/floor/rogue/cobblerock/alt,
 /area/rogue/outdoors/caves)
 "x" = (
@@ -111,7 +111,6 @@
 /obj/structure/fluff/walldeco/vinez/r,
 /obj/machinery/light/rogue/wallfire/candle/blue/r,
 /turf/open/floor/rogue/cobblerock/alt,
-/turf/open/floor/rogue/cobblerock/alt,
 /area/rogue/outdoors/caves)
 "I" = (
 /obj/structure/chair/wood/rogue/chair_noble,
@@ -121,7 +120,6 @@
 /obj/structure/fluff/walldeco/vinez/l,
 /obj/machinery/light/rogue/wallfire/candle/blue/l,
 /obj/item/reagent_containers/glass/bottle/rogue/whitewine,
-/turf/open/floor/rogue/cobblerock/alt,
 /turf/open/floor/rogue/cobblerock/alt,
 /area/rogue/outdoors/caves)
 "O" = (

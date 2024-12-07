@@ -82,10 +82,6 @@
 /mob/living/carbon/human/species/zizombie/npc/warrior,
 /turf/open/floor/rogue/blocks/stonered/tiny,
 /area/rogue/under/town/caverogue)
-"s" = (
-/obj/item/roguegem/random,
-/turf/open/floor/rogue/blocks/stonered,
-/area/rogue/under/town/caverogue)
 "t" = (
 /mob/living/simple_animal/hostile/rogue/orc,
 /turf/open/floor/rogue/blocks/stonered,
@@ -147,8 +143,6 @@
 /obj/item/clothing/ring/gold/protection,
 /obj/item/roguestatue/gold/loot,
 /obj/item/storage/belt/rogue/leather/plaquegold,
-/obj/item/roguegem/random,
-/obj/item/roguegem/random,
 /turf/open/floor/rogue/blocks/stonered,
 /area/rogue/under/town/caverogue)
 "E" = (
@@ -185,11 +179,6 @@
 /obj/effect/landmark/chest_or_mimic,
 /obj/item/roguecoin/silver/pile,
 /turf/open/floor/rogue/blocks/stonered/tiny,
-/area/rogue/under/town/caverogue)
-"L" = (
-/obj/machinery/light/rogue/torchholder/l,
-/obj/item/roguegem/random,
-/turf/open/floor/rogue/blocks/stonered,
 /area/rogue/under/town/caverogue)
 "M" = (
 /mob/living/simple_animal/hostile/rogue/orc/ranged,
@@ -1575,10 +1564,10 @@ a
 P
 l
 R
-s
 l
 l
-L
+l
+R
 W
 P
 a
@@ -1732,7 +1721,7 @@ P
 l
 P
 l
-s
+l
 l
 P
 l

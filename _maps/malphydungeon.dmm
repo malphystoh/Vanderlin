@@ -113,7 +113,6 @@
 "sG" = (
 /obj/structure/table/vtable,
 /obj/item/roguecoin/copper/pile,
-/obj/item/roguegem/random,
 /obj/item/roguecoin/copper/pile,
 /obj/item/roguecoin/copper/pile,
 /obj/item/roguecoin/copper/pile,
@@ -151,9 +150,6 @@
 /obj/item/roguestatue/gold/loot,
 /obj/item/clothing/ring/gold/rontz,
 /obj/item/roguecoin/silver/pile,
-/obj/item/roguegem/random,
-/obj/item/roguegem/random,
-/obj/item/roguegem/random,
 /turf/open/floor/rogue/cobble/mossy,
 /area/rogue/under/town/basement)
 "wL" = (

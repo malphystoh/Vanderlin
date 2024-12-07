@@ -62,6 +62,11 @@
 /obj/structure/flora/roguegrass/bush,
 /turf/open/floor/rogue/grass/red,
 /area/rogue/outdoors/rtfield)
+"jq" = (
+/obj/effect/decal/cleanable/blood,
+/obj/effect/decal/cleanable/blood/splatter,
+/turf/open/floor/rogue/grass/yel,
+/area/rogue/under/cave)
 "kS" = (
 /turf/open/floor/rogue/grass/cold,
 /area/rogue/outdoors/rtfield)
@@ -78,6 +83,9 @@
 /area/rogue/under/cave)
 "lO" = (
 /obj/item/natural/fur/volf,
+/obj/effect/decal/cleanable/blood/splatter,
+/obj/effect/decal/cleanable/blood/old,
+/obj/effect/decal/cleanable/blood,
 /turf/open/floor/rogue/dirt/ambush,
 /area/rogue/under/cave)
 "mk" = (
@@ -359,7 +367,7 @@ GG
 lG
 GG
 fb
-lG
+jq
 fb
 dy
 aT

@@ -132,9 +132,6 @@
 "lS" = (
 /obj/structure/closet/crate/coffin,
 /obj/structure/closet/burial_shroud,
-/obj/item/roguegem/random,
-/obj/item/roguegem/random,
-/obj/item/roguegem/random,
 /turf/open/floor/rogue/carpet/lord/center,
 /area/rogue/indoors/cave)
 "mm" = (
@@ -523,6 +520,8 @@
 /area/rogue/outdoors/rtfield)
 "Yw" = (
 /mob/living/carbon/human/species/skeleton/npc/warrior/skilled,
+/obj/effect/spawner/roguemap/loot/magic,
+/obj/effect/mapping_helpers/floor_clothing_equipper,
 /turf/open/floor/rogue/carpet/lord/center,
 /area/rogue/indoors/cave)
 "YE" = (

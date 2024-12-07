@@ -50,7 +50,7 @@
 		H.remove_all_languages()
 		H.base_intents = list(INTENT_HELP, INTENT_DISARM, INTENT_GRAB, /datum/intent/simple/claw)
 		H.update_a_intents()
-		H.cmode_music = 'sound/music/combat_weird.ogg'
+		H.cmode_music = 'sound/music/antag/combatskeleton.ogg'
 
 		var/obj/item/organ/eyes/eyes = H.getorganslot(ORGAN_SLOT_EYES)
 		if(eyes)
@@ -68,7 +68,7 @@
 		H.name = "skeleton"
 		H.real_name = "skeleton"
 		ADD_TRAIT(H, TRAIT_NOMOOD, TRAIT_GENERIC)
-		ADD_TRAIT(H, TRAIT_NOROGSTAM, TRAIT_GENERIC)
+		ADD_TRAIT(H, TRAIT_NOSTAMINA, TRAIT_GENERIC)
 		ADD_TRAIT(H, TRAIT_NOLIMBDISABLE, TRAIT_GENERIC)
 		ADD_TRAIT(H, TRAIT_NOHUNGER, TRAIT_GENERIC)
 		ADD_TRAIT(H, TRAIT_NOBREATH, TRAIT_GENERIC)
@@ -143,10 +143,10 @@
 			var/obj/item/rogueweapon/flail/militia/P = new()
 			H.put_in_hands(P, forced = TRUE)
 
-	H.STASTR = rand(8,10)
-	H.STASPD = rand(7,10)
-	H.STAINT = 1
-	H.STACON = 3
+	H.TOTALSTR = rand(8,10)
+	H.TOTALSPD = rand(7,10)
+	H.TOTALINT = 1
+	H.TOTALCON = 3
 	var/datum/antagonist/new_antag = new /datum/antagonist/skeleton()
 	H.mind.add_antag_datum(new_antag)
 

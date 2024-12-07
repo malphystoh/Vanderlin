@@ -24,6 +24,9 @@
 
 /datum/skill/craft/carpentry
 	name = "Carpentry"
+	dreams = list(
+		"...in the bitter cold, you stay in your cabin... in the dreary fire, the chair you made burns... the effort wasted, and yet you live..."
+	)
 
 /datum/skill/craft/masonry
 	name = "Masonry"
@@ -40,6 +43,14 @@
 
 /datum/skill/craft/alchemy
 	name = "Alchemy"
+
+/datum/skill/craft/alchemy/skill_level_effect(level, datum/mind/mind)
+	if(level > SKILL_LEVEL_MASTER)
+		ADD_TRAIT(mind?.current, TRAIT_LEGENDARY_ALCHEMIST, type)
+		//SEND_GLOBAL_SIGNAL(COMSIG_ATOM_ADD_TRAIT, (mind?.current, TRAIT_LEGENDARY_ALCHEMIST)
+	else if(HAS_TRAIT(mind?.current, TRAIT_LEGENDARY_ALCHEMIST))
+		REMOVE_TRAIT(mind?.current, TRAIT_LEGENDARY_ALCHEMIST, type)
+		//SEND_GLOBAL_SIGNAL(COMSIG_ATOM_ADD_TRAIT, (mind?.current, TRAIT_LEGENDARY_ALCHEMIST)
 
 /datum/skill/craft/bombs
 	name = "Bombcrafting"

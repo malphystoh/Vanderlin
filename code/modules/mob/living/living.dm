@@ -675,7 +675,6 @@
 		// You dont have any blood and your not bloodloss immune? Dead.
 		if(blood_volume <= 0)
 			health = 0
-	staminaloss = getStaminaLoss()
 	update_stat()
 	SEND_SIGNAL(src, COMSIG_LIVING_HEALTH_UPDATE)
 
@@ -708,7 +707,6 @@
 	SetImmobilized(0, FALSE)
 	SetParalyzed(0, FALSE)
 	SetSleeping(0, FALSE)
-	setStaminaLoss(0)
 	SetUnconscious(0, FALSE)
 	if(should_update_mobility)
 		update_mobility()
@@ -745,7 +743,7 @@
 	cure_blind()
 	cure_husk()
 	hallucination = 0
-	heal_overall_damage(INFINITY, INFINITY, INFINITY, null, TRUE) //heal brute and burn dmg on both organic and robotic limbs, and update health right away.
+	heal_overall_damage(INFINITY, INFINITY, null, TRUE) //heal brute and burn dmg on both organic and robotic limbs, and update health right away.
 	for(var/datum/wound/wound as anything in get_wounds())
 		if(admin_revive)
 			qdel(wound)
@@ -1035,7 +1033,7 @@
 	if(moving_resist && client) //we resisted by trying to move
 		client.move_delay = world.time + 20
 	if(prob(resist_chance))
-		rogfat_add(rand(5,15))
+		adjust_stamina(rand(5,15))
 		visible_message("<span class='warning'>[src] breaks free of [pulledby]'s grip!</span>", \
 						"<span class='notice'>I break free of [pulledby]'s grip!</span>", null, null, pulledby)
 		to_chat(pulledby, "<span class='danger'>[src] breaks free of my grip!</span>")
@@ -1049,7 +1047,7 @@
 
 		return FALSE
 	else
-		rogfat_add(rand(5,15))
+		adjust_stamina(rand(5,15))
 		var/shitte = ""
 //		if(client?.prefs.showrolls)
 //			shitte = " ([resist_chance]%)"
@@ -1283,9 +1281,6 @@
 		return FALSE
 	return TRUE
 
-/mob/living/proc/update_stamina()
-	return
-
 /mob/living/proc/owns_soul()
 	if(mind)
 		return mind.soulOwner == mind
@@ -1449,6 +1444,7 @@
 	else
 		mobility_flags |= MOBILITY_STAND
 		lying = 0
+	update_cone_show()
 
 /*
 	if(should_be_lying || restrained || incapacitated())
@@ -1657,7 +1653,6 @@
 			OXY:<font size='1'><a href='?_src_=vars;[HrefToken()];mobToDamage=[refid];adjustDamage=oxygen' id='oxygen'>[getOxyLoss()]</a>
 			CLONE:<font size='1'><a href='?_src_=vars;[HrefToken()];mobToDamage=[refid];adjustDamage=clone' id='clone'>[getCloneLoss()]</a>
 			BRAIN:<font size='1'><a href='?_src_=vars;[HrefToken()];mobToDamage=[refid];adjustDamage=brain' id='brain'>[getOrganLoss(ORGAN_SLOT_BRAIN)]</a>
-			STAMINA:<font size='1'><a href='?_src_=vars;[HrefToken()];mobToDamage=[refid];adjustDamage=stamina' id='stamina'>[getStaminaLoss()]</a>
 		</font>
 	"}
 
@@ -1722,6 +1717,15 @@
 					found_ping(get_turf(M), client, "trap")
 			if(istype(O, /obj/structure/flora/roguegrass/maneater/real))
 				found_ping(get_turf(O), client, "trap")
+
+		for(var/obj/effect/skill_tracker/potential_track in orange(7, src)) //Can't use view because they're invisible by default.
+			if(!can_see(src, potential_track, 10))
+				continue
+			if(!potential_track.check_reveal(src))
+				continue
+			found_ping(get_turf(potential_track), client, "hidden")
+			potential_track.handle_revealing(src)
+
 
 /proc/found_ping(atom/A, client/C, state)
 	if(!A || !C || !state)

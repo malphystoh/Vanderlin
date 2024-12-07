@@ -51,17 +51,17 @@
 		H.mind?.adjust_skillrank(/datum/skill/misc/stealing, pick(1,2,3,4,5), TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/misc/lockpicking, pick(1,2,3,4,5), TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/misc/climbing, pick(4,5), TRUE) // Pirouette, but falling and hurting yourself IS pretty funny.
-		H.mind?.adjust_skillrank(/datum/skill/misc/athletics, pick(1,2,3,4,5), TRUE)
+		H.mind?.adjust_skillrank(/datum/skill/misc/athletics, pick(4,4,4,4,5), TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/misc/music, pick(1,2,3,4,5,6), TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/craft/cooking, pick(1,2,3,4,5,6), TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/combat/firearms, pick(1,2,3,4,5,6), TRUE)
 		H.mind.AddSpell(new /obj/effect/proc_holder/spell/invoked/mockery) // Mock people to your heart's content!
-		H.STAINT = rand(1, 20)
-		H.STALUC = rand(1, 20)
-		H.STASTR = rand(1, 20)
-		H.STACON = rand(1, 20)
-		H.STAPER = rand(1, 20)
-		H.STASPD = rand(1, 20)
+		H.TOTALINT = rand(1, 20)
+		H.TOTALLUC = rand(1, 20)
+		H.TOTALSTR = rand(1, 20)
+		H.TOTALCON = rand(1, 20)
+		H.TOTALPER = rand(1, 20)
+		H.TOTALSPD = rand(1, 20)
 
 		if(H.STASTR > 16)
 			H.cmode_music = 'sound/music/combat_jester3.ogg'
@@ -83,6 +83,7 @@
 	H.verbs |= /mob/living/carbon/human/proc/ear_trick
 	ADD_TRAIT(H, TRAIT_EMPATH, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_NUTCRACKER, TRAIT_GENERIC)
+	ADD_TRAIT(H, TRAIT_ZJUMP, TRAIT_GENERIC)
 
 //Ventriloquism! Make things speak!
 

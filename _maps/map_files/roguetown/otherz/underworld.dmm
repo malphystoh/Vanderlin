@@ -19,7 +19,9 @@
 /turf/open/floor/rogue/churchrough,
 /area/rogue/underworld)
 "fC" = (
-/obj/structure/bars,
+/obj/structure/bars{
+	max_integrity = 700000
+	},
 /turf/open/floor/rogue/church,
 /area/rogue/underworld)
 "ip" = (
@@ -84,11 +86,23 @@
 	},
 /turf/open/floor/rogue/churchrough,
 /area/rogue/underworld)
+"xe" = (
+/obj/structure/underworld/necra{
+	pixel_x = -64
+	},
+/turf/open/floor/rogue/underworld/space,
+/area/rogue/underworld)
 "xn" = (
 /turf/open/floor/rogue/underworld/space,
 /area/rogue/underworld)
 "xG" = (
-/obj/effect/landmark/underworldcoin,
+/obj/effect/landmark/underworld_spawnpoint,
+/turf/open/floor/rogue/church,
+/area/rogue/underworld)
+"xS" = (
+/obj/structure/stairs/stone/church{
+	dir = 8
+	},
 /turf/open/floor/rogue/church,
 /area/rogue/underworld)
 "yn" = (
@@ -134,9 +148,9 @@
 /area/rogue/underworld)
 "Df" = (
 /obj/structure/stairs/stone/church{
-	dir = 1
+	dir = 8
 	},
-/turf/open/floor/rogue/church,
+/turf/open/floor/rogue/churchrough,
 /area/rogue/underworld)
 "DM" = (
 /obj/structure/stairs/stone/church{
@@ -163,10 +177,10 @@
 /turf/closed/indestructible/wooddark/mast,
 /area/rogue)
 "GV" = (
-/obj/structure/underworld/carriageman{
-	pixel_x = -32;
-	pixel_y = -20;
-	name = "Necra PLACEHOLDER"
+/obj/structure/underworld/ravox{
+	layer = 4.82;
+	pixel_x = 7;
+	pixel_y = -6
 	},
 /turf/open/floor/rogue/church,
 /area/rogue/underworld)
@@ -192,7 +206,7 @@
 /area/rogue/underworld)
 "Kf" = (
 /obj/machinery/light/rogue/firebowl/standing/blue,
-/turf/open/floor/rogue/underworld/road,
+/turf/open/floor/rogue/church,
 /area/rogue/underworld)
 "KU" = (
 /turf/closed/indestructible/wooddark/mast,
@@ -254,6 +268,10 @@
 /obj/machinery/light/rogue/wallfire/candle/blue,
 /turf/open/floor/rogue/churchmarble,
 /area/rogue/underworld)
+"Tb" = (
+/obj/structure/underworld/barrier,
+/turf/open/floor/rogue/underworld/road,
+/area/rogue/underworld)
 "Td" = (
 /obj/machinery/light/rogue/wallfire/candle/blue{
 	pixel_y = -32
@@ -281,7 +299,8 @@
 /area/rogue/underworld)
 "Vp" = (
 /obj/structure/gate/bars{
-	gid = "death"
+	gid = "death";
+	max_integrity = 5000000
 	},
 /turf/open/floor/rogue/churchrough,
 /area/rogue/underworld)
@@ -9854,10 +9873,10 @@ sz
 sz
 sz
 sz
-Qn
-df
-Lk
-Lk
+sz
+sz
+sz
+sz
 sz
 sz
 sz
@@ -9984,11 +10003,11 @@ sz
 sz
 sz
 sz
-Qn
-df
-df
-Lk
-Lk
+sz
+sz
+sz
+sz
+sz
 sz
 sz
 sz
@@ -10114,11 +10133,11 @@ sz
 sz
 sz
 sz
-Qn
-df
-df
-df
-Lk
+Df
+Df
+Df
+sz
+sz
 sz
 sz
 Wt
@@ -10245,7 +10264,7 @@ sz
 sz
 sz
 Lk
-Lk
+df
 df
 df
 Lk
@@ -10375,10 +10394,10 @@ sz
 sz
 sz
 IP
-Lk
 df
 df
-Lk
+df
+df
 IP
 sz
 Wt
@@ -10505,11 +10524,11 @@ sz
 sz
 sz
 IP
-Lk
 df
 df
-Lk
-Lk
+df
+df
+IP
 sz
 Wt
 sz
@@ -10635,7 +10654,7 @@ sz
 sz
 sz
 Lk
-Lk
+df
 df
 df
 Lk
@@ -10767,7 +10786,7 @@ Lk
 Lk
 df
 df
-Lk
+df
 Lk
 PP
 sz
@@ -11026,7 +11045,7 @@ PP
 Lk
 df
 df
-Lk
+df
 Lk
 PP
 sz
@@ -11154,7 +11173,7 @@ sz
 PP
 Lk
 Lk
-Lk
+df
 df
 Lk
 Lk
@@ -15058,7 +15077,7 @@ sO
 sO
 sO
 sO
-sO
+rm
 sO
 sO
 sO
@@ -25193,7 +25212,7 @@ PP
 PP
 PP
 IP
-Lk
+Tb
 Lk
 fC
 Wt
@@ -25577,9 +25596,9 @@ xn
 xn
 xn
 xn
-xn
-GV
+xe
 Wt
+GV
 lw
 Wt
 Wt
@@ -25973,7 +25992,7 @@ PP
 PP
 PP
 IP
-Lk
+Tb
 Lk
 fC
 Wt
@@ -26104,7 +26123,7 @@ PP
 PP
 PP
 PP
-Bj
+yn
 sz
 Wt
 ol
@@ -26231,11 +26250,11 @@ xn
 xn
 PP
 PP
-Wt
-Wt
-Wt
-Wt
-Wt
+PP
+PP
+PP
+aC
+Kf
 Wt
 ol
 ol
@@ -26361,12 +26380,12 @@ xn
 xn
 xn
 PP
-Wt
-Lk
 PP
-sz
-sz
-sz
+PP
+PP
+aC
+Wt
+Wt
 Wt
 ol
 ol
@@ -26491,13 +26510,13 @@ xn
 xn
 xn
 PP
+PP
+PP
+PP
+aC
 Wt
 Wt
 Wt
-Df
-kH
-sz
-sz
 Wt
 ol
 ol
@@ -26620,14 +26639,14 @@ xn
 xn
 xn
 PP
-Kf
-Wt
-Wt
-Wt
-Df
-kH
-kH
-sz
+PP
+PP
+PP
+PP
+aC
+xS
+xS
+xS
 sz
 vI
 ol
@@ -26751,10 +26770,10 @@ xn
 xn
 PP
 PP
-Wt
-Wt
-Wt
-Df
+PP
+PP
+PP
+aC
 kH
 kH
 kH
@@ -26881,10 +26900,10 @@ xn
 xn
 PP
 PP
-Kf
 PP
-Lk
-yn
+PP
+PP
+aC
 kH
 kH
 kH
@@ -29080,7 +29099,7 @@ xn
 PP
 Lk
 Lk
-Lk
+Jx
 Lk
 PP
 PP
@@ -29597,12 +29616,12 @@ xn
 xn
 PP
 PP
-Lk
+Jx
 Lk
 PP
 PP
 Lk
-Lk
+Jx
 Lk
 PP
 kH
@@ -30766,7 +30785,7 @@ xn
 xn
 xn
 PP
-Lk
+Jx
 Lk
 Lk
 PP
@@ -30799,7 +30818,7 @@ Lk
 Lk
 Lk
 Lk
-Lk
+Jx
 Lk
 Lk
 Lk
@@ -31297,7 +31316,7 @@ PP
 Lk
 Lk
 Lk
-Lk
+Jx
 Lk
 Lk
 PP
@@ -31431,7 +31450,7 @@ Lk
 Lk
 Lk
 PP
-Lk
+Jx
 Lk
 Lk
 Lk
@@ -31971,7 +31990,7 @@ Jx
 Lk
 Lk
 PP
-Lk
+Jx
 Lk
 PP
 Lk

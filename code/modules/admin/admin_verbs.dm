@@ -15,6 +15,7 @@ GLOBAL_PROTECT(admin_verbs_default)
 	/datum/admins/proc/start_vote,
 	/datum/admins/proc/show_player_panel,
 	/datum/admins/proc/admin_heal,
+	/datum/admins/proc/admin_curse,
 	/datum/admins/proc/admin_sleep,
 	/client/proc/ghost_down,
 	/client/proc/jumptoarea,
@@ -28,7 +29,7 @@ GLOBAL_PROTECT(admin_verbs_default)
 	/client/proc/admin_force_next_migrant_wave,
 	/client/proc/cmd_admin_say,
 	/client/proc/deadmin,				/*destroys our own admin datum so we can play as a regular player*/
-	/client/proc/set_context_menu_enabled,
+	/client/proc/toggle_context_menu,
 	/client/proc/delete_player_book,
 	/client/proc/ShowAllFamilies,
 	)
@@ -348,16 +349,17 @@ GLOBAL_PROTECT(admin_verbs_hideable)
 	SSblackbox.record_feedback("tally", "admin_verb", 1, "Show Adminverbs") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 
 
-/client/proc/set_context_menu_enabled(Enable as num)
+/client/proc/toggle_context_menu()
 	set category = "Admin"
 	set name = "Right-click Menu"
-	if(holder)
-		if(Enable)
-			show_popup_menus = TRUE
-		else
-			show_popup_menus = FALSE
+	if(!holder)
+		return
+	if(show_popup_menus == FALSE)
+		show_popup_menus = TRUE
+		log_admin("[key_name(usr)] toggled context menu ON.")
 	else
 		show_popup_menus = FALSE
+		log_admin("[key_name(usr)] toggled context menu OFF.")
 
 /client/proc/admin_ghost()
 	set category = "GameMaster"
@@ -673,7 +675,7 @@ GLOBAL_PROTECT(admin_verbs_hideable)
 
 	holder.deactivate()
 
-	to_chat(src, "<span class='interface'>I are now a normal player.</span>")
+	to_chat(src, "<span class='interface'>I am now a normal player.</span>")
 	log_admin("[src] deadmined themself.")
 	message_admins("[src] deadmined themself.")
 	SSblackbox.record_feedback("tally", "admin_verb", 1, "Deadmin")

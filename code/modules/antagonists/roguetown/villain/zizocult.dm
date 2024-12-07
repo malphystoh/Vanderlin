@@ -553,16 +553,16 @@ GLOBAL_LIST_EMPTY(ritualslist)
 		H.mob_biotypes = MOB_UNDEAD
 		H.faction = list("undead")
 
-		H.STASPD = rand(7,10)
-		H.STAINT = 1
-		H.STACON = 3
-		H.STASTR = rand(8,17)
+		H.TOTALSPD = rand(7,10)
+		H.TOTALINT = 1
+		H.TOTALCON = 3
+		H.TOTALSTR = rand(8,17)
 
 		H.verbs |= /mob/living/carbon/human/proc/praise
 		H.verbs |= /mob/living/carbon/human/proc/communicate
 
 		ADD_TRAIT(H, TRAIT_NOMOOD, TRAIT_GENERIC)
-		ADD_TRAIT(H, TRAIT_NOROGSTAM, TRAIT_GENERIC)
+		ADD_TRAIT(H, TRAIT_NOSTAMINA, TRAIT_GENERIC)
 		ADD_TRAIT(H, TRAIT_NOLIMBDISABLE, TRAIT_GENERIC)
 		ADD_TRAIT(H, TRAIT_NOHUNGER, TRAIT_GENERIC)
 		ADD_TRAIT(H, TRAIT_NOBREATH, TRAIT_GENERIC)
@@ -599,7 +599,7 @@ GLOBAL_LIST_EMPTY(ritualslist)
 						return
 					if(istype(HL.wear_neck, /obj/item/clothing/neck/roguetown/psycross))
 						return
-					if(HAS_TRAIT(HL, TRAIT_NOROGSTAM))
+					if(HAS_TRAIT(HL, TRAIT_NOSTAMINA))
 						return
 					to_chat(HL.mind, "<span class='warning'>I'm so sleepy...</span>")
 					HL.SetSleeping(30)

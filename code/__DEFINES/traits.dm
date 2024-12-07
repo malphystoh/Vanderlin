@@ -13,11 +13,12 @@
 #define TRAIT_MEDIUMARMOR				"Mail Training"
 #define TRAIT_HEAVYARMOR				"Plate Training"
 #define TRAIT_DODGEEXPERT              "Fast Reflexes"
+#define TRAIT_DECEIVING_MEEKNESS 		"Deceiving Meekness"
 #define TRAIT_VILLAIN					"Villain"
 #define TRAIT_CRITICAL_RESISTANCE		"Critical Resistance"
 #define TRAIT_CRITICAL_WEAKNESS		"Critical Weakness"
 #define TRAIT_MANIAC_AWOKEN			"Awoken"
-#define TRAIT_NOROGSTAM				"Indefatigable" //for ai
+#define TRAIT_NOSTAMINA				"Indefatigable" //for ai
 #define TRAIT_NOSLEEP				"Fatal Insomnia" //for thralls
 #define TRAIT_FASTSLEEP 			"Fast Sleeper"
 #define TRAIT_NUDIST					"Nudist" //you can't wear most clothes
@@ -38,6 +39,7 @@
 #define TRAIT_ANTIMAGIC					"Anti-Magic"
 #define TRAIT_ANTISCRYING				"Anti-Scrying"
 #define TRAIT_SHOCKIMMUNE				"Shock Immunity"
+#define TRAIT_LEGENDARY_ALCHEMIST		"Expert Herb Finder"
 
 // Divine patron trait bonuses:
 #define TRAIT_SOUL_EXAMINE				"Blessing of Necra"  //can check bodies to see if they have departed
@@ -54,6 +56,8 @@
 #define TRAIT_BASHDOORS "bashdoors"
 #define TRAIT_NOMOOD "no_mood"
 #define TRAIT_SIMPLE_WOUNDS "simple_wounds"
+#define TRAIT_SCHIZO_AMBIENCE "schizo_ambience" //replaces all ambience with creepy shit
+#define TRAIT_SCREENSHAKE "screenshake" //screen will always be shaking, you cannot stop it
 #define TRAIT_BANDITCAMP "banditcamp"
 #define TRAIT_KNOWBANDITS "knowbandits"
 #define TRAIT_VAMPMANSION "vampiremansion"
@@ -69,6 +73,22 @@
 // JOB RELATED TRAITS
 
 #define TRAIT_MALUMFIRE "Professional Smith"
+
+// PATRON CURSE TRAITS
+#define TRAIT_CURSE "Curse" //source
+#define TRAIT_ATHEISM_CURSE "Curse of Atheism"
+#define TRAIT_PSYDON_CURSE "Psydon's Curse"
+#define TRAIT_ASTRATA_CURSE "Astrata's Curse"
+#define TRAIT_NOC_CURSE "Noc's Curse"
+#define TRAIT_RAVOX_CURSE "Ravox's Curse"
+#define TRAIT_NECRA_CURSE "Necra's Curse"
+#define TRAIT_XYLIX_CURSE "Xylix's Curse"
+#define TRAIT_PESTRA_CURSE "Pestra's Curse"
+#define TRAIT_EORA_CURSE "Eora's Curse"
+#define TRAIT_ZIZO_CURSE "Zizo's Curse"
+#define TRAIT_GRAGGAR_CURSE "Graggar's Curse"
+#define TRAIT_MATTHIOS_CURSE "Matthios' Curse"
+#define TRAIT_BAOTHA_CURSE "Baotha's Curse"
 
 GLOBAL_LIST_INIT(roguetraits, list(
 	TRAIT_WEBWALK = "I can move freely between webs.",
@@ -90,7 +110,7 @@ GLOBAL_LIST_INIT(roguetraits, list(
 	TRAIT_CRITICAL_RESISTANCE = "I am resistant to wounds that would be life threatening to others.",
 	TRAIT_CRITICAL_WEAKNESS = span_danger("I am weak to wounds that others could survive."),
 	TRAIT_MANIAC_AWOKEN = span_danger("I am <b>WAKING UP</b> and the sheeple know this. They will resist."),
-	TRAIT_NOROGSTAM = "I have boundless energy, I will never tire.",
+	TRAIT_NOSTAMINA = "I have boundless energy, I will never tire.",
 	TRAIT_NOSLEEP = span_warning("I can't sleep."),
 	TRAIT_NUDIST = "I <b>refuse</b> to wear clothes. They are a hindrance to my freedom.",
 	TRAIT_KNEESTINGER_IMMUNITY = "I am immune to the shock of kneestingers.",
@@ -117,6 +137,8 @@ GLOBAL_LIST_INIT(roguetraits, list(
 	TRAIT_MALUMFIRE = "My hands are blessed by Malum to forge items of superb quality.",
 	TRAIT_DEATHSIGHT = span_info("I can feel when someone nearby draws the Undermaiden's attention, a tiny voice whispering 'Someone has died,' in my ear."),
 	TRAIT_CABAL = span_info("In secret, I have studied the ways of Her ascension, and know of others of the Cabal."),
+	TRAIT_LEGENDARY_ALCHEMIST = span_info("An expert in the art of finding herbs in the wild."),
+	TRAIT_DECEIVING_MEEKNESS = "People look at me and think I am a weakling. They are mistaken.",
 	))
 
 // trait accessor defines
@@ -127,6 +149,7 @@ GLOBAL_LIST_INIT(roguetraits, list(
 			target.status_traits = list(); \
 			_L = target.status_traits; \
 			_L[trait] = list(source); \
+			SEND_GLOBAL_SIGNAL(COMSIG_ATOM_ADD_TRAIT, target, trait); \
 		} else { \
 			_L = target.status_traits; \
 			if (_L[trait]) { \
@@ -134,6 +157,7 @@ GLOBAL_LIST_INIT(roguetraits, list(
 			} else { \
 				_L[trait] = list(source); \
 			} \
+			SEND_GLOBAL_SIGNAL(COMSIG_ATOM_ADD_TRAIT, target, trait);\
 		} \
 	} while (0)
 #define REMOVE_TRAIT(target, trait, sources) \
@@ -152,7 +176,8 @@ GLOBAL_LIST_INIT(roguetraits, list(
 				} \
 			};\
 			if (!length(_L[trait])) { \
-				_L -= trait \
+				_L -= trait; \
+				SEND_GLOBAL_SIGNAL(COMSIG_ATOM_REMOVE_TRAIT, target, trait); \
 			}; \
 			if (!length(_L)) { \
 				target.status_traits = null \
@@ -304,6 +329,7 @@ Remember to update _globalvars/traits.dm if you're adding/removing/renaming trai
 #define INNATE_TRAIT "innate"
 
 // unique trait sources, still defines
+#define TRAIT_BESTIALSENSE "bestial-sense"
 #define TRAIT_DARKVISION "darkvision"
 #define CLONING_POD_TRAIT "cloning-pod"
 #define STATUE_MUTE "statue"

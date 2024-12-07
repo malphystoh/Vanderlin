@@ -69,7 +69,7 @@
 		return FALSE
 	if(lying)
 		return FALSE
-	if(user.badluck(4))
+	if(user.stat_roll(STATKEY_LCK,4,10,TRUE))
 		var/list/usedp = list("Critical miss!", "Damn! Critical miss!", "No! Critical miss!", "It can't be! Critical miss!", "Betrayed by lady luck! Critical miss!", "Bad luck! Critical miss!", "Curse creation! Critical miss!", "What?! Critical miss!")
 		to_chat(user, "<span class='boldwarning'>[pick(usedp)]</span>")
 		flash_fullscreen("blackflash2")
@@ -317,7 +317,7 @@
 /mob/proc/do_parry(obj/item/W, parrydrain as num, mob/living/user)
 	if(ishuman(src))
 		var/mob/living/carbon/human/H = src
-		if(H.rogfat_add(parrydrain))
+		if(H.adjust_stamina(parrydrain))
 			if(W)
 				playsound(get_turf(src), pick(W.parrysound), 100, FALSE)
 			if(istype(rmb_intent, /datum/rmb_intent/riposte))
@@ -342,7 +342,7 @@
 /mob/proc/do_unarmed_parry(parrydrain as num, mob/living/user)
 	if(ishuman(src))
 		var/mob/living/carbon/human/H = src
-		if(H.rogfat_add(parrydrain))
+		if(H.adjust_stamina(parrydrain))
 			playsound(get_turf(src), pick(parry_sound), 100, FALSE)
 			src.visible_message("<span class='warning'><b>[src]</b> parries [user] with their hands!</span>")
 			return TRUE
@@ -373,8 +373,8 @@
 		AH = user
 		I = AH.used_intent.masteritem
 
-	var/dodge_score = D.simpmob_defend
-	if(D.rogfat >= D.maxrogfat)
+	var/dodge_score = D.defprob
+	if(D.stamina >= D.maximum_stamina)
 		return FALSE
 	if(!(D.mobility_flags & MOBILITY_STAND))							//Can't dodge when knocked down
 		return FALSE
@@ -384,13 +384,13 @@
 		else
 			dodge_score += ((D.STASPD * 10))
 	if(A)
-		dodge_score -= (A.mind ? (A.STASPD * 5) : A.simpmob_attack)
+		dodge_score -= A.STASPD * 5
 	if(I)
 		if(AH?.mind)
 			dodge_score -= (AH.mind.get_skill_level(I.associated_skill) * 10) //this means at legendary -60 dodge rating
-
-	if(I.wbalance > 0)													//Enemy weapon is quick, so they get a bonus based on spddiff
-		dodge_score -= ((A.STASPD - D.STASPD) * 5)
+	if(I)
+		if(I.wbalance > 0)													//Enemy weapon is quick, so they get a bonus based on spddiff
+			dodge_score -= ((A.STASPD - D.STASPD) * 5)
 
 	dodge_score += (D.rmb_intent?.def_bonus)								//Dodge bonus from Poise
 
@@ -450,7 +450,7 @@
 			to_chat(src, span_info("Roll under [dodge_score] to dodge... [dodgeroll]"))
 		if(dodgeroll > dodge_score)
 			return FALSE
-		if(!DH.rogfat_add(max(drained, 5)))
+		if(!DH.adjust_stamina(max(drained, 5)))
 			to_chat(src, span_warning("I'm too tired to dodge!"))
 			return FALSE
 	else																//Defender is non human

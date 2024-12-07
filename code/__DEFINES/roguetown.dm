@@ -3,9 +3,34 @@
 
 #define ALL_PLAYER_RACES_BY_NAME		list("Humen", "Half-Elf", "Dark Elf", "Elf", "Dwarf","Tiefling", "Half-Orc", "Aasimar")
 
-#define ALL_TEMPLE_PATRONS 		list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/eora, /datum/patron/divine/necra, /datum/patron/divine/pestra, /datum/patron/divine/dendor)
-#define ALL_CLERIC_PATRONS 		list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/eora, /datum/patron/divine/necra, /datum/patron/divine/pestra, /datum/patron/divine/dendor)
-#define ALL_TEMPLAR_PATRONS 	list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/eora, /datum/patron/divine/necra, /datum/patron/divine/pestra, /datum/patron/divine/dendor)
+#define ALL_TEMPLE_PATRONS 		list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/eora, /datum/patron/divine/necra, /datum/patron/divine/pestra, /datum/patron/divine/dendor, /datum/patron/divine/abyssor)
+#define ALL_CLERIC_PATRONS 		list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/eora, /datum/patron/divine/necra, /datum/patron/divine/pestra, /datum/patron/divine/dendor, /datum/patron/divine/abyssor)
+#define ALL_TEMPLAR_PATRONS 	list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/eora, /datum/patron/divine/necra, /datum/patron/divine/pestra, /datum/patron/divine/dendor, /datum/patron/divine/abyssor)
+
+#define TEN_CURSES list(\
+	/datum/curse/astrata,\
+	/datum/curse/noc,\
+	/datum/curse/ravox,\
+	/datum/curse/necra,\
+	/datum/curse/xylix,\
+	/datum/curse/pestra,\
+	/datum/curse/eora\
+)
+
+#define INHUMEN_CURSES list(\
+	/datum/curse/zizo,\
+	/datum/curse/graggar,\
+	/datum/curse/matthios,\
+	/datum/curse/baotha\
+)
+#define SPECIAL_CURSES list(\
+	/datum/curse/atheism\
+)
+#define ALL_CURSES list(\
+	SPECIAL_CURSES,\
+	TEN_CURSES,\
+	INHUMEN_CURSES\
+)
 
 #define PLATEHIT "plate"
 #define CHAINHIT "chain"
@@ -57,7 +82,6 @@ GLOBAL_LIST_INIT(wolf_suffixes, list("Fang", "Claw", "Stalker", "Prowler", "Roar
 #define FAMILY_OMMER "Parents Sibling"
 #define FAMILY_INLAW "In Law"
 
-GLOBAL_LIST_EMPTY(sunlights)
 GLOBAL_LIST_EMPTY(job_respawn_delays)
 
 //stress levels

@@ -7,6 +7,8 @@
 	sheet_type = null
 	baseturfs = list(/turf/open/floor/rogue/dirt/road)
 	wallclimb = TRUE
+	explosion_block = 10
+	damage_deflection = 0
 	icon = 'icons/turf/roguewall.dmi'
 
 /turf/closed/wall/mineral/rogue/examine()
@@ -44,12 +46,14 @@
 	neighborlay = "dirtedge"
 	climbdiff = 1
 	damage_deflection = 10
+	hardness = 3
 
 /turf/closed/wall/mineral/rogue/stone/window
 	name = "stone murder hole"
 	desc = "A wall of stone with convenient small indents on it, perfect to let loose arrows against invaders."
 	opacity = FALSE
 	max_integrity = 800
+	explosion_block = 2
 
 /turf/closed/wall/mineral/rogue/stone/window/CanPass(atom/movable/mover, turf/target)
 	if(istype(mover) && ((mover.pass_flags & PASSTABLE) || (mover.pass_flags & PASSGRILLE)) )
@@ -71,8 +75,8 @@
 	climbdiff = 4
 
 /turf/closed/wall/mineral/rogue/craftstone
-	name = "stone wall"
-	desc = "A wall of smooth, unyielding stone."
+	name = "craftstone wall"
+	desc = "A durable wall made from specially crafted stone."
 	icon = 'icons/turf/walls/craftstone.dmi'
 	icon_state = "box"
 	smooth = SMOOTH_MORE
@@ -91,7 +95,7 @@
 
 /turf/closed/wall/mineral/rogue/stonebrick
 	name = "brick wall"
-	desc = "Several bricks form this wall."
+	desc = "Several rows of bricks form this wall."
 	icon = 'icons/turf/walls/stonebrick.dmi'
 	icon_state = "stonebrick"
 	smooth = SMOOTH_MORE
@@ -107,6 +111,7 @@
 	neighborlay = "dirtedge"
 	climbdiff = 4
 	damage_deflection = 20
+	hardness = 2
 
 /*	..................   Red brick Walls   ................... */
 /turf/closed/wall/mineral/rogue/stonebrick/reddish
@@ -123,7 +128,7 @@
 
 
 /turf/closed/wall/mineral/rogue/wood
-	name = "wall"
+	name = "wooden wall"
 	desc = "A rough-hewn wall of wood."
 	icon = 'icons/turf/walls/roguewood.dmi'
 	icon_state = "wood"
@@ -138,6 +143,8 @@
 	baseturfs = list(/turf/open/floor/rogue/ruinedwood)
 	neighborlay = "dirtedge"
 	climbdiff = 3
+	explosion_block = 4
+	hardness = 7
 
 /turf/closed/wall/mineral/rogue/wood/window
 	name = "wooden window"
@@ -171,20 +178,22 @@
 	baseturfs = list(/turf/open/floor/rogue/twig)
 	neighborlay = "dirtedge"
 	climbdiff = 1
+	explosion_block = 0
+	hardness = 70
 
 
 /turf/closed/wall/mineral/rogue/tent/OnCrafted(dirin)
 	dir = dirin
-	return
+	return ..()
 
 /turf/closed/wall/mineral/rogue/wooddark
-	name = "wooden wall"
+	name = "dark wood wall"
 	desc = "Made from durable, somewhat darker wood."
 	icon = 'icons/turf/roguewall.dmi'
 	icon_state = "corner"
 	smooth = SMOOTH_FALSE
 	blade_dulling = DULLING_BASHCHOP
-	max_integrity = 1100
+	max_integrity = 1500
 	break_sound = 'sound/combat/hits/onwood/destroywalldoor.ogg'
 	attacked_sound = list('sound/combat/hits/onwood/woodimpact (1).ogg','sound/combat/hits/onwood/woodimpact (2).ogg')
 //	sheet_type = /obj/item/grown/log/tree/lumber
@@ -192,27 +201,36 @@
 	baseturfs = list(/turf/open/floor/rogue/ruinedwood)
 	neighborlay = "dirtedge"
 	climbdiff = 3
+	explosion_block = 4
+	hardness = 7
+
+/turf/closed/wall/mineral/rogue/wooddark/OnCrafted(dirin)
+	if(dirin == NORTH || dirin == SOUTH)
+		icon_state = "vertwooddark"
+	else
+		icon_state = "horizwooddark"
+	. = ..()
 
 /turf/closed/wall/mineral/rogue/wooddark/horizontal
-	name = "wooden wall"
 	icon_state = "horizwooddark"
 
 /turf/closed/wall/mineral/rogue/wooddark/vertical
-	name = "wooden wall"
 	icon_state = "vertwooddark"
 
 /turf/closed/wall/mineral/rogue/wooddark/end
-	name = "wooden wall"
 	icon_state = "endwooddark"
 
 /turf/closed/wall/mineral/rogue/wooddark/slitted
-	name = "wooden wall"
 	icon_state = "slittedwooddark"
 
 /turf/closed/wall/mineral/rogue/wooddark/window
-	name = "wooden window"
+	name = "dark wood window"
 	icon_state = "subwindow"
 	opacity = FALSE
+	explosion_block = 1
+
+/turf/closed/wall/mineral/rogue/wooddark/window/OnCrafted(dirin)
+	return
 
 /turf/closed/wall/mineral/rogue/wooddark/window/CanPass(atom/movable/mover, turf/target)
 	if(istype(mover) && ((mover.pass_flags & PASSTABLE) || (mover.pass_flags & PASSGRILLE)) )
@@ -232,6 +250,7 @@
 	baseturfs = list(/turf/open/floor/rogue/ruinedwood)
 	neighborlay = "dirtedge"
 	climbdiff = 3
+	hardness = 7
 
 /turf/closed/wall/mineral/rogue/roofwall/center
 	icon_state = "roofTurf_I"
@@ -247,7 +266,7 @@
 
 /turf/closed/wall/mineral/rogue/decowood
 	name = "daub wall"
-	desc = "a wattle and daub wall."
+	desc = "A wattle and daub wall."
 	icon = 'icons/turf/roguewall.dmi'
 	icon_state = "decowood"
 	smooth = SMOOTH_FALSE
@@ -260,6 +279,8 @@
 	baseturfs = list(/turf/open/floor/rogue/ruinedwood)
 	neighborlay = "dirtedge"
 	climbdiff = 3
+	explosion_block = 4
+	hardness = 7
 
 /turf/closed/wall/mineral/rogue/decowood/Initialize()
 	. = ..()
@@ -270,7 +291,7 @@
 
 /turf/closed/wall/mineral/rogue/decostone
 	name = "decorated stone wall"
-	desc = "The masons did some good work here."
+	desc = "The mason did an excellent job etching details into this wall."
 	icon = 'icons/turf/roguewall.dmi'
 	icon_state = "decostone-b"
 	smooth = SMOOTH_MORE
@@ -284,6 +305,7 @@
 	baseturfs = list(/turf/open/floor/rogue/blocks)
 	neighborlay = "dirtedge"
 	climbdiff = 1
+	hardness = 2
 
 /turf/closed/wall/mineral/rogue/decostone/long
 	icon_state = "decostone-l"
@@ -330,6 +352,8 @@
 	debris = list(/obj/item/grown/log/tree/stick = 1, /obj/item/natural/thorn = 2, /obj/item/natural/fibers = 1)
 	climbdiff = 0
 	above_floor = /turf/open/floor/rogue/shroud
+	explosion_block = 0
+	hardness = 90
 	var/res = 0
 	var/res_replenish
 
@@ -378,6 +402,7 @@
 	baseturfs = list(/turf/open/floor/rogue/concrete)
 	climbdiff = 1
 	damage_deflection = 20
+	hardness = 10
 
 /turf/closed/wall/mineral/rogue/underbrick
 	name = "erebus stone wall"
@@ -395,3 +420,14 @@
 	baseturfs = list(/turf/open/floor/rogue/church)
 	neighborlay = "dirtedge"
 	climbdiff = 6
+
+//NO. BAD SKELETONS
+/turf/closed/wall/mineral/rogue/underbrick/TerraformTurf(path, new_baseturf, flags, defer_change = FALSE, ignore_air = FALSE)
+	return
+
+/turf/closed/wall/mineral/rogue/underbrick/acid_act(acidpwr, acid_volume, acid_id)
+	return 0
+
+/turf/closed/wall/mineral/rogue/underbrick/Melt()
+	to_be_destroyed = FALSE
+	return src

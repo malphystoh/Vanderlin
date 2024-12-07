@@ -70,6 +70,13 @@
 	icon_state = "standingb1"
 	base_state = "standingb"
 
+/obj/machinery/light/rogue/firebowl/standing/blue/burn_out()
+	return FALSE
+
+/obj/machinery/light/rogue/firebowl/standing/blue/extinguish()
+	return FALSE
+
+
 /obj/machinery/light/rogue/firebowl/standing/proc/knock_over() //use this later for jump impacts and shit
 	icon_state = "[base_state]over"
 
@@ -114,6 +121,20 @@
 	pixel_y = 32
 	soundloop = null
 
+/obj/machinery/light/rogue/wallfire/candle/OnCrafted(dirin)
+	pixel_x = 0
+	pixel_y = 0
+	switch(dirin)
+		if(NORTH)
+			pixel_y = 32
+		if(SOUTH)
+			pixel_y = -32
+		if(EAST)
+			pixel_x = 32
+		if(WEST)
+			pixel_x = -32
+	. = ..()
+
 /obj/machinery/light/rogue/wallfire/candle/attack_hand(mob/user)
 	if(isliving(user) && on)
 		user.visible_message("<span class='warning'>[user] snuffs [src].</span>")
@@ -132,6 +153,12 @@
 	bulb_colour = "#b9bcff"
 	icon_state = "wallcandleb1"
 	base_state = "wallcandleb"
+
+/obj/machinery/light/rogue/wallfire/candle/blue/extinguish()
+	return FALSE
+
+/obj/machinery/light/rogue/wallfire/candle/blue/burn_out()
+	return FALSE
 
 /obj/machinery/light/rogue/wallfire/candle/blue/r
 	pixel_y = 0
@@ -191,6 +218,13 @@
 	torchy.spark_act()
 	. = ..()
 
+/obj/machinery/light/rogue/torchholder/OnCrafted(dirin, user)
+	dir = turn(dirin, 180)
+	if(dir == SOUTH)
+		pixel_y = 32
+	QDEL_NULL(torchy)
+	. = ..()
+
 /obj/machinery/light/rogue/torchholder/process()
 	if(on)
 		if(torchy)
@@ -224,7 +258,7 @@
 		icon_state = "torchwall"
 
 /obj/machinery/light/rogue/torchholder/burn_out()
-	if(torchy.on)
+	if(torchy && torchy.on)
 		torchy.turn_off()
 	..()
 
@@ -252,14 +286,16 @@
 					user.update_inv_hands()
 		else
 			if(LR.on)
-				LR.forceMove(src)
+				if(!user.transferItemToLoc(LR, src))
+					return
 				torchy = LR
 				on = TRUE
 				update()
 				update_icon()
 				addtimer(CALLBACK(src, PROC_REF(trigger_weather)), rand(5,20))
 			else
-				LR.forceMove(src)
+				if(!user.transferItemToLoc(LR, src))
+					return
 				torchy = LR
 				update_icon()
 			playsound(src.loc, 'sound/foley/torchfixtureput.ogg', 70)
@@ -339,200 +375,14 @@
 					return
 // New concept = boil at least 33 water, add item, it turns into food reagent volume 33 of the appropriate type
 		else if(istype(attachment, /obj/item/reagent_containers/glass/bucket/pot))
-			var/obj/item/reagent_containers/glass/bucket/pot = attachment
+			var/obj/item/reagent_containers/glass/bucket/pot/pot = attachment
 			if(!pot.reagents.has_reagent(/datum/reagent/water, 33))
 				to_chat(user, "<span class='notice'>Not enough water.</span>")
 				return TRUE
 			if(pot.reagents.chem_temp < 374)
 				to_chat(user, "<span class='warning'>[pot] isn't boiling!</span>")
 				return
-			if(istype(W, /obj/item/reagent_containers/food/snacks/produce/oat))
-				if(do_after(user,2 SECONDS, target = src))
-					user.visible_message("<span class='info'>[user] places [W] into the pot.</span>")
-					qdel(W)
-					playsound(src.loc, 'sound/items/Fish_out.ogg', 20, TRUE)
-					pot.reagents.remove_reagent(/datum/reagent/water, 32)
-					sleep(300)
-					playsound(src, "bubbles", 30, TRUE)
-					pot.reagents.add_reagent(/datum/reagent/consumable/soup/oatmeal, 32)
-					pot.reagents.remove_reagent(/datum/reagent/water, 1)
-				return
-
-			if(W.type in subtypesof(/obj/item/reagent_containers/food/snacks/rogue/veg))
-				if(do_after(user,2 SECONDS, target = src))
-					user.visible_message("<span class='info'>[user] places [W] into the pot.</span>")
-					playsound(src.loc, 'sound/items/Fish_out.ogg', 20, TRUE)
-					pot.reagents.remove_reagent(/datum/reagent/water, 32)
-					if(istype(W, /obj/item/reagent_containers/food/snacks/rogue/veg/potato_sliced))
-						qdel(W)
-						sleep(800)
-						playsound(src, "bubbles", 30, TRUE)
-						pot.reagents.add_reagent(/datum/reagent/consumable/soup/veggie/potato, 32)
-						pot.reagents.remove_reagent(/datum/reagent/water, 1)
-					if(istype(W, /obj/item/reagent_containers/food/snacks/rogue/veg/onion_sliced))
-						qdel(W)
-						sleep(600)
-						playsound(src, "bubbles", 30, TRUE)
-						pot.reagents.add_reagent(/datum/reagent/consumable/soup/veggie/onion, 32)
-						pot.reagents.remove_reagent(/datum/reagent/water, 1)
-					if(istype(W, /obj/item/reagent_containers/food/snacks/rogue/veg/cabbage_sliced))
-						qdel(W)
-						sleep(700)
-						playsound(src, "bubbles", 30, TRUE)
-						pot.reagents.add_reagent(/datum/reagent/consumable/soup/veggie/cabbage, 32)
-						pot.reagents.remove_reagent(/datum/reagent/water, 1)
-					if(istype(W, /obj/item/reagent_containers/food/snacks/rogue/veg/turnip_sliced))
-						qdel(W)
-						sleep(700)
-						playsound(src, "bubbles", 30, TRUE)
-						pot.reagents.add_reagent(/datum/reagent/consumable/soup/veggie/turnip, 32)
-						pot.reagents.remove_reagent(/datum/reagent/water, 1)
-				return
-
-			if(W.type in subtypesof(/obj/item/reagent_containers/food/snacks/rogue/meat))
-				if(do_after(user,2 SECONDS, target = src))
-					user.visible_message("<span class='info'>[user] places [W] into the pot.</span>")
-					playsound(src.loc, 'sound/items/Fish_out.ogg', 20, TRUE)
-					pot.reagents.remove_reagent(/datum/reagent/water, 32)
-					if(istype(W, /obj/item/reagent_containers/food/snacks/rogue/meat/mince/fish))
-						qdel(W)
-						sleep(800)
-						playsound(src, "bubbles", 30, TRUE)
-						pot.reagents.add_reagent(/datum/reagent/consumable/soup/stew/fish, 32)
-						pot.reagents.remove_reagent(/datum/reagent/water, 1)
-					if(istype(W, /obj/item/reagent_containers/food/snacks/rogue/meat/poultry/cutlet) || istype(W, /obj/item/reagent_containers/food/snacks/rogue/meat/mince/poultry))
-						qdel(W)
-						sleep(900)
-						playsound(src, "bubbles", 30, TRUE)
-						pot.reagents.add_reagent(/datum/reagent/consumable/soup/stew/chicken, 32)
-						pot.reagents.remove_reagent(/datum/reagent/water, 1)
-					if(istype(W, /obj/item/reagent_containers/food/snacks/rogue/meat/spider))
-						qdel(W)
-						sleep(1000)
-						playsound(src, "bubbles", 30, TRUE)
-						pot.reagents.add_reagent(/datum/reagent/consumable/soup/stew/gross, 32)
-						pot.reagents.remove_reagent(/datum/reagent/water, 1)
-					else
-						qdel(W)
-						sleep(900)
-						playsound(src, "bubbles", 30, TRUE)
-						pot.reagents.add_reagent(/datum/reagent/consumable/soup/stew/meat, 32)
-						pot.reagents.remove_reagent(/datum/reagent/water, 1)
-
-			if(istype(W, /obj/item/reagent_containers/food/snacks/egg))
-				if(do_after(user,2 SECONDS, target = src))
-					user.visible_message("<span class='info'>[user] places the [W] into the pot.</span>")
-					playsound(src.loc, 'sound/items/Fish_out.ogg', 20, TRUE)
-					pot.reagents.remove_reagent(/datum/reagent/water, 32)
-					qdel(W)
-					sleep(800)
-					playsound(src, "bubbles", 30, TRUE)
-					pot.reagents.add_reagent(/datum/reagent/consumable/soup/egg, 32)
-					pot.reagents.remove_reagent(/datum/reagent/water, 1)
-
-			if(istype(W, /obj/item/reagent_containers/food/snacks/rogue/truffles))
-				if(do_after(user,2 SECONDS, target = src))
-					user.visible_message("<span class='info'>[user] places the [W] into the pot.</span>")
-					playsound(src.loc, 'sound/items/Fish_out.ogg', 20, TRUE)
-					pot.reagents.remove_reagent(/datum/reagent/water, 32)
-					qdel(W)
-					sleep(800)
-					playsound(src, "bubbles", 30, TRUE)
-					pot.reagents.add_reagent(/datum/reagent/consumable/soup/stew/truffle, 32)
-					pot.reagents.remove_reagent(/datum/reagent/water, 1)
-
-			if(istype(W, /obj/item/reagent_containers/food/snacks/rogue/cheese) || istype(W, /obj/item/reagent_containers/food/snacks/rogue/cheddarwedge))
-				if(do_after(user,2 SECONDS, target = src))
-					user.visible_message("<span class='info'>[user] places the [W] into the pot.</span>")
-					playsound(src.loc, 'sound/items/Fish_out.ogg', 20, TRUE)
-					pot.reagents.remove_reagent(/datum/reagent/water, 32)
-					qdel(W)
-					sleep(800)
-					playsound(src, "bubbles", 30, TRUE)
-					pot.reagents.add_reagent(/datum/reagent/consumable/soup/cheese, 32)
-					pot.reagents.remove_reagent(/datum/reagent/water, 1)
-
-			// drugs and such
-			if(istype(W, /obj/item/reagent_containers/powder/spice))
-				if(do_after(user,2 SECONDS, target = src))
-					user.visible_message("<span class='info'>[user] places the [W] into the pot.</span>")
-					playsound(src.loc, 'sound/items/Fish_out.ogg', 20, TRUE)
-					pot.reagents.remove_reagent(/datum/reagent/water, 32)
-					qdel(W)
-					sleep(500)
-					playsound(src, "bubbles", 30, TRUE)
-					pot.reagents.add_reagent(/datum/reagent/druqks = 15)
-					pot.reagents.add_reagent(/datum/reagent/water/spicy = 17)
-					pot.reagents.remove_reagent(/datum/reagent/water, 1)
-
-			// Bad and rotten and toxic stuff below. Less lethal due to boiling, but really disgusting. Graggars inhumen followers love this stuff, get some healing from it too.
-			if(istype(W, /obj/item/reagent_containers/food/snacks/produce/jacksberry/poison) || istype(W, /obj/item/natural/poo)|| istype(W, /obj/item/reagent_containers/food/snacks/rogue/toxicshrooms) || istype(W, /obj/item/natural/worms))
-				if(do_after(user,2 SECONDS, target = src))
-					user.visible_message("<span class='info'>[user] places [W] into the pot.</span>")
-					playsound(src.loc, 'sound/items/Fish_out.ogg', 20, TRUE)
-					pot.reagents.remove_reagent(/datum/reagent/water, 32)
-					qdel(W)
-					sleep(600)
-					playsound(src, "bubbles", 30, TRUE)
-					pot.reagents.add_reagent(/datum/reagent/yuck/cursed_soup, 32)
-					pot.reagents.remove_reagent(/datum/reagent/water, 1)
-
-			if(W.type in subtypesof(/obj/item/reagent_containers/food/snacks/rotten)) // Graggar likes rotten food I guess
-				if(do_after(user,2 SECONDS, target = src))
-					user.visible_message("<span class='info'>[user] places [W] into the pot.</span>")
-					playsound(src.loc, 'sound/items/Fish_out.ogg', 20, TRUE)
-					pot.reagents.remove_reagent(/datum/reagent/water, 32)
-					qdel(W)
-					sleep(600)
-					playsound(src, "bubbles", 30, TRUE)
-					pot.reagents.add_reagent(/datum/reagent/yuck/cursed_soup, 32)
-					pot.reagents.remove_reagent(/datum/reagent/water, 1)
-
-			if(W.type in subtypesof(/obj/item/organ)) // ....and leeches and such....andd organs more MORE MORE if()!!! GIVE ME MOOORE
-				if(do_after(user,2 SECONDS, target = src))
-					user.visible_message("<span class='info'>[user] places [W] into the pot.</span>")
-					playsound(src.loc, 'sound/items/Fish_out.ogg', 20, TRUE)
-					pot.reagents.remove_reagent(/datum/reagent/water, 32)
-					qdel(W)
-					sleep(600)
-					playsound(src, "bubbles", 30, TRUE)
-					pot.reagents.add_reagent(/datum/reagent/yuck/cursed_soup, 32)
-					pot.reagents.remove_reagent(/datum/reagent/water, 1)
-
-			if(W.type in subtypesof(/obj/item/natural/worms)) // ....and leeches and such....andd organs more MORE MORE if()!!! GIVE ME MOOORE
-				if(do_after(user,2 SECONDS, target = src))
-					user.visible_message("<span class='info'>[user] places [W] into the pot.</span>")
-					playsound(src.loc, 'sound/items/Fish_out.ogg', 20, TRUE)
-					pot.reagents.remove_reagent(/datum/reagent/water, 32)
-					qdel(W)
-					sleep(600)
-					playsound(src, "bubbles", 30, TRUE)
-					pot.reagents.add_reagent(/datum/reagent/yuck/cursed_soup, 32)
-					pot.reagents.remove_reagent(/datum/reagent/water, 1)
-
-			if(istype(W, /obj/item/reagent_containers/food/snacks/smallrat/dead) || istype(W, /obj/item/reagent_containers/food/snacks/badrecipe))  // every beggar loves ratsoup
-				if(do_after(user,2 SECONDS, target = src))
-					user.visible_message("<span class='info'>[user] places the [W] into the pot.</span>")
-					playsound(src.loc, 'sound/items/Fish_out.ogg', 20, TRUE)
-					pot.reagents.remove_reagent(/datum/reagent/water, 32)
-					qdel(W)
-					sleep(600)
-					playsound(src, "bubbles", 30, TRUE)
-					pot.reagents.add_reagent(/datum/reagent/consumable/soup/stew/gross, 32)
-					pot.reagents.remove_reagent(/datum/reagent/water, 1)
-
-			else if(istype(W, /obj/item/reagent_containers/food/snacks/smallrat))  // a step to far for most beggars, paying tribute to Graggar
-				if(do_after(user,2 SECONDS, target = src))
-					user.visible_message("<span class='info'>[user] throws [W] into the boiling water.</span>")
-					playsound(src.loc, 'sound/items/Fish_out.ogg', 60, TRUE)
-					sleep(3)
-					playsound(src, 'sound/vo/mobs/rat/rat_death.ogg', 100, FALSE, -1)
-					pot.reagents.remove_reagent(/datum/reagent/water, 32)
-					qdel(W)
-					sleep(600)
-					playsound(src, "bubbles", 30, TRUE)
-					pot.reagents.add_reagent(/datum/reagent/yuck/cursed_soup, 32)
-					pot.reagents.remove_reagent(/datum/reagent/water, 1)
+			pot.attempt_pot_recipes(W, user)
 	. = ..()
 
 //////////////////////////////////
@@ -648,6 +498,7 @@
 	fueluse = 15 MINUTES
 	bulb_colour = "#da5e21"
 	cookonme = TRUE
+	max_integrity = 30
 
 /obj/machinery/light/rogue/campfire/process()
 	..()
@@ -691,6 +542,7 @@
 	fueluse = 30 MINUTES
 	pass_flags = LETPASSTHROW
 	bulb_colour = "#eea96a"
+	max_integrity = 60
 
 /obj/machinery/light/rogue/campfire/densefire/CanPass(atom/movable/mover, turf/target)
 	if(istype(mover) && (mover.pass_flags & PASSTABLE))
@@ -705,7 +557,7 @@
 
 
 /obj/machinery/light/rogue/campfire/pyre
-	name = "Pyre"
+	name = "pyre"
 	icon = 'icons/roguetown/misc/tallstructure.dmi'
 	icon_state = "pyre1"
 	base_state = "pyre"

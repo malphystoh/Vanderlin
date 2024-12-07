@@ -5,6 +5,7 @@
 	allowed_sexes = list(MALE)
 	allowed_races = list("Humen")
 	grant_lit_torch = TRUE
+	advjob_examine = FALSE
 /datum/outfit/job/roguetown/heartfelt/lord/pre_equip(mob/living/carbon/human/H)
 	..()
 	shirt = /obj/item/clothing/suit/roguetown/shirt/undershirt
@@ -33,12 +34,12 @@
 		H.mind?.adjust_skillrank(/datum/skill/misc/reading, 4, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/misc/riding, 3, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/craft/cooking, 1, TRUE)
-		H.change_stat("strength", 1)
-		H.change_stat("intelligence", 3)
-		H.change_stat("endurance", 3)
-		H.change_stat("speed", 1)
-		H.change_stat("perception", 2)
-		H.change_stat("fortune", 5)
+		H.change_stat(STATKEY_STR, 1)
+		H.change_stat(STATKEY_INT, 3)
+		H.change_stat(STATKEY_END, 3)
+		H.change_stat(STATKEY_SPD, 1)
+		H.change_stat(STATKEY_PER, 2)
+		H.change_stat(STATKEY_LCK, 5)
 	ADD_TRAIT(H, TRAIT_NOBLE, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_NOSEGRAB, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_HEAVYARMOR, TRAIT_GENERIC)
@@ -50,6 +51,7 @@
 	allowed_sexes = list(FEMALE)
 	allowed_races = list("Humen")
 	grant_lit_torch = TRUE
+	advjob_examine = FALSE
 /datum/outfit/job/roguetown/heartfelt/lady/pre_equip(mob/living/carbon/human/H)
 	..()
 	head = /obj/item/clothing/head/roguetown/hennin
@@ -75,11 +77,11 @@
 		H.mind?.adjust_skillrank(/datum/skill/misc/athletics, 4, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/misc/reading, 4, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/misc/medicine, 2, TRUE)
-		H.change_stat("intelligence", 3)
-		H.change_stat("endurance", 3)
-		H.change_stat("speed", 2)
-		H.change_stat("perception", 2)
-		H.change_stat("fortune", 5)
+		H.change_stat(STATKEY_INT, 3)
+		H.change_stat(STATKEY_END, 3)
+		H.change_stat(STATKEY_SPD, 2)
+		H.change_stat(STATKEY_PER, 2)
+		H.change_stat(STATKEY_LCK, 5)
 	ADD_TRAIT(H, TRAIT_SEEPRICES, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_NOBLE, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_NUTCRACKER, TRAIT_GENERIC)
@@ -89,6 +91,7 @@
 	outfit = /datum/outfit/job/roguetown/heartfelt/hand
 	allowed_races = list("Humen")
 	grant_lit_torch = TRUE
+	advjob_examine = FALSE
 /datum/outfit/job/roguetown/heartfelt/hand/pre_equip(mob/living/carbon/human/H)
 	..()
 	shirt = /obj/item/clothing/suit/roguetown/shirt/undershirt
@@ -115,9 +118,9 @@
 		H.mind?.adjust_skillrank(/datum/skill/misc/swimming, 2, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/misc/climbing, 2, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/craft/cooking, 1, TRUE)
-		H.change_stat("strength", 3)
-		H.change_stat("perception", 2)
-		H.change_stat("intelligence", 3)
+		H.change_stat(STATKEY_STR, 3)
+		H.change_stat(STATKEY_PER, 2)
+		H.change_stat(STATKEY_INT, 3)
 
 	ADD_TRAIT(H, TRAIT_HEAVYARMOR, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_SEEPRICES, TRAIT_GENERIC)
@@ -128,7 +131,7 @@
 	outfit = /datum/outfit/job/roguetown/heartfelt/knight
 	allowed_races = list("Humen")
 	grant_lit_torch = TRUE
-
+	advjob_examine = FALSE
 /datum/outfit/job/roguetown/heartfelt/knight/pre_equip(mob/living/carbon/human/H)
 	..()
 	head = /obj/item/clothing/head/roguetown/helmet
@@ -160,12 +163,12 @@
 		H.mind?.adjust_skillrank(/datum/skill/misc/climbing, 1, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/misc/reading, 3, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/misc/riding, 4, TRUE)
-		H.change_stat("strength", 3)
-		H.change_stat("perception", 1)
-		H.change_stat("intelligence", 2)
-		H.change_stat("constitution", 2)
-		H.change_stat("endurance", 2)
-		H.change_stat("speed", -1)
+		H.change_stat(STATKEY_STR, 3)
+		H.change_stat(STATKEY_PER, 1)
+		H.change_stat(STATKEY_INT, 2)
+		H.change_stat(STATKEY_CON, 2)
+		H.change_stat(STATKEY_END, 2)
+		H.change_stat(STATKEY_SPD, -1)
 	H.dna.species.soundpack_m = new /datum/voicepack/male/knight()
 	ADD_TRAIT(H, TRAIT_NOBLE, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_NOSEGRAB, TRAIT_GENERIC)
@@ -230,13 +233,13 @@
 		H.mind?.adjust_skillrank(/datum/skill/craft/crafting, 1, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/misc/medicine, 3, TRUE)
 		H.mind?.adjust_skillrank(/datum/skill/misc/riding, 1, TRUE)
-		H.change_stat("strength", -1)
-		H.change_stat("constitution", -1)
-		H.change_stat("intelligence", 4)
+		H.change_stat(STATKEY_STR, -1)
+		H.change_stat(STATKEY_CON, -1)
+		H.change_stat(STATKEY_INT, 4)
 		if(H.age == AGE_OLD)
-			H.change_stat("speed", -1)
-			H.change_stat("intelligence", 1)
-			H.change_stat("perception", 1)
+			H.change_stat(STATKEY_SPD, -1)
+			H.change_stat(STATKEY_INT, 1)
+			H.change_stat(STATKEY_PER, 1)
 			if(ishumannorthern(H))
 				belt = /obj/item/storage/belt/rogue/leather/plaquegold
 				cloak = null
@@ -280,11 +283,11 @@
 		H.mind?.adjust_skillrank(/datum/skill/magic/holy, 4, TRUE)
 		if(H.age == AGE_OLD)
 			H.mind?.adjust_skillrank(/datum/skill/magic/holy, 1, TRUE)
-		H.change_stat("strength", -1)
-		H.change_stat("intelligence", 3)
-		H.change_stat("constitution", -1)
-		H.change_stat("endurance", 1)
-		H.change_stat("speed", -1)
+		H.change_stat(STATKEY_STR, -1)
+		H.change_stat(STATKEY_INT, 3)
+		H.change_stat(STATKEY_CON, -1)
+		H.change_stat(STATKEY_END, 1)
+		H.change_stat(STATKEY_SPD, -1)
 	var/datum/devotion/cleric_holder/C = new /datum/devotion/cleric_holder(H, H.patron)
 	C.grant_spells_priest(H)
 	H.verbs += list(/mob/living/carbon/human/proc/devotionreport, /mob/living/carbon/human/proc/clericpray)

@@ -14,6 +14,7 @@
 	possible_mmb_intents = list(INTENT_STEAL, INTENT_JUMP, INTENT_KICK, INTENT_BITE)
 	possible_rmb_intents = list(/datum/rmb_intent/feint, /datum/rmb_intent/aimed, /datum/rmb_intent/strong, /datum/rmb_intent/weak)
 	stand_attempts = 4
+	cmode_music = 'sound/music/antag/combatskeleton.ogg'
 
 /mob/living/carbon/human/species/skeleton/npc/no_equipment
 	skel_outfit = null
@@ -71,13 +72,14 @@
 	name = "skeleton"
 	real_name = "skeleton"
 	ADD_TRAIT(src, TRAIT_NOMOOD, TRAIT_GENERIC)
-	ADD_TRAIT(src, TRAIT_NOROGSTAM, TRAIT_GENERIC)
+	ADD_TRAIT(src, TRAIT_NOSTAMINA, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOHUNGER, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_EASYDISMEMBER, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOBREATH, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOPAIN, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_TOXIMMUNE, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_LIMBATTACHMENT, TRAIT_GENERIC)
+	ADD_TRAIT(src, TRAIT_CRITICAL_WEAKNESS, TRAIT_GENERIC)
 	if(skel_outfit)
 		var/datum/outfit/OU = new skel_outfit
 		if(OU)
@@ -87,11 +89,11 @@
 /datum/outfit/job/roguetown/npc/skeleton/random/pre_equip(mob/living/carbon/human/H)
 	..()
 
-	H.STASTR = 6
-	H.STASPD = 10
-	H.STACON = 8
-	H.STAEND = 8
-	H.STAINT = 1
+	H.TOTALSTR = 6
+	H.TOTALSPD = 10
+	H.TOTALCON = 8
+	H.TOTALEND = 8
+	H.TOTALINT = 1
 
 
 /datum/outfit/job/roguetown/greater_skeleton/pre_equip(mob/living/carbon/human/H) //equipped onto Summon Greater Undead player skeletons only after the mind is added
@@ -106,11 +108,11 @@
 	head = /obj/item/clothing/head/roguetown/helmet/leather
 	shoes = /obj/item/clothing/shoes/roguetown/boots
 
-	H.STASTR = rand(14,16)
-	H.STASPD = 8
-	H.STACON = 9
-	H.STAEND = 15
-	H.STAINT = 1
+	H.TOTALSTR = rand(14,16)
+	H.TOTALSPD = 8
+	H.TOTALCON = 9
+	H.TOTALEND = 15
+	H.TOTALINT = 1
 
 	//light labor skills for skeleton manual labor and some warrior-adventurer skills, equipment is still bad probably
 	H.mind?.adjust_skillrank(/datum/skill/craft/carpentry, 1, TRUE)
@@ -150,7 +152,7 @@
 	..()
 	ADD_TRAIT(src, TRAIT_NOMOOD, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOHUNGER, TRAIT_GENERIC)
-	ADD_TRAIT(src, TRAIT_NOROGSTAM, TRAIT_GENERIC)
+	ADD_TRAIT(src, TRAIT_NOSTAMINA, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_EASYDISMEMBER, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_CRITICAL_WEAKNESS, TRAIT_GENERIC)
 	equipOutfit(new /datum/outfit/job/roguetown/species/skeleton/npc/peasant)
@@ -163,10 +165,10 @@
 
 /datum/outfit/job/roguetown/species/skeleton/npc/peasant/pre_equip(mob/living/carbon/human/H)
 	..()
-	H.STASTR = 6
-	H.STASPD = 8
-	H.STACON = 8
-	H.STAEND = 8
+	H.TOTALSTR = 6
+	H.TOTALSPD = 8
+	H.TOTALCON = 8
+	H.TOTALEND = 8
 	var/loadout = rand(1,7)
 	head = /obj/item/clothing/head/roguetown/roguehood/random
 	pants = /obj/item/clothing/under/roguetown/tights/vagrant
@@ -200,7 +202,7 @@
 	..()
 	ADD_TRAIT(src, TRAIT_NOMOOD, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOHUNGER, TRAIT_GENERIC)
-	ADD_TRAIT(src, TRAIT_NOROGSTAM, TRAIT_GENERIC)
+	ADD_TRAIT(src, TRAIT_NOSTAMINA, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_HEAVYARMOR, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_EASYDISMEMBER, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_CRITICAL_WEAKNESS, TRAIT_GENERIC)
@@ -241,7 +243,7 @@
 	..()
 	ADD_TRAIT(src, TRAIT_NOMOOD, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOHUNGER, TRAIT_GENERIC)
-	ADD_TRAIT(src, TRAIT_NOROGSTAM, TRAIT_GENERIC)
+	ADD_TRAIT(src, TRAIT_NOSTAMINA, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_HEAVYARMOR, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_EASYDISMEMBER, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_CRITICAL_WEAKNESS, TRAIT_GENERIC)
@@ -255,10 +257,10 @@
 
 /datum/outfit/job/roguetown/species/skeleton/npc/warrior/pre_equip(mob/living/carbon/human/H)
 	..()
-	H.STASTR = 10
-	H.STASPD = 7
-	H.STACON = 10
-	H.STAEND = 10
+	H.TOTALSTR = 10
+	H.TOTALSPD = 7
+	H.TOTALCON = 10
+	H.TOTALEND = 10
 	var/loadout = rand(1,6)
 	switch(loadout)
 		if(1) //Skeleton Warrior
@@ -323,7 +325,7 @@
 	..()
 	ADD_TRAIT(src, TRAIT_NOMOOD, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOHUNGER, TRAIT_GENERIC)
-	ADD_TRAIT(src, TRAIT_NOROGSTAM, TRAIT_GENERIC)
+	ADD_TRAIT(src, TRAIT_NOSTAMINA, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_HEAVYARMOR, TRAIT_GENERIC)
 	equipOutfit(new /datum/outfit/job/roguetown/species/skeleton/npc/warrior)
 	aggressive=1

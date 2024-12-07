@@ -677,6 +677,8 @@
 		playsound_local(src, 'sound/misc/comboff.ogg', 100)
 		SSdroning.play_area_sound(get_area(src), client)
 		cmode = FALSE
+		if(client && HAS_TRAIT(src, TRAIT_SCHIZO_AMBIENCE) && !HAS_TRAIT(src, TRAIT_SCREENSHAKE))
+			animate(client, pixel_y) // stops screenshake if you're not on 4th wonder yet.
 	else
 		cmode = TRUE
 		playsound_local(src, 'sound/misc/combon.ogg', 100)
@@ -1033,15 +1035,17 @@
 /mob/proc/can_see_reagents()
 	return stat == DEAD || has_unlimited_silicon_privilege //Dead guys and silicons can always see reagents
 
-/mob/proc/get_role_title()
+/mob/living/carbon/human/proc/get_role_title()
 	var/used_title
 	if(migrant_type)
 		var/datum/migrant_role/migrant = MIGRANT_ROLE(migrant_type)
 		used_title = migrant.name
+	else if(advjob)
+		used_title = advjob
 	else if(job)
 		var/datum/job/J = SSjob.GetJob(job)
 		if(!J)
-			return "unknown"
+			return "Unknown"
 		used_title = J.title
 		if((gender == FEMALE) && J.f_title)
 			used_title = J.f_title

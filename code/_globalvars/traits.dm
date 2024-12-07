@@ -98,7 +98,7 @@ GLOBAL_LIST_INIT(traits_by_type, list(
 		"Critical Resistance" = TRAIT_CRITICAL_RESISTANCE,
 		"Critical Weakness" = TRAIT_CRITICAL_WEAKNESS,
 		"Awoken" = TRAIT_MANIAC_AWOKEN,
-		"Indefatigable" = TRAIT_NOROGSTAM,
+		"Indefatigable" = TRAIT_NOSTAMINA,
 		"Fatal Insomnia" = TRAIT_NOSLEEP,
 		"Fast Sleeper" = TRAIT_FASTSLEEP,
 		"Nudist" = TRAIT_NUDIST,
@@ -119,6 +119,8 @@ GLOBAL_LIST_INIT(traits_by_type, list(
 		"Anti-Magic" = TRAIT_ANTIMAGIC,
 		"Anti-Scrying" = TRAIT_ANTISCRYING,
 		"Shock Immunity" = TRAIT_SHOCKIMMUNE,
+		"Expert Herb Finder" = TRAIT_LEGENDARY_ALCHEMIST,
+		"Deceiving Meekness" = TRAIT_DECEIVING_MEEKNESS,
 	),
 	/obj/item/bodypart = list(
 		"TRAIT_PARALYSIS" = TRAIT_PARALYSIS

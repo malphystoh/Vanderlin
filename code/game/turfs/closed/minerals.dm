@@ -16,6 +16,7 @@
 	var/turf/open/floor/turf_type = /turf/open/floor
 	var/obj/item/mineralType = null
 	var/obj/item/natural/rock/rockType = null
+	var/mob/living/lastminer //for xp gain and luck shenanigans
 	var/mineralAmt = 3
 	var/spread = 0 //will the seam spread?
 	var/spreadChance = 0 //the percentual chance of an ore spreading to the neighbouring tiles
@@ -24,6 +25,8 @@
 	var/defer_change = 0
 	blade_dulling = DULLING_PICK
 	max_integrity = 1000
+	explosion_block = 20
+	damage_deflection = 10
 	break_sound = 'sound/combat/hits/onstone/stonedeath.ogg'
 	attacked_sound = list('sound/combat/hits/onrock/onrock (1).ogg', 'sound/combat/hits/onrock/onrock (2).ogg', 'sound/combat/hits/onrock/onrock (3).ogg', 'sound/combat/hits/onrock/onrock (4).ogg')
 	neighborlay = "dirtedge"
@@ -36,6 +39,10 @@
 //	transform = M
 	icon = smooth_icon
 	. = ..()
+
+/turf/closed/mineral/Destroy()
+	. = ..()
+	lastminer = null
 
 /turf/closed/mineral/LateInitialize()
 	. = ..()
@@ -59,8 +66,9 @@
 
 /turf/closed/mineral/attackby(obj/item/I, mob/user, params)
 	if (!user.IsAdvancedToolUser())
-		to_chat(usr, "<span class='warning'>I don't have the dexterity to do this!</span>")
+		to_chat(user, span_warning("I don't have the dexterity to do this!"))
 		return
+	lastminer = user
 	var/olddam = turf_integrity
 	..()
 	if(turf_integrity && turf_integrity > 10)
@@ -71,11 +79,35 @@
 					S.forceMove(get_turf(user))
 
 /turf/closed/mineral/turf_destruction(damage_flag)
-	gets_drilled(give_exp = FALSE)
-	queue_smooth_neighbors(src)
+	if(!(istype(src, /turf/closed)))
+		return
+	if(damage_flag == "blunt")
+		var/obj/item/explo_mineral = mineralType
+		var/explo_mineral_amount = mineralAmt
+		var/obj/item/natural/rock/explo_rock = rockType
+		ScrapeAway()
+		queue_smooth_neighbors(src)
+		new /obj/item/natural/stone(src)
+		if(prob(30))
+			new /obj/item/natural/stone(src)
+		if (explo_mineral && (explo_mineral_amount > 0))
+			if(prob(33)) //chance to spawn ore directly
+				new explo_mineral(src)
+			if(explo_rock)
+				if(prob(23))
+					new explo_rock(src)
+			SSblackbox.record_feedback("tally", "ore_mined", explo_mineral_amount, explo_mineral)
+		else
+			return
+	else
+		if(lastminer.stat_roll(STATKEY_LCK,2,10) && mineralType)
+	//		to_chat(lastminer, span_notice("Bonus ducks!"))
+			new mineralType(src)
+		gets_drilled(lastminer, give_exp = FALSE)
+		queue_smooth_neighbors(src)
 	..()
 
-/turf/closed/mineral/proc/gets_drilled(user, triggered_by_explosion = FALSE, give_exp = TRUE)
+/turf/closed/mineral/proc/gets_drilled(mob/living/user, triggered_by_explosion = FALSE, give_exp = TRUE)
 	new /obj/item/natural/stone(src)
 	if(prob(30))
 		new /obj/item/natural/stone(src)
@@ -87,6 +119,10 @@
 			if(prob(23))
 				new rockType(src)
 		SSblackbox.record_feedback("tally", "ore_mined", mineralAmt, mineralType)
+	else if(user.stat_roll(STATKEY_LCK,2,10))
+		var/newthing = pickweight(list(/obj/item/natural/rock/salt = 2, /obj/item/natural/rock/iron = 1, /obj/item/natural/rock/coal = 2))
+//		to_chat(user, "<span class='notice'>Bonus ducks!</span>")
+		new newthing(src)
 	var/flags = NONE
 	if(defer_change) // TODO: make the defer change var a var for any changeturf flag
 		flags = CHANGETURF_DEFER_CHANGE
@@ -100,25 +136,46 @@
 /turf/closed/mineral/acid_melt()
 	ScrapeAway()
 
-/turf/closed/mineral/ex_act(severity, target)
-	..()
-	switch(severity)
-		if(3)
-			if (prob(75))
-				gets_drilled(null, triggered_by_explosion = TRUE)
-		if(2)
-			if (prob(90))
-				gets_drilled(null, triggered_by_explosion = TRUE)
-		if(1)
-			gets_drilled(null, triggered_by_explosion = TRUE)
-	return
+/turf/closed/mineral/ex_act(severity, target, epicenter, devastation_range, heavy_impact_range, light_impact_range, flame_range)
+	if(target == src)
+		ScrapeAway()
+		return
+	var/ddist = devastation_range
+	var/hdist = heavy_impact_range
+	var/ldist = light_impact_range
+	var/fdist = flame_range
+	var/fodist = get_dist(src, epicenter)
+	var/brute_loss = 0
+	var/dmgmod = round(rand(0.1, 2), 0.1)
+
+	switch (severity)
+		if (EXPLODE_DEVASTATE)
+			brute_loss = ((250 * ddist) - (250 * fodist) * dmgmod)
+
+		if (EXPLODE_HEAVY)
+			brute_loss = ((100 * hdist) - (100 * fodist) * dmgmod)
+
+		if(EXPLODE_LIGHT)
+			brute_loss = ((25 * ldist) - (25 * fodist) * dmgmod)
+
+	if(fodist == 0)
+		brute_loss *= 2
+	take_damage(brute_loss, BRUTE, "blunt", 0)
+
+	if(fdist && !QDELETED(src))
+		var/stacks = ((fdist - fodist) * 2)
+		fire_act(stacks)
+
+	if(!density)
+		..()
 
 /turf/closed/mineral/Spread(turf/T)
 	T.ChangeTurf(type)
 
 /turf/closed/mineral/random
+	///if this isn't empty, swaps to one of them via pickweight
 	var/list/mineralSpawnChanceList = list()
-		//Currently, Adamantine won't spawn as it has no uses. -Durandan
+	///the chance to swap to something useful
 	var/mineralChance = 13
 	var/display_icon_state = "rock"
 
@@ -168,8 +225,38 @@
 
 /turf/closed/mineral/random/rogue/high
 	icon_state = "minrandhigh"
-	mineralChance = 60
+	mineralChance = 70
 	mineralSpawnChanceList = list(/turf/closed/mineral/rogue/gold = 15 , /turf/closed/mineral/rogue/iron = 25, /turf/closed/mineral/rogue/silver = 15)//, /turf/closed/mineral/rogue/gemeralds = 10)
+
+/turf/closed/mineral/random/rogue/low_nonval
+	icon_state = "cticbad"
+	mineralChance = 30
+	mineralSpawnChanceList = list(/turf/closed/mineral/rogue/copper = 15,/turf/closed/mineral/rogue/tin = 15, /turf/closed/mineral/rogue/iron = 25, /turf/closed/mineral/rogue/coal = 20)
+
+/turf/closed/mineral/random/rogue/med_nonval
+	icon_state = "cticmed"
+	mineralChance = 50
+	mineralSpawnChanceList = list(/turf/closed/mineral/rogue/copper = 15,/turf/closed/mineral/rogue/tin = 15, /turf/closed/mineral/rogue/iron = 25, /turf/closed/mineral/rogue/coal = 20)
+
+/turf/closed/mineral/random/rogue/high_nonval
+	icon_state = "cticgood"
+	mineralChance = 70
+	mineralSpawnChanceList = list(/turf/closed/mineral/rogue/copper = 15,/turf/closed/mineral/rogue/tin = 15, /turf/closed/mineral/rogue/iron = 25, /turf/closed/mineral/rogue/coal = 20)
+
+/turf/closed/mineral/random/rogue/low_valuable
+	icon_state = "gsgbad"
+	mineralChance = 30
+	mineralSpawnChanceList = list(/turf/closed/mineral/rogue/gold = 40 , /turf/closed/mineral/rogue/gemeralds = 20, /turf/closed/mineral/rogue/silver = 40)
+
+/turf/closed/mineral/random/rogue/med_valuable
+	icon_state = "gsgmed"
+	mineralChance = 50
+	mineralSpawnChanceList = list(/turf/closed/mineral/rogue/gold = 40 , /turf/closed/mineral/rogue/gemeralds = 20, /turf/closed/mineral/rogue/silver = 40)
+
+/turf/closed/mineral/random/rogue/high_valuable
+	icon_state = "gsggood"
+	mineralChance = 70
+	mineralSpawnChanceList = list(/turf/closed/mineral/rogue/gold = 40 , /turf/closed/mineral/rogue/gemeralds = 20, /turf/closed/mineral/rogue/silver = 40)
 
 
 //begin actual mineral turfs
@@ -196,77 +283,80 @@
 
 
 /turf/closed/mineral/rogue/copper
-	desc = "seems rich in copper"
-	icon_state = "mingold"
+	icon_state = "coppbad"
 	mineralType = /obj/item/rogueore/copper
 	rockType = /obj/item/natural/rock/copper
 	spreadChance = 4
 	spread = 3
 
 /turf/closed/mineral/rogue/tin
-	icon_state = "mingold"
+	icon_state = "tinbad"
 	mineralType = /obj/item/rogueore/tin
 	rockType = /obj/item/natural/rock/tin
 	spreadChance = 15
 	spread = 5
 
 /turf/closed/mineral/rogue/silver
-	desc = "seems rich in silver"
-	icon_state = "mingold"
+	icon_state = "silverbad"
 	mineralType = /obj/item/rogueore/silver
 	rockType = /obj/item/natural/rock/silver
 	spreadChance = 2
 	spread = 2
 
 /turf/closed/mineral/rogue/gold
-	desc = "seems rich in gold"
-	icon_state = "mingold"
+	icon_state = "goldbad"
 	mineralType = /obj/item/rogueore/gold
 	rockType = /obj/item/natural/rock/gold
 	spreadChance = 2
 	spread = 2
 
 /turf/closed/mineral/rogue/salt
-	desc = "seems rich in salt"
-	icon_state = "mingold"
+	icon_state = "saltbad"
 	mineralType = /obj/item/reagent_containers/powder/salt
 	rockType = /obj/item/natural/rock/salt
 	spreadChance = 12
 	spread = 3
 
 /turf/closed/mineral/rogue/iron
-	desc = "seems rich in iron"
-	icon_state = "mingold"
+	icon_state = "ironbad"
 	mineralType = /obj/item/rogueore/iron
 	rockType = /obj/item/natural/rock/iron
 	spreadChance = 5
 	spread = 3
 
 /turf/closed/mineral/rogue/coal
-	desc = "seems rich in coal"
-	icon_state = "mingold"
+	icon_state = "coalbad"
 	mineralType = /obj/item/rogueore/coal
 	rockType = /obj/item/natural/rock/coal
 	spreadChance = 3
 	spread = 4
 
 /turf/closed/mineral/rogue/gemeralds
-	icon_state = "mingold"
-	desc = "there is an strange light on the stone?"
-	mineralType = /obj/item/roguegem/random
+	icon_state = "gembad"
+	mineralType = /obj/item/roguegem
 	rockType = /obj/item/natural/rock/gemerald
 	spreadChance = 3
 	spread = 2
 
 /turf/closed/mineral/rogue/bedrock
 	name = "rock"
-	desc = "seems too hard"
+	desc = "seems barren, and nigh indestructable"
 	icon_state = "rockyashbed"
 //	smooth_icon = 'icons/turf/walls/hardrock.dmi'
-	max_integrity = 900
+	max_integrity = 10000000
+	damage_deflection = 99999999
 	above_floor = /turf/closed/mineral/rogue/bedrock
 
 /turf/closed/mineral/rogue/bedrock/attackby(obj/item/I, mob/user, params)
-	..()
-	to_chat(user, "<span class='warning'>TOO HARD!</span>")
-	turf_integrity = max_integrity
+	to_chat(user, span_warning("This is far to sturdy to be destroyed!"))
+	return FALSE
+
+/turf/closed/mineral/rogue/bedrock/TerraformTurf(path, new_baseturf, flags, defer_change = FALSE, ignore_air = FALSE)
+	return
+
+/turf/closed/mineral/rogue/bedrock/acid_act(acidpwr, acid_volume, acid_id)
+	return 0
+
+/turf/closed/mineral/rogue/bedrock/Melt()
+	to_be_destroyed = FALSE
+	return src

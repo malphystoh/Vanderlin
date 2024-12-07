@@ -28,7 +28,7 @@
 		return
 	if(!istype(src, /obj/item/grabbing))
 		if(HAS_TRAIT(user, TRAIT_CHUNKYFINGERS))
-			to_chat(user, "<span class='warning'>...What?</span>")
+			to_chat(user, span_warning("...What?"))
 			return
 	if(tool_behaviour && target.tool_act(user, src, tool_behaviour))
 		return
@@ -134,9 +134,9 @@
 				user.do_attack_animation(M, visual_effect_icon = user.used_intent.animname)
 			return
 	if(istype(user.rmb_intent, /datum/rmb_intent/strong))
-		user.rogfat_add(10)
+		user.adjust_stamina(10)
 	if(istype(user.rmb_intent, /datum/rmb_intent/swift))
-		user.rogfat_add(10)
+		user.adjust_stamina(10)
 	if(M.checkdefense(user.used_intent, user))
 		if(M.d_intent == INTENT_PARRY)
 			if(!M.get_active_held_item() && !M.get_inactive_held_item()) //we parried with a bracer, redirect damage
@@ -381,7 +381,7 @@
 	var/verbu = "hits"
 	verbu = pick(user.used_intent.attack_verb)
 	if(newforce > 1)
-		if(user.rogfat_add(5))
+		if(user.adjust_stamina(5))
 			user.visible_message("<span class='danger'>[user] [verbu] [src] with [I]!</span>")
 		else
 			user.visible_message("<span class='warning'>[user] [verbu] [src] with [I]!</span>")
@@ -408,7 +408,7 @@
 	var/verbu = "hits"
 	verbu = pick(user.used_intent.attack_verb)
 	if(newforce > 1)
-		if(user.rogfat_add(5))
+		if(user.adjust_stamina(5))
 			user.visible_message("<span class='danger'>[user] [verbu] [src] with [I]!</span>")
 		else
 			user.visible_message("<span class='warning'>[user] [verbu] [src] with [I]!</span>")
@@ -430,6 +430,42 @@
 		return "body"
 
 /obj/item/proc/funny_attack_effects(mob/living/target, mob/living/user, nodmg)
+	if(is_silver)
+		if(world.time < src.last_used + 120)
+			to_chat(user, span_notice("The silver effect is on cooldown."))
+			return
+
+		if(ishuman(target) && target.mind)
+			var/mob/living/carbon/human/s_user = user
+			var/mob/living/carbon/human/H = target
+			var/datum/antagonist/werewolf/W = H.mind.has_antag_datum(/datum/antagonist/werewolf/)
+			var/datum/antagonist/vampirelord/lesser/V = H.mind.has_antag_datum(/datum/antagonist/vampirelord/lesser)
+			var/datum/antagonist/vampirelord/V_lord = H.mind.has_antag_datum(/datum/antagonist/vampirelord/)
+			if(V)
+				if(V.disguised)
+					H.visible_message("<font color='white'>The silver weapon weakens the curse temporarily!</font>")
+					to_chat(H, span_userdanger("I'm hit by my BANE!"))
+					H.apply_status_effect(/datum/status_effect/debuff/silver_curse)
+					src.last_used = world.time
+				else
+					H.visible_message("<font color='white'>The silver weapon weakens the curse temporarily!</font>")
+					to_chat(H, span_userdanger("I'm hit by my BANE!"))
+					H.apply_status_effect(/datum/status_effect/debuff/silver_curse)
+					src.last_used = world.time
+			if(V_lord)
+				if(V_lord.vamplevel < 4 && !V)
+					H.visible_message("<font color='white'>The silver weapon weakens the curse temporarily!</font>")
+					to_chat(H, span_userdanger("I'm hit by my BANE!"))
+					H.apply_status_effect(/datum/status_effect/debuff/silver_curse)
+					src.last_used = world.time
+				if(V_lord.vamplevel == 4 && !V)
+					to_chat(s_user, "<font color='red'> The silver weapon fails!</font>")
+					H.visible_message(H, span_userdanger("This feeble metal can't hurt me, I AM ANCIENT!"))
+			if(W && W.transformed == TRUE)
+				H.visible_message("<font color='white'>The silver weapon weakens the curse temporarily!</font>")
+				to_chat(H, span_userdanger("I'm hit by my BANE!"))
+				H.apply_status_effect(/datum/status_effect/debuff/silver_curse)
+				src.last_used = world.time
 	return
 
 /mob/living/attacked_by(obj/item/I, mob/living/user)

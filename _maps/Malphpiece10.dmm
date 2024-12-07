@@ -1,0 +1,531 @@
+//MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE
+"a" = (
+/turf/closed/wall/mineral/rogue/stonebrick/reddish,
+/area/rogue/outdoors/caves)
+"b" = (
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"c" = (
+/obj/effect/decal/cleanable/blood/old,
+/obj/effect/decal/cleanable/blood/drip,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"e" = (
+/obj/structure/fluff/walldeco/vinez/l,
+/turf/open/floor/rogue/cobblerock/alt,
+/area/rogue/outdoors/caves)
+"f" = (
+/obj/machinery/light/rogue/firebowl,
+/turf/open/floor/rogue/cobblerock/alt,
+/area/rogue/outdoors/caves)
+"h" = (
+/turf/open/floor/rogue/cobblerock/alt,
+/area/rogue/outdoors/caves)
+"i" = (
+/mob/living/simple_animal/hostile/rogue/orc/ranged,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"j" = (
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood/puddle,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"k" = (
+/mob/living/carbon/human/species/orc/warlord/skilled,
+/obj/effect/mapping_helpers/floor_clothing_equipper,
+/obj/item/clothing/mask/rogue/facemask,
+/obj/effect/decal/cleanable/blood/footprints,
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood/tracks,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"m" = (
+/obj/effect/decal/cleanable/blood/puddle,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"o" = (
+/obj/effect/decal/cleanable/blood/old,
+/obj/effect/decal/cleanable/blood/footprints,
+/obj/effect/decal/cleanable/blood/tracks,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"p" = (
+/obj/effect/decal/cleanable/blood/old,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"q" = (
+/obj/effect/decal/cleanable/blood/gibs/core,
+/obj/effect/decal/cleanable/blood/drip,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"r" = (
+/obj/effect/decal/cleanable/blood/drip,
+/turf/closed/wall/mineral/rogue/stonebrick/reddish,
+/area/rogue/outdoors/caves)
+"t" = (
+/obj/effect/decal/cleanable/blood,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"u" = (
+/obj/structure/table/wood/plain/alt,
+/obj/item/clothing/wrists/roguetown/bracers/copper,
+/turf/open/floor/rogue/cobblerock/alt,
+/area/rogue/outdoors/caves)
+"v" = (
+/turf/closed/mineral/rogue/bedrock,
+/area/rogue/outdoors/caves)
+"w" = (
+/obj/effect/decal/cleanable/blood/gibs/down,
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood/drip,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"x" = (
+/obj/structure/fluff/walldeco/vinez/r,
+/turf/open/floor/rogue/cobblerock/alt,
+/area/rogue/outdoors/caves)
+"y" = (
+/obj/structure/table/wood/plain/alt,
+/obj/item/clothing/suit/roguetown/armor/cuirass/copperchest,
+/turf/open/floor/rogue/cobblerock/alt,
+/area/rogue/outdoors/caves)
+"z" = (
+/obj/effect/decal/cleanable/blood/drip,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"A" = (
+/obj/structure/table/wood/plain/alt,
+/obj/item/ingot/copper,
+/obj/item/ingot/copper,
+/obj/item/ingot/copper,
+/turf/open/floor/rogue/cobblerock/alt,
+/area/rogue/outdoors/caves)
+"B" = (
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"C" = (
+/obj/structure/fluff/walldeco/vinez/offset,
+/turf/open/floor/rogue/cobblerock/alt,
+/area/rogue/outdoors/caves)
+"D" = (
+/obj/effect/decal/cleanable/blood/footprints,
+/obj/effect/decal/cleanable/blood/tracks,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"E" = (
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood,
+/obj/effect/decal/cleanable/blood,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"F" = (
+/obj/machinery/light/rogue/firebowl/standing,
+/obj/effect/decal/cleanable/blood/drip,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"H" = (
+/obj/effect/decal/cleanable/blood/gibs/core,
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood/puddle,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"I" = (
+/mob/living/carbon/human/species/goblin/npc/ambush/cave,
+/obj/effect/mapping_helpers/floor_clothing_equipper,
+/obj/item/rogueweapon/pitchfork/copper,
+/obj/item/clothing/suit/roguetown/armor/cuirass/copperchest,
+/obj/item/clothing/head/roguetown/helmet/coppercap,
+/turf/open/floor/rogue/cobblerock/alt,
+/area/rogue/outdoors/caves)
+"J" = (
+/obj/effect/decal/cleanable/blood/footprints,
+/obj/effect/decal/cleanable/blood/footprints,
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood/tracks,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"K" = (
+/obj/item/rogueweapon/mace/goden,
+/turf/open/floor/rogue/cobblerock/alt,
+/area/rogue/outdoors/caves)
+"L" = (
+/obj/structure/fluff/walldeco/vinez/l,
+/mob/living/carbon/human/species/goblin/npc/ambush/cave,
+/obj/effect/mapping_helpers/floor_clothing_equipper,
+/obj/item/rogueweapon/pitchfork/copper,
+/obj/structure/bed/rogue/sleepingbag,
+/obj/item/clothing/suit/roguetown/armor/cuirass/copperchest,
+/obj/item/clothing/head/roguetown/helmet/coppercap,
+/turf/open/floor/rogue/cobblerock/alt,
+/area/rogue/outdoors/caves)
+"M" = (
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood/drip,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"N" = (
+/mob/living/simple_animal/hostile/rogue/orc/ranged,
+/obj/effect/decal/cleanable/blood/drip,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"O" = (
+/obj/effect/decal/cleanable/blood/old,
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood/puddle,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"P" = (
+/obj/structure/fluff/walldeco/vinez/r,
+/mob/living/carbon/human/species/goblin/npc/ambush/cave,
+/obj/effect/mapping_helpers/floor_clothing_equipper,
+/obj/item/rogueweapon/pitchfork/copper,
+/obj/structure/bed/rogue/sleepingbag,
+/obj/item/clothing/suit/roguetown/armor/cuirass/copperchest,
+/obj/item/clothing/head/roguetown/helmet/coppercap,
+/turf/open/floor/rogue/cobblerock/alt,
+/area/rogue/outdoors/caves)
+"Q" = (
+/obj/structure/table/wood/plain/alt,
+/obj/item/flashlight/flare/torch/lantern/copper,
+/turf/open/floor/rogue/cobblerock/alt,
+/area/rogue/outdoors/caves)
+"R" = (
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood/drip,
+/turf/closed/wall/mineral/rogue/stonebrick/reddish,
+/area/rogue/outdoors/caves)
+"S" = (
+/obj/effect/decal/cleanable/blood/gibs,
+/obj/effect/decal/cleanable/blood/footprints,
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood/tracks,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"T" = (
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood/drip,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"U" = (
+/obj/machinery/light/rogue/firebowl/standing,
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood/puddle,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"V" = (
+/obj/structure/fluff/walldeco/vinez,
+/turf/closed/mineral/rogue/bedrock,
+/area/rogue/outdoors/caves)
+"W" = (
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood/puddle,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"X" = (
+/obj/machinery/light/rogue/firebowl/standing,
+/obj/effect/decal/cleanable/blood/drip,
+/obj/effect/decal/cleanable/blood/drip,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"Y" = (
+/obj/effect/decal/cleanable/blood/gibs/down,
+/obj/effect/decal/cleanable/blood/drip,
+/turf/open/floor/rogue/churchbrick,
+/area/rogue/outdoors/caves)
+"Z" = (
+/obj/structure/fluff/walldeco/vinez/l,
+/obj/structure/bed/rogue/sleepingbag,
+/turf/open/floor/rogue/cobblerock/alt,
+/area/rogue/outdoors/caves)
+
+(1,1,1) = {"
+v
+h
+h
+h
+v
+v
+v
+v
+v
+v
+v
+"}
+(2,1,1) = {"
+v
+C
+h
+h
+e
+e
+h
+v
+v
+v
+v
+"}
+(3,1,1) = {"
+v
+C
+h
+h
+h
+h
+h
+L
+v
+v
+v
+"}
+(4,1,1) = {"
+v
+C
+h
+h
+K
+h
+h
+h
+e
+v
+v
+"}
+(5,1,1) = {"
+v
+h
+h
+h
+h
+u
+h
+h
+h
+v
+v
+"}
+(6,1,1) = {"
+v
+h
+h
+h
+A
+f
+y
+h
+h
+Z
+v
+"}
+(7,1,1) = {"
+v
+P
+h
+h
+h
+Q
+h
+h
+h
+h
+V
+"}
+(8,1,1) = {"
+v
+v
+x
+h
+h
+h
+h
+h
+h
+h
+v
+"}
+(9,1,1) = {"
+v
+v
+v
+x
+h
+h
+h
+h
+I
+h
+V
+"}
+(10,1,1) = {"
+v
+v
+v
+v
+x
+x
+x
+h
+h
+h
+V
+"}
+(11,1,1) = {"
+v
+v
+v
+v
+v
+v
+v
+h
+h
+h
+v
+"}
+
+(1,1,2) = {"
+a
+a
+a
+a
+a
+a
+a
+B
+B
+B
+a
+"}
+(2,1,2) = {"
+a
+t
+B
+q
+z
+B
+a
+z
+N
+B
+a
+"}
+(3,1,2) = {"
+a
+B
+U
+M
+r
+B
+B
+Y
+U
+B
+a
+"}
+(4,1,2) = {"
+a
+p
+E
+B
+z
+c
+a
+B
+B
+z
+a
+"}
+(5,1,2) = {"
+a
+B
+z
+m
+r
+J
+D
+D
+o
+D
+a
+"}
+(6,1,2) = {"
+a
+M
+T
+D
+S
+k
+a
+m
+B
+b
+a
+"}
+(7,1,2) = {"
+a
+z
+j
+M
+R
+B
+B
+j
+H
+z
+a
+"}
+(8,1,2) = {"
+a
+q
+O
+w
+W
+z
+r
+j
+j
+B
+a
+"}
+(9,1,2) = {"
+a
+j
+X
+z
+r
+z
+z
+z
+F
+B
+a
+"}
+(10,1,2) = {"
+a
+B
+i
+z
+z
+B
+c
+z
+b
+B
+a
+"}
+(11,1,2) = {"
+a
+B
+B
+B
+a
+a
+a
+a
+a
+a
+a
+"}

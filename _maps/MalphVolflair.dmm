@@ -207,7 +207,6 @@
 "Up" = (
 /obj/item/roguecoin/copper/pile,
 /obj/item/roguecoin/silver/pile,
-/obj/item/roguegem/random,
 /obj/structure/fluff/nest,
 /obj/item/rogueweapon/mace/steel,
 /turf/open/floor/rogue/grass/yel,

@@ -68,7 +68,7 @@
 			if(user.used_intent.type == INTENT_HELP)
 				pushed_mob.visible_message("<span class='notice'>[user] begins to place [pushed_mob] onto [src]...</span>", \
 									"<span class='danger'>[user] begins to place [pushed_mob] onto [src]...</span>")
-				if(do_after(user, 35, target = pushed_mob))
+				if(do_after(user, 3.5 SECONDS, pushed_mob))
 					tableplace(user, pushed_mob)
 				else
 					return
@@ -83,9 +83,6 @@
 
 /obj/structure/table/proc/after_added_effects(obj/item/item, mob/user)
 
-/obj/structure/table/attack_tk()
-	return FALSE
-
 /obj/structure/table/CanPass(atom/movable/mover, turf/target)
 	if(istype(mover) && (mover.pass_flags & PASSTABLE))
 		return 1
@@ -96,10 +93,10 @@
 	else
 		return !density
 
-/obj/structure/table/CanAStarPass(ID, dir, caller)
+/obj/structure/table/CanAStarPass(ID, dir, requester)
 	. = !density
-	if(ismovableatom(caller))
-		var/atom/movable/mover = caller
+	if(ismovableatom(requester))
+		var/atom/movable/mover = requester
 		. = . || (mover.pass_flags & PASSTABLE)
 
 /obj/structure/table/proc/tableplace(mob/living/user, mob/living/pushed_mob)
@@ -160,11 +157,12 @@
 				deconstruct(TRUE, 1)
 			return
 
-	if(istype(I, /obj/item/storage/bag/tray))
-		var/obj/item/storage/bag/tray/T = I
+	if(istype(I, /obj/item/plate/tray))
+		var/obj/item/plate/tray/T = I
 		if(T.contents.len > 0) // If the tray isn't empty
-			SEND_SIGNAL(I, COMSIG_TRY_STORAGE_QUICK_EMPTY, drop_location())
-			user.visible_message("<span class='notice'>[user] empties [I] on [src].</span>")
+			for(var/obj/item/scattered_item as anything in T.contents)
+				scattered_item.forceMove(drop_location())
+			user.visible_message(span_notice("[user] empties [I] on [src]."))
 			return
 		// If the tray IS empty, continue on (tray will be placed on the table like other items)
 
@@ -179,24 +177,6 @@
 				I.pixel_x = initial(I.pixel_x) + CLAMP(text2num(click_params["icon-x"]) - 16, -(world.icon_size/2), world.icon_size/2)
 				I.pixel_y = initial(I.pixel_y) + CLAMP(text2num(click_params["icon-y"]) - 16, -(world.icon_size/2), world.icon_size/2)
 				after_added_effects(I, user)
-				if(istype(I, /obj/item/rogue/instrument)) // SURPRISE SURPRISE, YET ANOTHER EXPLOIT PREVENTION.
-					var/obj/item/rogue/instrument/P = I
-					if(P.playing)
-						P.playing = FALSE
-						P.soundloop.stop()
-						for(var/mob/living/carbon/L in viewers(7))
-							var/mob/living/carbon/buffed = L
-							if(buffed.mind?.has_antag_datum(/datum/antagonist))
-								if(buffed.mind?.isactuallygood())
-									for(var/datum/status_effect/bardicbuff/b in L.status_effects)
-										buffed.remove_status_effect(b)
-										return TRUE
-								else
-									return TRUE
-							else
-								for(var/datum/status_effect/bardicbuff/b in L.status_effects)
-									buffed.remove_status_effect(b)
-									return TRUE
 				return TRUE
 
 	return ..()
@@ -234,7 +214,6 @@
 
 /obj/structure/table/wood
 	name = "wooden table"
-	desc = ""
 	icon = 'icons/roguetown/misc/tables.dmi'
 	icon_state = "tablewood"
 	resistance_flags = FLAMMABLE
@@ -248,24 +227,8 @@
 	flags_1 = NODECONSTRUCT_1
 	max_integrity = 1000
 
-/obj/structure/table/wood/crafted/Initialize()
-	. = ..()
-	icon_state = pick("tablewood2", "tablewood1")
-
-/obj/structure/table/wood/narsie_act(total_override = TRUE)
-	if(!total_override)
-		..()
-
-/obj/structure/table/wood
-	name = "wooden table"
-	desc = ""
-	icon = 'icons/roguetown/misc/tables.dmi'
-	icon_state = "tablewood"
-	resistance_flags = FLAMMABLE
-	max_integrity = 70
-	smooth = 0
-	debris = list(/obj/item/grown/log/tree/small = 1)
-	climb_offset = 10
+/obj/structure/table/wood/crafted
+	icon_state = "tablewood1"
 
 /obj/structure/table/church
 	name = "stone table"
@@ -275,10 +238,21 @@
 	max_integrity = 300
 	smooth = 0
 	climb_offset = 10
+	debris = list(/obj/item/natural/stone = 1)
 
 /obj/structure/table/church/m
 	icon = 'icons/roguetown/misc/tables.dmi'
 	icon_state = "churchtable_mid"
+
+/obj/structure/table/stone_small
+	name = "stone table"
+	desc = ""
+	icon = 'icons/roguetown/misc/tables.dmi'
+	icon_state = "stonetable_small"
+	max_integrity = 300
+	smooth = 0
+	climb_offset = 10
+	debris = list(/obj/item/natural/stone = 1)
 
 /obj/structure/table/vtable
 	name = "ancient wooden table"
@@ -451,8 +425,10 @@
 /obj/structure/rack
 	name = "rack"
 	desc = ""
-	icon = 'icons/obj/objects.dmi'
+	icon = 'icons/roguetown/misc/structure.dmi'
 	icon_state = "rack"
+	climbable = TRUE
+	climb_offset = 10
 	layer = TABLE_LAYER
 	density = TRUE
 	anchored = TRUE
@@ -474,10 +450,10 @@
 	else
 		return 0
 
-/obj/structure/rack/CanAStarPass(ID, dir, caller)
+/obj/structure/rack/CanAStarPass(ID, dir, requester)
 	. = !density
-	if(ismovableatom(caller))
-		var/atom/movable/mover = caller
+	if(ismovableatom(requester))
+		var/atom/movable/mover = requester
 		. = . || (mover.pass_flags & PASSTABLE)
 
 /obj/structure/rack/MouseDrop_T(obj/O, mob/user)
@@ -512,45 +488,38 @@
 	attack_hand(user)
 
 
-
-/obj/structure/rack/rogue
-	icon = 'icons/roguetown/misc/structure.dmi'
-	icon_state = "rack"
-	climbable = TRUE
-	climb_offset = 10
-
-/obj/structure/rack/rogue/deconstruct(disassembled = TRUE)
+/obj/structure/rack/deconstruct(disassembled = TRUE)
 	qdel(src)
 
-/obj/structure/rack/rogue/underworld
+/obj/structure/rack/underworld
 	icon = 'icons/roguetown/misc/structure.dmi'
 	icon_state = "rack_underworld"
 	climbable = TRUE
 	climb_offset = 10
 
-/obj/structure/rack/rogue/shelf
+/obj/structure/rack/shelf
 	icon = 'icons/roguetown/misc/structure.dmi'
 	icon_state = "shelf"
 	climbable = FALSE
 	dir = SOUTH
 	pixel_y = 32
 
-/obj/structure/rack/rogue/shelf/big
+/obj/structure/rack/shelf/big
 	icon_state = "shelf_big"
 	climbable = FALSE
 	dir = SOUTH
 	pixel_y = 16
 
-/obj/structure/rack/rogue/shelf/biggest
+/obj/structure/rack/shelf/biggest
 	icon_state = "shelf_biggest"
 	pixel_y = 0
 
-/obj/structure/rack/rogue/shelf/notdense // makes the wall mounted one less weird in a way, got downside of offset when loaded again tho
+/obj/structure/rack/shelf/notdense // makes the wall mounted one less weird in a way, got downside of offset when loaded again tho
 	density = FALSE
 	pixel_y = 24
 
 // Necessary to avoid a critical bug with disappearing weapons.
-/obj/structure/rack/rogue/attackby(obj/item/W, mob/user, params)
+/obj/structure/rack/attackby(obj/item/W, mob/user, params)
 	if(!user.cmode)
 		if(!(W.item_flags & ABSTRACT))
 			if(user.transferItemToLoc(W, drop_location(), silent = FALSE))

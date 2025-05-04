@@ -27,24 +27,24 @@
 
 /datum/objective_item/steal/rogue/ledger
 	name = "the merchant's catatoma."
-	targetitem = /obj/item/book/rogue/secret/ledger
+	targetitem = /obj/item/book/secret/ledger
 	difficulty = 2
 	excludefromjob = list("Merchant")
 
 /datum/objective_item/steal/rogue/mkey
 	name = "the master key."
-	targetitem = /obj/item/roguekey/lord
+	targetitem = /obj/item/key/lord
 	difficulty = 3
-	excludefromjob = list("Lord", "Knight")
+	excludefromjob = list("Monarch", "Knight")
 
 /datum/objective_item/steal/rogue/spices
 	name = "a pepper mill."
-	targetitem = /obj/item/reagent_containers/food/condiment/peppermill
+	targetitem = /obj/item/reagent_containers/peppermill
 	difficulty = 1
 	excludefromjob = list("Cook")
 
 /datum/objective_item/steal/rogue/crown
 	name = "the Lord's crown."
-	targetitem = /obj/item/clothing/head/roguetown/crown/serpcrown
+	targetitem = /obj/item/clothing/head/crown/serpcrown
 	difficulty = 3
-	excludefromjob = list("King", "Queen", "Knight")
+	excludefromjob = list("Monarch", "Knight")

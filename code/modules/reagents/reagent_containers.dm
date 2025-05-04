@@ -4,6 +4,9 @@
 	icon = 'icons/obj/chemical.dmi'
 	icon_state = null
 	w_class = WEIGHT_CLASS_TINY
+
+	grid_height = 64
+	grid_width = 32
 	var/amount_per_transfer_from_this = 5
 	var/list/possible_transfer_amounts = list(5,10,15,20,25,30)
 	var/volume = 30
@@ -19,9 +22,7 @@
 	var/short_cooktime = FALSE  // based on cooking skill
 	var/long_cooktime = FALSE  // based on cooking skill
 
-/obj/item/reagent_containers/weather_trigger(W)
-	if(W==/datum/weather/rain)
-		START_PROCESSING(SSweather,src)
+	COOLDOWN_DECLARE(fill_cooldown)
 
 /obj/item/reagent_containers/Initialize(mapload, vol)
 	. = ..()
@@ -31,22 +32,26 @@
 
 	add_initial_reagents()
 
+	if(spillable)
+		GLOB.weather_act_upon_list |= src
+
+/obj/item/reagent_containers/weather_act_on(weather_trait, severity)
+	if(weather_trait != PARTICLEWEATHER_RAIN || !COOLDOWN_FINISHED(src, fill_cooldown))
+		return
+	if(!isturf(loc))
+		return
+	reagents.add_reagent(/datum/reagent/water, clamp(severity * 0.5, 1, 5))
+	COOLDOWN_START(src, fill_cooldown, 10 SECONDS)
+
+/obj/item/reagent_containers/Destroy()
+	. = ..()
+	if(spillable)
+		GLOB.weather_act_upon_list -= src
+
 /obj/item/reagent_containers/proc/add_initial_reagents()
 	if(list_reagents)
 		reagents.add_reagent_list(list_reagents)
-/*
-/obj/item/reagent_containers/attack_self(mob/user)
-	if(possible_transfer_amounts.len)
-		var/i=0
-		for(var/A in possible_transfer_amounts)
-			i++
-			if(A == amount_per_transfer_from_this)
-				if(i<possible_transfer_amounts.len)
-					amount_per_transfer_from_this = possible_transfer_amounts[i+1]
-				else
-					amount_per_transfer_from_this = possible_transfer_amounts[1]
-				to_chat(user, "<span class='notice'>[src]'s transfer amount is now [amount_per_transfer_from_this] units.</span>")
-				return*/
+	update_icon()
 
 /obj/item/reagent_containers/attack(mob/M, mob/user, def_zone)
 	return ..()
@@ -61,10 +66,11 @@
 	else if(C.is_mouth_covered(mask_only = 1))
 		covered = "mask"
 	if(C != user)
-		if(C.mobility_flags & MOBILITY_STAND)
-			if(get_dir(eater, user) != eater.dir)
-				to_chat(user, "<span class='warning'>I must stand in front of [C.p_them()].</span>")
-				return 0
+		if(isturf(eater.loc))
+			if(C.mobility_flags & MOBILITY_STAND)
+				if(get_dir(eater, user) != eater.dir)
+					to_chat(user, "<span class='warning'>I must stand in front of [C.p_them()].</span>")
+					return 0
 	if(covered)
 		if(!silent)
 			var/who = (isnull(user) || eater == user) ? "your" : "[eater.p_their()]"
@@ -115,10 +121,14 @@
 		return
 
 	else
-		if(isturf(target) && reagents.reagent_list.len && thrownby)
-			log_combat(thrownby, target, "splashed (thrown) [english_list(reagents.reagent_list)]", "in [AREACOORD(target)]")
-			log_game("[key_name(thrownby)] splashed (thrown) [english_list(reagents.reagent_list)] on [target] in [AREACOORD(target)].")
-			message_admins("[ADMIN_LOOKUPFLW(thrownby)] splashed (thrown) [english_list(reagents.reagent_list)] on [target] in [ADMIN_VERBOSEJMP(target)].")
+		if(isturf(target))
+			var/turf/target_turf = target
+			if(istype(target_turf, /turf/open))
+				target_turf.add_liquid_from_reagents(reagents, FALSE, reagents.chem_temp)
+			if(reagents.reagent_list.len && thrownby)
+				log_combat(thrownby, target, "splashed (thrown) [english_list(reagents.reagent_list)]", "in [AREACOORD(target)]")
+				log_game("[key_name(thrownby)] splashed (thrown) [english_list(reagents.reagent_list)] on [target] in [AREACOORD(target)].")
+				message_admins("[ADMIN_LOOKUPFLW(thrownby)] splashed (thrown) [english_list(reagents.reagent_list)] on [target] in [ADMIN_VERBOSEJMP(target)].")
 		visible_message("<span class='notice'>[src] spills its contents all over [target].</span>")
 		reagents.reaction(target, TOUCH)
 		if(QDELETED(src))
@@ -130,7 +140,7 @@
 	reagents.expose_temperature(1000)
 	..()
 
-/obj/item/reagent_containers/temperature_expose(datum/gas_mixture/air, exposed_temperature, exposed_volume)
+/obj/item/reagent_containers/temperature_expose(exposed_temperature, exposed_volume)
 	reagents.expose_temperature(exposed_temperature)
 
 /obj/item/reagent_containers/on_reagent_change(changetype)
@@ -154,5 +164,12 @@
 				filling.icon_state = "[fill_name][fill_icon_thresholds[i]]"
 
 		filling.color = mix_color_from_reagents(reagents.reagent_list)
+		for(var/datum/reagent/reagent as anything in reagents.reagent_list)
+			if(reagent.glows)
+				var/mutable_appearance/emissive = mutable_appearance('icons/obj/reagentfillings.dmi', filling.icon_state)
+				emissive.plane = EMISSIVE_PLANE
+				overlays += emissive
+				break
 		add_overlay(filling)
 	. = ..()
+

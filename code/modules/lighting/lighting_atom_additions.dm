@@ -24,6 +24,7 @@
 	///Bitflags to determine lighting-related atom properties.
 	var/light_flags = NONE
 
+
 /atom/movable
 	///Lazylist to keep track on the sources of illumination.
 	var/list/affected_dynamic_lights
@@ -32,8 +33,11 @@
 
 /atom/movable/Initialize(mapload, ...)
 	. = ..()
-	if(light_system == MOVABLE_LIGHT)
+	if((light_system == MOVABLE_LIGHT) && !istype(src, /atom/movable/outdoor_effect) && !istype(src, /atom/movable/lighting_object))
 		AddComponent(/datum/component/overlay_lighting)
+	if (has_initial_mana_pool && can_have_mana_pool())
+		mana_pool = initialize_mana_pool()
+		after_manapool_init()
 
 ///Keeps track of the sources of dynamic luminosity and updates our visibility with the highest.
 /atom/movable/proc/update_dynamic_luminosity()

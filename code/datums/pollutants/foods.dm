@@ -12,6 +12,10 @@
 	name = "apple pie"
 	scent = "apple pie"
 
+/datum/pollutant/food/pear_pie
+	name = "pear pie"
+	scent = "pear pie"
+
 /datum/pollutant/food/fish_pie
 	name = "fish pie"
 	scent = "fish pie"
@@ -64,6 +68,10 @@
 	name = "fresh baked prezzel"
 	scent = "fresh baked prezzel"
 
+/datum/pollutant/food/fritter
+	name = "fresh baked apple fritter"
+	scent = "fresh baked apple fritter"
+
 /datum/pollutant/food/honey_cake
 	name = "fresh baked honey cake"
 	scent = "fresh baked honey cake"
@@ -71,6 +79,22 @@
 /datum/pollutant/food/cheese_cake
 	name = "fresh baked cheese cake"
 	scent = "fresh baked cheese cake"
+
+/datum/pollutant/food/strawberry_cake
+	name = "fresh baked strawberry cake"
+	scent = "fresh baked strawberry cake"
+
+/datum/pollutant/food/crimson_cake
+	name = "fresh baked crimson pine cake"
+	scent = "fresh baked crimson pine cake"
+
+/datum/pollutant/food/scone
+	name = "fresh baked scones"
+	scent = "fresh baked scones"
+
+/datum/pollutant/food/griddlecake
+	name = "freshly fried griddle cake"
+	scent = "freshly fried griddle cake"
 
 /datum/pollutant/food/baked_potato
 	name = "baked potatos"
@@ -85,12 +109,20 @@
 	scent = "cooked eel"
 
 /datum/pollutant/food/baked_clownfish
-	name = "cooked clown fish"
-	scent = "cooked clown fish"
+	name = "cooked clownfish"
+	scent = "cooked clownfish"
 
 /datum/pollutant/food/baked_angler
-	name = "cooked angler fish"
-	scent = "cooked angler fish"
+	name = "cooked anglerfish"
+	scent = "cooked anglerfish"
+
+/datum/pollutant/food/baked_swordfish
+	name = "cooked swordfish"
+	scent = "cooked swordfish"
+
+/datum/pollutant/food/baked_shrimp
+	name = "cooked shrimp"
+	scent = "cooked shrimp"
 
 /datum/pollutant/food/truffles
 	name = "cooked truffles"
@@ -107,10 +139,6 @@
 /datum/pollutant/food/fried_chicken
 	name = "cooked chicken"
 	scent = "cooked chicken"
-
-/datum/pollutant/food/sausage
-	name = "cooked sausage"
-	scent = "cooked sausage"
 
 /datum/pollutant/food/sausage
 	name = "cooked sausage"
@@ -179,6 +207,10 @@
 /datum/pollutant/food/cheese_soup
 	name = "cheese soup"
 	scent = "cheese soup"
+
+/datum/pollutant/food/sugar
+	name = "saccharine sweetness"
+	scent = "saccharine sweetness"
 
 /datum/pollutant/food/druqks
 	name = "acrid air"

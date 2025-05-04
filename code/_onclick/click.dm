@@ -49,6 +49,9 @@
 */
 /atom/Click(location,control,params)
 	if(flags_1 & INITIALIZED_1)
+		if(ismob(usr))
+			if(istype(usr:focus, /obj/abstract/visual_ui_element/console_input))
+				usr:focus:unfocus()
 		SEND_SIGNAL(src, COMSIG_CLICK, location, control, params, usr)
 		usr.ClickOn(src, params)
 	return
@@ -76,6 +79,14 @@
 */
 /mob/proc/ClickOn( atom/A, params )
 	var/list/modifiers = params2list(params)
+
+	if(LAZYACCESS(modifiers, RIGHT_CLICK) && LAZYACCESS(modifiers, "shift"))
+		if(mind && mind.active_uis["quake_console"])
+			if(client.holder)
+				client.holder.marked_datum = A
+				var/datum/visual_ui/console/console =  mind.active_uis["quake_console"]
+				var/obj/abstract/visual_ui_element/scrollable/console_output/output = locate(/obj/abstract/visual_ui_element/scrollable/console_output) in console.elements
+				output.add_line("MARKED: [A]")
 
 	if(curplaying)
 		curplaying.on_mouse_up()
@@ -115,15 +126,16 @@
 			used_hand = 2
 			if(next_rmove > world.time)
 				return
-		if(used_intent.get_chargetime())
-			if(used_intent.no_early_release && client?.chargedprog < 100)
-				var/adf = used_intent.clickcd
-				if(istype(rmb_intent, /datum/rmb_intent/aimed))
-					adf = round(adf * 1.4)
-				if(istype(rmb_intent, /datum/rmb_intent/swift))
-					adf = round(adf * 0.6)
-				changeNext_move(adf,used_hand)
-				return
+		if(uses_intents)
+			if(used_intent?.get_chargetime())
+				if(used_intent.no_early_release && client?.chargedprog < 100)
+					var/adf = used_intent.clickcd
+					if(istype(rmb_intent, /datum/rmb_intent/aimed))
+						adf = round(adf * 1.4)
+					if(istype(rmb_intent, /datum/rmb_intent/swift))
+						adf = round(adf * 0.6)
+					changeNext_move(adf,used_hand)
+					return
 	if(modifiers["right"])
 		if(oactive)
 			if(atkswinging != "right")
@@ -169,19 +181,19 @@
 	if(modifiers["shift"])
 		ShiftClickOn(A)
 		return
-//	if(modifiers["alt"]) // alt and alt-gr (rightalt)
-//		AltClickOn(A)
-//		return
-//	if(modifiers["ctrl"])
-//		CtrlClickOn(A)
-//		return
+	if(modifiers["alt"]) // alt and alt-gr (rightalt)
+		AltClickOn(A)
+		return
+	if(modifiers["ctrl"])
+		CtrlClickOn(A)
+		return
 	if(modifiers["right"])
 		testing("right")
 		if(!oactive)
 			RightClickOn(A, params)
 			return
 
-	if(incapacitated(ignore_restraints = 1))
+	if(incapacitated(ignore_restraints = TRUE))
 		return
 
 	if(!atkswinging)
@@ -288,9 +300,14 @@
 								atkswinging = null
 								//update_warning()
 								return
+					if(cmode)
+						resolveAdjacentClick(T,W,params,used_hand) //hit the turf
 					if(!used_intent.noaa)
 						changeNext_move(CLICK_CD_MELEE)
-						do_attack_animation(T, visual_effect_icon = used_intent.animname)
+						if(get_dist(get_turf(src), T) <= used_intent.reach)
+							do_attack_animation(T, visual_effect_icon = used_intent.animname)
+						else
+							do_attack_animation(get_ranged_target_turf(src, get_dir(src, T), 1), visual_effect_icon = used_intent.animname)
 						if(W)
 							playsound(get_turf(src), pick(W.swingsound), 100, FALSE)
 							var/adf = used_intent.clickcd
@@ -302,8 +319,8 @@
 						else
 							playsound(get_turf(src), used_intent.miss_sound, 100, FALSE)
 							if(used_intent.miss_text)
-								visible_message("<span class='warning'>[src] [used_intent.miss_text]!</span>", \
-												"<span class='warning'>I [used_intent.miss_text]!</span>")
+								visible_message("<span class='warning'>[src] [used_intent.miss_text]</span>", \
+												"<span class='warning'>I [used_intent.miss_text]</span>")
 					aftermiss()
 					atkswinging = null
 					//update_warning()
@@ -403,7 +420,7 @@
 				var/mob/user = src
 				if(user.used_intent)
 					usedreach = user.used_intent.reach
-			if(isturf(target) || isturf(target.loc) || (target in direct_access)) //Directly accessible atoms
+			if(isturf(target) || isturf(target.loc) || (target in direct_access) || (ismovable(target) && target.flags_1 & IS_ONTOP_1)) //Directly accessible atoms
 				if(Adjacent(target) || (tool && CheckToolReach(src, target, usedreach))) //Adjacent or reaching attacks
 					return TRUE
 
@@ -440,8 +457,9 @@
 		if(1)
 			return FALSE //here.Adjacent(there)
 		if(2 to INFINITY)
-			var/obj/dummy = new(get_turf(here))
+			var/obj/effect/dummy = new(get_turf(here))
 			dummy.pass_flags |= PASSTABLE
+			dummy.movement_type = FLYING
 			dummy.invisibility = INVISIBILITY_ABSTRACT
 			for(var/i in 1 to reach) //Limit it to that many tries
 				var/turf/T = get_step(dummy, get_dir(dummy, there))
@@ -480,7 +498,8 @@
 	animals lunging, etc.
 */
 /mob/proc/RangedAttack(atom/A, params)
-	SEND_SIGNAL(src, COMSIG_MOB_ATTACK_RANGED, A, params)
+	if(SEND_SIGNAL(src, COMSIG_MOB_ATTACK_RANGED, A, params) & COMPONENT_CANCEL_ATTACK_CHAIN)
+		return TRUE
 /*
 	Restrained ClickOn
 
@@ -542,6 +561,7 @@
 	if(atomy[AB].loc != src)
 		return
 	var/AE = atomy[AB]
+	user.cast_move = 0
 	user.used_intent = user.a_intent
 	user.UnarmedAttack(AE,1,params)
 
@@ -591,6 +611,7 @@
 	. = SEND_SIGNAL(src, COMSIG_MOB_ALTCLICKON, A)
 	if(. & COMSIG_MOB_CANCEL_CLICKON)
 		return
+	A.AltClick(src)
 
 /atom/proc/AltClick(mob/user)
 	SEND_SIGNAL(src, COMSIG_CLICK_ALT, user)
@@ -789,14 +810,16 @@
 	return
 
 /mob/proc/RightClickOn(atom/A, params)
+	if(stat >= UNCONSCIOUS)
+		return
+	changeNext_move(CLICK_CD_MELEE)
 	if(A.Adjacent(src))
 		if(A.loc == src && (A == get_active_held_item()) )
 			A.rmb_self(src)
 		else
 			rmb_on(A, params)
-	else if(used_intent.rmb_ranged)
+	else if(uses_intents && used_intent.rmb_ranged)
 		used_intent.rmb_ranged(A, src) //get the message from the intent
-	changeNext_move(CLICK_CD_MELEE)
 	if(isturf(A.loc))
 		face_atom(A)
 
@@ -806,7 +829,7 @@
 			UntargetMob()
 		targetting = target
 		if(!fixedeye) //If fixedeye isn't already enabled, we need to set this var
-			nodirchange = TRUE
+			atom_flags |= NO_DIR_CHANGE
 		tempfixeye = TRUE //Change icon to 'target' red eye
 		targeti = image('icons/mouseover.dmi', targetting.loc, "target", ABOVE_HUD_LAYER+0.1)
 		var/icon/I = icon(icon, icon_state, dir)
@@ -829,7 +852,7 @@
 	targetting = null
 	tempfixeye = FALSE
 	if(!fixedeye)
-		nodirchange = FALSE
+		atom_flags &= ~NO_DIR_CHANGE
 	src.client.images -= targeti
 	//clear hud icon
 	for(var/atom/movable/screen/eye_intent/eyet in hud_used.static_inventory)
@@ -869,7 +892,7 @@
 	temptarget = TRUE
 	targetting = swingtarget
 	if(!fixedeye)
-		nodirchange = TRUE
+		atom_flags |= NO_DIR_CHANGE
 	tempfixeye = TRUE
 	for(var/atom/movable/screen/eye_intent/eyet in hud_used.static_inventory)
 		eyet.update_icon(src) //Update eye icon

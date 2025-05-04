@@ -33,15 +33,8 @@
 		ping_sound(source)
 
 	var/list/muffled_listeners = list() //this is very rudimentary list of muffled listeners above and below to mimic sound muffling (this is done through modifying the playsounds for them)
-	if(!ignore_walls) //these sounds don't carry through walls
+	if(!ignore_walls) //these sounds don't carry through walls or vertically
 		listeners = listeners & hearers(maxdistance,turf_source)
-
-		if(above_turf)
-			muffled_listeners += hearers(maxdistance,above_turf)
-
-		if(below_turf)
-			muffled_listeners += hearers(maxdistance,below_turf)
-
 	else
 		if(above_turf)
 			listeners += SSmobs.clients_by_zlevel[above_turf.z]
@@ -73,25 +66,8 @@
 	I.mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 	flick_overlay(I, GLOB.clients, 6)
 
-/proc/ping_sound_through_walls(turf/T)
-	new /obj/effect/temp_visual/soundping(T)
 
-/obj/effect/temp_visual/soundping
-	plane = FULLSCREEN_PLANE
-	layer = FLASH_LAYER
-	icon = 'icons/effects/ore_visuals.dmi'
-	icon_state = "zz"
-	appearance_flags = 0 //to avoid having TILE_BOUND in the flags, so that the 480x480 icon states let you see it no matter where you are
-	duration = 6
-	pixel_x = -224
-	pixel_y = -218
-
-/*
-/obj/effect/temp_visual/soundping/Initialize()
-	. = ..()
-	animate(src, alpha = 0, time = duration, easing = EASE_IN)
-*/
-/mob/proc/playsound_local(turf/turf_source, soundin, vol as num, vary, frequency, falloff, channel, pressure_affected = TRUE, sound/S, repeat, muffled)
+/mob/proc/playsound_local(atom/turf_source, soundin, vol as num, vary, frequency, falloff, channel, pressure_affected = TRUE, sound/S, repeat, muffled)
 	if(!client || !can_hear())
 		return FALSE
 
@@ -133,71 +109,47 @@
 		var/distance = get_dist(T, turf_source)
 
 		S.volume -= (distance * (0.10 * S.volume)) //10% each step
-/*
-		if(pressure_affected)
-			//Atmosphere affects sound
-			var/pressure_factor = 1
-			var/datum/gas_mixture/hearer_env = T.return_air()
-			var/datum/gas_mixture/source_env = turf_source.return_air()
-
-			if(hearer_env && source_env)
-				var/pressure = min(hearer_env.return_pressure(), source_env.return_pressure())
-				if(pressure < ONE_ATMOSPHERE)
-					pressure_factor = max((pressure - SOUND_MINIMUM_PRESSURE)/(ONE_ATMOSPHERE - SOUND_MINIMUM_PRESSURE), 0)
-			else //space
-				pressure_factor = 0
-
-			if(distance <= 1)
-				pressure_factor = max(pressure_factor, 0.15) //touching the source of the sound
-
-			S.volume *= pressure_factor
-			//End Atmosphere affecting sound
-*/
-
 		if(S.volume <= 0)
 			return FALSE //No sound
 
-		var/dx = turf_source.x - T.x // Hearing from the right/left
-		if(dx <= 1 && dx >= -1) //if we're  close enough we're heard in both ears
+		var/dx = turf_source.x - x
+		if(dx <= 1 && dx >= -1)
 			S.x = 0
 		else
 			S.x = dx
-		var/dz = turf_source.y - T.y // Hearing from infront/behind
-		if(dz <= 1 && dz >= -1) //if we're  close enough we're heard in both ears
+		var/dz = turf_source.y - y
+		if(dz <= 1 && dz >= -1)
 			S.z = 0
 		else
 			S.z = dz
-		var/dy = (turf_source.z - T.z) * 2 // Hearing from  above / below, multiplied by 5 because we assume height is further along coords.
+
+		var/dy = turf_source.z - z
 		S.y = dy
 
 		S.falloff = (falloff ? falloff : FALLOFF_SOUNDS)
 
-	if(repeat)
-		if(istype(repeat, /datum/looping_sound))
-			var/datum/looping_sound/D = repeat
-			if(src in D.thingshearing) //we are already hearing this loop
-				if(client.played_loops[D])
-					var/sound/DS = client.played_loops[D]["SOUND"]
-					if(DS)
-						var/volly = client.played_loops[D]["VOL"]
-						if(volly != S.volume)
-							DS.x = S.x
-							DS.y = S.y
-							DS.z = S.z
-							DS.falloff = S.falloff
-							client.played_loops[D]["VOL"] = S.volume
-							update_sound_volume(DS, S.volume)
-							if(client.played_loops[D]["MUTESTATUS"]) //we have sound so turn this off
-								client.played_loops[D]["MUTESTATUS"] = null
-						return TRUE
-			else
-				D.thingshearing += src
+	if(repeat && istype(repeat, /datum/looping_sound))
+		var/datum/looping_sound/D = repeat
+		if(src in D.thingshearing) //we are already hearing this loop
+			if(client.played_loops[D])
+				var/sound/DS = client.played_loops[D]["SOUND"]
+				if(DS)
+					var/volly = client.played_loops[D]["VOL"]
+					if(volly != S.volume)
+						DS.x = S.x
+						DS.y = S.y
+						DS.z = S.z
+						DS.falloff = S.falloff
+						client.played_loops[D]["VOL"] = S.volume
+						update_sound_volume(DS, S.volume)
+						if(client.played_loops[D]["MUTESTATUS"]) //we have sound so turn this off
+							client.played_loops[D]["MUTESTATUS"] = null
+		else
+			D.thingshearing += src
 			client.played_loops[D] = list()
 			client.played_loops[D]["SOUND"] = S
 			client.played_loops[D]["VOL"] = S.volume
 			client.played_loops[D]["MUTESTATUS"] = null
-//			if(D.persistent_loop) //shut up music because we're hearing ingame music
-//				play_ambience(get_area(src))
 			S.repeat = 1
 
 	SEND_SOUND(src, S)

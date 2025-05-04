@@ -7,7 +7,7 @@
 	/// Restricts sexes if list is not null
 	var/list/allowed_sexes
 	/// Restricts ages if list is not null
-	var/list/allowed_ages
+	var/list/allowed_ages = ALL_AGES_LIST
 	/// Typepath of outfit for the migrant role
 	var/outfit
 	/// Typepath of the antag datum for the migrant role
@@ -18,15 +18,20 @@
 	var/greet_text
 	/// Whether to grant a lit torch upon spawn
 	var/grant_lit_torch = FALSE
-		/// Whether to show wanderer examine like adventurers or pilgrims
-	var/show_wanderer_examine = TRUE
+	/// Whether to show them as foreigners
+	var/is_foreigner = TRUE
 	var/advjob_examine = TRUE
+	var/banned_leprosy = TRUE
+	var/banned_lunatic = TRUE
 
 /datum/migrant_role/proc/after_spawn(mob/living/carbon/human/character)
+	if(is_foreigner)
+		ADD_TRAIT(character, TRAIT_FOREIGNER, TRAIT_GENERIC)
 	return
 
 /datum/migrant_role/pilgrim
 	name = "Pilgrim"
+	banned_leprosy = FALSE
 	advclass_cat_rolls = list(CTAG_PILGRIM = 10)
 
 /datum/migrant_role/adventurer
@@ -43,3 +48,7 @@
 	name = "Mercenary"
 	advclass_cat_rolls = list(CTAG_MERCENARY = 20)
 	grant_lit_torch = TRUE
+
+/datum/migrant_role/lich
+	name = "Lich"
+	antag_datum = /datum/antagonist/lich

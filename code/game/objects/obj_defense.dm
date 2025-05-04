@@ -31,13 +31,13 @@
 /obj/proc/run_obj_armor(damage_amount, damage_type, damage_flag = 0, attack_dir, armor_penetration = 0)
 	if(damage_flag == "blunt" && damage_amount < damage_deflection)
 		testing("damtest55")
-		return 1
+		return 0
 	if(damage_type != BRUTE && damage_type != BURN)
 		testing("damtest66")
 		return 0
 	var/armor_protection = 0
 	if(damage_flag)
-		armor_protection = armor.getRating(damage_flag)
+		armor_protection = armor?.getRating(damage_flag)
 	if(armor_protection)		//Only apply weak-against-armor/hollowpoint effects if there actually IS armor.
 		armor_protection = CLAMP(armor_protection - armor_penetration, min(armor_protection, 0), 100)
 	return round(damage_amount * (100 - armor_protection)*0.01, DAMAGE_PRECISION)
@@ -166,6 +166,8 @@ GLOBAL_DATUM_INIT(acid_overlay, /mutable_appearance, mutable_appearance('icons/e
 
 ///Called when the obj is exposed to fire.
 /obj/fire_act(added, maxstacks)
+	if(QDELETED(src))
+		return
 	if(isturf(loc))
 		var/turf/T = loc
 		if(T.intact && level == 1) //fire can't damage things hidden below the floor.

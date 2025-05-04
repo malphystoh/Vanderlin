@@ -61,9 +61,9 @@
 			msg += "<span class='bloody'>[m1] [bleed_wording]!</span>"
 
 	//Fire/water stacks
-	if(fire_stacks > 0)
+	if(fire_stacks + divine_fire_stacks > 0)
 		msg += "[m1] covered in something flammable."
-	else if(fire_stacks < 0)
+	else if(fire_stacks < 0 && !on_fire)
 		msg += "[m1] soaked."
 
 	//Grabbing
@@ -95,9 +95,10 @@
 				. += "<span class='warning'><B>[t_He] look[p_s()] much weaker than I.</B></span>"
 
 	if(Adjacent(user) && HAS_TRAIT(src, TRAIT_SIMPLE_WOUNDS))
-		. += "<a href='?src=[REF(src)];inspect_animal=1'>Inspect Wounds</a>"
+		. += "<a href='byond://?src=[REF(src)];inspect_animal=1'>Inspect Wounds</a>"
 
 	if(desc)
 		. += desc
 
 	. += "ᛉ ------------ ᛉ</span>"
+	SEND_SIGNAL(src, COMSIG_PARENT_EXAMINE, user, .)

@@ -19,7 +19,6 @@
 #define THERMAL_PROTECTION_HAND_RIGHT	0.025
 
 /mob/living/carbon/human
-	var/leprosy = 2
 	var/allmig_reward = 0
 
 /mob/living/carbon/human/Life()
@@ -32,9 +31,6 @@
 	if (QDELETED(src))
 		return 0
 
-	if(. && (mode != AI_OFF))
-		handle_ai()
-
 	if(advsetup)
 		Stun(50)
 
@@ -43,66 +39,51 @@
 		for(var/datum/antagonist/A in mind.antag_datums)
 			A.on_life(src)
 
-		if(mode == AI_OFF)
-			handle_vamp_dreams()
-			if(stat)
-				if(health > 0)
-					if(has_status_effect(/datum/status_effect/debuff/sleepytime))
-						remove_status_effect(/datum/status_effect/debuff/sleepytime)
-						remove_stress(/datum/stressevent/sleepytime)
-						if(mind)
-							mind.sleep_adv.advance_cycle()
-						var/datum/game_mode/chaosmode/C = SSticker.mode
-						if(istype(C))
-							if(mind)
-								allmig_reward++
-								to_chat(src, "<span class='danger'>Nights Survived: \Roman[allmig_reward]</span>")
-								if(C.allmig)
-									if(allmig_reward > 3)
-										adjust_triumphs(1)
-					if(has_status_effect(/datum/status_effect/debuff/trainsleep))
-						remove_status_effect(/datum/status_effect/debuff/trainsleep)
-			if(leprosy == 1)
-				adjustToxLoss(2)
-			else if(leprosy == 2)
-				if(client)
-					if(check_blacklist(client.ckey))
-						ADD_TRAIT(src, TRAIT_NOPAIN, TRAIT_GENERIC)
-						leprosy = 1
-						var/obj/item/bodypart/B = get_bodypart(BODY_ZONE_HEAD)
-						if(B)
-							B.sellprice = rand(16, 33)
-					else
-						leprosy = 3
-			//heart attack stuff
-			handle_curses()
-			handle_heart()
-			handle_liver()
-			update_stamina()
-			update_energy()
-			if(charflaw && !charflaw.ephemeral)
-				charflaw.flaw_on_life(src)
-			if(health <= 0)
-				adjustOxyLoss(0.5)
-			else
-				if(stat < 3) //not dead
-					if(!(NOBLOOD in dna?.species?.species_traits))
-						if(blood_volume <= BLOOD_VOLUME_SURVIVE)
-							adjustOxyLoss(0.5)
-							if(blood_volume <= 40)
-								adjustOxyLoss(3)
-			if(!client && !HAS_TRAIT(src, TRAIT_NOSLEEP))
-				if(mob_timers["slo"])
-					if(world.time > mob_timers["slo"] + 90 SECONDS)
-						Sleeping(100)
-				else
-					mob_timers["slo"] = world.time
-			else
-				if(mob_timers["slo"])
-					mob_timers["slo"] = null
+	handle_vamp_dreams()
+	if(IsSleeping())
+		if(health > 0)
+			remove_status_effect(/datum/status_effect/debuff/trainsleep)
+			remove_status_effect(/datum/status_effect/debuff/sleepytime)
+			if(has_status_effect(/datum/status_effect/debuff/dreamytime))
+				remove_status_effect(/datum/status_effect/debuff/dreamytime)
+				if(mind)
+					mind.sleep_adv.advance_cycle()
+					if(!mind.antag_datums || !mind.antag_datums.len)
+						allmig_reward++
+						to_chat(src, span_danger("Nights Survived: \Roman[allmig_reward]"))
+						if(allmig_reward > 0 && allmig_reward % 2 == 0)
+							adjust_triumphs(1)
+	if(HAS_TRAIT(src, TRAIT_LEPROSY))
+		if(MOBTIMER_FINISHED(src, MT_LEPERBLEED, 6 MINUTES))
+			if(prob(10))
+				to_chat(src, span_warning("My skin opens up and bleeds..."))
+				MOBTIMER_SET(src, MT_LEPERBLEED)
+				var/obj/item/bodypart/part = pick(bodyparts)
+				if(part)
+					part.add_wound(/datum/wound/slash)
+		adjustToxLoss(0.3)
+	//heart attack stuff
+	handle_curses()
+	handle_heart()
+	handle_liver()
+	update_stamina()
+	update_energy()
+	handle_environment()
+	if(charflaw && !charflaw.ephemeral)
+		charflaw.flaw_on_life(src)
+	if(health <= 0)
+		apply_damage(1, OXY)
+	if(!client && !HAS_TRAIT(src, TRAIT_NOSLEEP) && !ai_controller)
+		if(MOBTIMER_EXISTS(src, MT_SLO))
+			if(MOBTIMER_FINISHED(src, MT_SLO, 90 SECONDS)) //?????
+				Sleeping(100)
+		else
+			MOBTIMER_SET(src, MT_SLO)
+	else
+		MOBTIMER_UNSET(src, MT_SLO)
 
-		if(dna?.species)
-			dna.species.spec_life(src) // for mutantraces
+	if(dna?.species)
+		dna.species.spec_life(src) // for mutantraces
 
 	if(!typing)
 		set_typing_indicator(FALSE)
@@ -132,15 +113,7 @@
 				if(gender == MALE)
 					if(prob(50))
 						has_stubble = TRUE
-						update_hair()
-
-/mob/living/carbon/human/calculate_affecting_pressure(pressure)
-	if (wear_armor && head && istype(wear_armor, /obj/item/clothing) && istype(head, /obj/item/clothing))
-		var/obj/item/clothing/CS = wear_armor
-		var/obj/item/clothing/CH = head
-		if (CS.clothing_flags & CH.clothing_flags & STOPSPRESSUREDAMAGE)
-			return ONE_ATMOSPHERE
-	return pressure
+						update_body()
 
 
 /mob/living/carbon/human/handle_traits()
@@ -150,8 +123,11 @@
 		SEND_SIGNAL(src, COMSIG_CLEAR_MOOD_EVENT, "brain_damage")
 	return ..()
 
-/mob/living/carbon/human/handle_environment(datum/gas_mixture/environment)
-	dna.species.handle_environment(environment, src)
+/mob/living/proc/handle_environment()
+	return
+
+/mob/living/carbon/human/handle_environment()
+	dna?.species.handle_environment(src)
 
 ///FIRE CODE
 /mob/living/carbon/human/handle_fire()
@@ -163,19 +139,19 @@
 		. = dna.species.handle_fire(src) //do special handling based on the mob's species. TRUE = they are immune to the effects of the fire.
 
 	if(!last_fire_update)
-		last_fire_update = fire_stacks
-	if((fire_stacks > 10 && last_fire_update <= 10) || (fire_stacks <= 10 && last_fire_update > 10))
-		last_fire_update = fire_stacks
+		last_fire_update = fire_stacks + divine_fire_stacks
+	if((fire_stacks + divine_fire_stacks > 10 && last_fire_update <= 10) || (fire_stacks + divine_fire_stacks <= 10 && last_fire_update > 10))
+		last_fire_update = fire_stacks + divine_fire_stacks
 		update_fire()
 
 
 /mob/living/carbon/human/proc/get_thermal_protection()
 	var/thermal_protection = 0 //Simple check to estimate how protected we are against multiple temperatures
 	if(wear_armor)
-		if(wear_armor.max_heat_protection_temperature >= FIRE_SUIT_MAX_TEMP_PROTECT)
+		if(wear_armor.max_heat_protection_temperature >= 30000)
 			thermal_protection += (wear_armor.max_heat_protection_temperature*0.7)
 	if(head)
-		if(head.max_heat_protection_temperature >= FIRE_HELM_MAX_TEMP_PROTECT)
+		if(head.max_heat_protection_temperature >= 30000)
 			thermal_protection += (head.max_heat_protection_temperature*THERMAL_PROTECTION_HEAD)
 	thermal_protection = round(thermal_protection)
 	return thermal_protection
@@ -185,7 +161,7 @@
 	//If firestacks are high enough
 	if(!dna || dna.species.CanIgniteMob(src))
 		if(!on_fire)
-			if(fire_stacks > 10)
+			if(fire_stacks + divine_fire_stacks > 10)
 				Immobilize(30)
 				emote("firescream", TRUE)
 			else
@@ -201,9 +177,8 @@
 /mob/living/carbon/human/SoakMob(locations)
 	. = ..()
 	var/coverhead
-//	var/coverfeet
 	//add belt slots to this for rusting
-	var/list/body_parts = list(head, wear_mask, wear_wrists, wear_shirt, wear_neck, cloak, wear_armor, wear_pants, backr, backl, gloves, shoes, belt, s_store, glasses, ears, wear_ring) //Everything but pockets. Pockets are l_store and r_store. (if pockets were allowed, putting something armored, gloves or hats for example, would double up on the armor)
+	var/list/body_parts = list(head, wear_mask, wear_wrists, wear_shirt, wear_neck, cloak, wear_armor, wear_pants, backr, backl, gloves, shoes, belt, s_store, ears, wear_ring) //Everything but pockets. Pockets are l_store and r_store. (if pockets were allowed, putting something armored, gloves or hats for example, would double up on the armor)
 	for(var/bp in body_parts)
 		if(!bp)
 			continue
@@ -211,16 +186,10 @@
 			var/obj/item/clothing/C = bp
 			if(zone2covered(BODY_ZONE_HEAD, C.body_parts_covered))
 				coverhead = TRUE
-//			if(zone2covered(BODY_ZONE_PRECISE_L_FOOT, C.body_parts_covered))
-//				coverfeet = TRUE
 	if(locations & HEAD)
 		if(!coverhead)
 			var/mob/living/carbon/V = src
 			V.add_stress(/datum/stressevent/coldhead)
-//	if(locations & FEET)
-//		if(!coverfeet)
-//			add_stress(/datum/stressevent/coldfeet)
-
 //END FIRE CODE
 
 
@@ -342,15 +311,12 @@
 	//Puke if toxloss is too high
 	if(!stat)
 		if(prob(33) && getToxLoss() >= 75)
-			mob_timers["puke"] = world.time
+			MOBTIMER_SET(src, MT_PUKE)
 			vomit(1, blood = TRUE)
 
 /mob/living/carbon/human/has_smoke_protection()
 	if(wear_mask)
 		if(wear_mask.clothing_flags & BLOCK_GAS_SMOKE_EFFECT)
-			return TRUE
-	if(glasses)
-		if(glasses.clothing_flags & BLOCK_GAS_SMOKE_EFFECT)
 			return TRUE
 	if(head && istype(head, /obj/item/clothing))
 		var/obj/item/clothing/CH = head

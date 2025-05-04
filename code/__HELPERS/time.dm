@@ -6,6 +6,11 @@
 	var/time_string = time2text(world.timeofday, format)
 	return show_ds ? "[time_string]:[world.timeofday % 10]" : time_string
 
+/proc/time_stamp_metric()
+	var/date_portion = time2text(world.timeofday, "YYYY-MM-DD")
+	var/time_portion = time2text(world.timeofday, "hh:mm:ss")
+	return "[date_portion]T[time_portion]"
+
 /proc/gameTimestamp(format = "hh:mm:ss", wtime=null)
 	if(!wtime)
 		wtime = world.time
@@ -20,6 +25,7 @@
 GLOBAL_VAR_INIT(tod, FALSE)
 GLOBAL_VAR_INIT(forecast, FALSE)
 GLOBAL_VAR_INIT(todoverride, FALSE)
+/// The current day of the week, range from 1-7 (Moon's Dae - Sun's Dae)
 GLOBAL_VAR_INIT(dayspassed, FALSE)
 
 /proc/settod()
@@ -40,41 +46,14 @@ GLOBAL_VAR_INIT(dayspassed, FALSE)
 	if(GLOB.todoverride)
 		GLOB.tod = GLOB.todoverride
 	if((GLOB.tod != oldtod) && !GLOB.todoverride && (GLOB.dayspassed>1)) //weather check on tod changes
-		if(!GLOB.forecast)
-			switch(GLOB.tod)
-				if("dawn")
-					if(prob(25))
-						GLOB.forecast = "rain"
-				if("day")
-					if(prob(5))
-						GLOB.forecast = "rain"
-				if("dusk")
-					if(prob(33))
-						GLOB.forecast = "rain"
-				if("night")
-					if(prob(40))
-						GLOB.forecast = "rain"
-			if(GLOB.forecast == "rain")
-				var/foundnd
-				if(SSParticleWeather?.runningWeather?.target_trait == PARTICLEWEATHER_RAIN)
-					foundnd = TRUE
-				if(!foundnd)
-					SSParticleWeather?.run_weather(pick(/datum/particle_weather/rain_gentle, /datum/particle_weather/rain_storm))
-		else
-			switch(GLOB.forecast) //end the weather now
-				if("rain")
-					if(GLOB.tod == "day")
-						GLOB.forecast = "rainbow"
-					else
-						GLOB.forecast = null
-				if("rainbow")
-					GLOB.forecast = null
+		SSParticleWeather.check_forecast(GLOB.tod)
 
 	if(GLOB.tod != oldtod)
 		if(GLOB.tod == "dawn")
 			GLOB.dayspassed++
 			if(GLOB.dayspassed == 8)
 				GLOB.dayspassed = 1
+			SStreasury.distribute_estate_incomes()
 		for(var/mob/living/player in GLOB.mob_list)
 			if(player.stat != DEAD && player.client)
 				player.do_time_change()
@@ -210,3 +189,14 @@ GLOBAL_VAR_INIT(rollovercheck_last_timeofday, 0)
 	//if the time is less than station time, add 24 hours (MIDNIGHT_ROLLOVER)
 	var/time_diff = timeA > timeB ? (timeB + 24 HOURS) - timeA : timeB - timeA
 	return time_diff / SSticker.station_time_rate_multiplier // normalise with the time rate multiplier
+
+/// Until a condition is true, sleep, or until a certain amount of time has passed.
+/// Basically, UNTIL() but with a timeout.
+#define UNTIL_OR_TIMEOUT(Condition, Timeout) \
+	do { \
+		var/__end_time = REALTIMEOFDAY + (Timeout); \
+		UNTIL((Condition) || (REALTIMEOFDAY > __end_time)); \
+	} while(0)
+
+///displays the current time into the round, with a lot of extra code just there for ensuring it looks okay after an entire day passes
+#define ROUND_TIME(...) ( "[world.time - SSticker.round_start_time > MIDNIGHT_ROLLOVER ? "[round((world.time - SSticker.round_start_time)/MIDNIGHT_ROLLOVER)]:[worldtime2text()]" : worldtime2text()]" )

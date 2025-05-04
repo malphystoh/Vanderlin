@@ -13,12 +13,15 @@
 //#define ROUNDTIMERBOAT (300 MINUTES)
 #define INITIAL_ROUND_TIMER (99 MINUTES)
 #define ROUND_EXTENSION_TIME (30 MINUTES)
+#define ROUND_END_TIME (15 MINUTES)
+#define ROUND_END_TIME_VERBAL "15 minutes"
 //180 norma
 //60 test
 
 #define MODE_RESTART
 //comment out if you want to restart the server instead of shutting down
 
+#define DEBUG 1
 // Comment this out if you are debugging problems that might be obscured by custom error handling in world/Error
 #ifdef DEBUG
 #define USE_CUSTOM_ERROR_HANDLER
@@ -38,6 +41,11 @@
 
 // #define UNIT_TESTS			//Enables unit tests
 
+// If this is uncommented, will attempt to load and initialize prof.dll/libprof.so by default.
+// Even if it's not defined, you can pass "tracy" via -params in order to try to load it.
+// We do not ship byond-tracy. Build it yourself here: https://github.com/mafemergency/byond-tracy/
+// #define USE_BYOND_TRACY
+
 #if defined(CIBUILDING) && !defined(OPENDREAM)
 #define UNIT_TESTS
 #endif
@@ -51,8 +59,12 @@
 #endif								//	1 to use the default behaviour;
 									//	2 for preloading absolutely everything;
 
+//#define LOWMEMORYMODE //uncomment this to load centcom and roguetest and thats it.
+
+//#define NO_DUNGEON //comment this to load dungeons.
+
 #ifdef LOWMEMORYMODE
-#define FORCE_MAP "_maps/runtimestation.json"
+#define FORCE_MAP "_maps/roguetest.json"
 #endif
 
 //Update this whenever you need to take advantage of more recent byond features
@@ -61,6 +73,16 @@
 //Don't forget to update this part
 #error Your version of BYOND is too out-of-date to compile this project. Go to https://secure.byond.com/download and update.
 #error You need version 515 or higher
+#endif
+
+//Update this whenever you need to take advantage of more recent byond features
+#define MIN_COMPILER_MINOR_VERSION 1643
+#ifndef SPACEMAN_DMM
+#if DM_BUILD < MIN_COMPILER_MINOR_VERSION
+//Don't forget to update this part
+#error Your version of BYOND is too out-of-date to compile this project. Go to https://secure.byond.com/download and update.
+#error You need version 515.1643 or higher
+#endif
 #endif
 
 //Additional code for the above flags.

@@ -90,7 +90,7 @@
 
 /proc/log_manifest(ckey, datum/mind/mind,mob/body, latejoin = FALSE)
 	if(CONFIG_GET(flag/log_manifest))
-		WRITE_LOG(GLOB.world_manifest_log, "\[[TIMETOTEXT4LOGS]\] [ckey] \\ [body.real_name] \\ [mind.assigned_role] \\ [mind.special_role ? mind.special_role : "NONE"] \\ [latejoin ? "LATEJOIN":"ROUNDSTART"]")
+		WRITE_LOG(GLOB.world_manifest_log, "\[[TIMETOTEXT4LOGS]\] [ckey] \\ [body.real_name] \\ [mind.assigned_role.title] \\ [mind.special_role ? mind.special_role : "NONE"] \\ [latejoin ? "LATEJOIN":"ROUNDSTART"]")
 
 /proc/log_bomber(atom/user, details, atom/bomb, additional_details, message_admins = TRUE)
 	var/bomb_message = "\[[TIMETOTEXT4LOGS]\] [details][bomb ? " [bomb.name] at [AREACOORD(bomb)]": ""][additional_details ? " [additional_details]" : ""]."
@@ -205,6 +205,9 @@
 /proc/log_tgui(text)
 	WRITE_LOG(GLOB.tgui_log, text)
 
+/proc/log_storyteller(text, list/data)
+	WRITE_LOG(GLOB.world_game_log, "STORYTELLERS: [text]")
+
 /* For logging round startup. */
 /proc/start_log(log)
 	WRITE_LOG(log, "\[[TIMETOTEXT4LOGS]\] Starting up round ID [GLOB.rogue_round_id].\n-------------------------")
@@ -277,7 +280,7 @@
 		else
 			if(include_link)
 				. += "<a href='?priv_msg=[ckey]'>"
-			. += key
+			. += "[key]"
 		if(!C)
 			. += "\[DC\]"
 

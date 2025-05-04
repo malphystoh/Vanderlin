@@ -2,7 +2,7 @@
 
 /client/verb/who()
 	set name = "Whom"
-	set category = "Options"
+	set category = "OOC"
 
 	var/msg = ""
 
@@ -17,8 +17,7 @@
 				entry += " <i>(as [C.holder.fakekey])</i>"
 			if (isnewplayer(C.mob))
 				entry += " - <font color='darkgray'><b>In Lobby</b></font>"
-				if(C.ckey in GLOB.anonymize)
-					entry += " (as [get_fake_key(C.ckey)])"
+
 			else
 				if(ishuman(C.mob))
 					var/mob/living/carbon/human/H = C.mob
@@ -40,7 +39,6 @@
 				if(C.mob.mind)
 					if(C.mob.mind.special_role)
 						entry += " - <b><font color='red'>[C.mob.mind.special_role]</font></b>"
-			entry += " ([CheckIPCountry(C.address)])"
 			if(C.whitelisted())
 				wled++
 				entry += "(WL)"
@@ -48,11 +46,7 @@
 			Lines += entry
 	else
 		for(var/client/C in GLOB.clients)
-			if(C.whitelisted())
-				wled++
-			var/usedkey = C.ckey
-			if(C.ckey in GLOB.anonymize)
-				usedkey = get_fake_key(C.ckey)
+			var/usedkey = get_display_ckey(C.key)
 			Lines += "<span class='info'>[usedkey]</span>"
 	for(var/line in sortList(Lines))
 		msg += "[line]\n"

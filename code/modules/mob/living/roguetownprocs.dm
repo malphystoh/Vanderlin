@@ -150,7 +150,7 @@
 				if(offhand.can_parry)
 					offhand_defense += (H.mind ? (H.mind.get_skill_level(offhand.associated_skill) * 20) : 20)
 					offhand_defense += (offhand.wdefense * 10)
-					if(istype(offhand, /obj/item/rogueweapon/shield))
+					if(istype(offhand, /obj/item/weapon/shield))
 						force_shield = TRUE
 			if(!force_shield)
 				if(mainhand_defense >= offhand_defense)
@@ -184,6 +184,11 @@
 					attacker_skill = U.mind.get_skill_level(/datum/skill/combat/unarmed)
 					prob2defend -= (attacker_skill * 20)
 
+			if(HAS_TRAIT(H, TRAIT_GUIDANCE))
+				prob2defend += 10
+			if(HAS_TRAIT(U, TRAIT_GUIDANCE))
+				prob2defend -= 10
+
 			if(!(mobility_flags & MOBILITY_STAND))	// checks if laying down and applies 20% defense malus if so
 				prob2defend *= 0.8
 			prob2defend = clamp(prob2defend, 5, 95)
@@ -205,9 +210,9 @@
 					// defender skill gain
 					if((mobility_flags & MOBILITY_STAND) && attacker_skill && (defender_skill < attacker_skill - SKILL_LEVEL_NOVICE))
 						// No duping exp gains by attacking with a shield on active hand
-						if(used_weapon == offhand && istype(used_weapon, /obj/item/rogueweapon/shield))
+						if(used_weapon == offhand && istype(used_weapon, /obj/item/weapon/shield))
 							// Most shield users aren't bright, let's not make it near impossible to learn
-							var/boon = H.mind?.get_learning_boon(/obj/item/rogueweapon/shield)
+							var/boon = H.mind?.get_learning_boon(/obj/item/weapon/shield)
 							H.mind?.adjust_experience(/datum/skill/combat/shields, max(round(H.STAINT * boon), 0), FALSE)
 						else
 							H.mind?.adjust_experience(used_weapon.associated_skill, max(round(H.STAINT/2), 0), FALSE)
@@ -222,13 +227,14 @@
 						else
 							U.mind?.adjust_experience(/datum/skill/combat/unarmed, max(round(U.STAINT/2), 0), FALSE)
 
+					var/obj/effect/temp_visual/dir_setting/block/blk = new(get_turf(src), get_dir(H, U))
+					blk.icon_state = "p[U.used_intent.animname]"
 					if(prob(66) && AB)
 						if((used_weapon.flags_1 & CONDUCT_1) && (AB.flags_1 & CONDUCT_1))
 							flash_fullscreen("whiteflash")
 							user.flash_fullscreen("whiteflash")
 							var/datum/effect_system/spark_spread/S = new()
-							var/turf/front = get_step(src,src.dir)
-							S.set_up(1, 1, front)
+							S.set_up(n = 1, loca = get_turf(src))
 							S.start()
 						else
 							flash_fullscreen("blackflash2")
@@ -308,6 +314,11 @@
 					if(do_dodge(user, turfy))
 						flash_fullscreen("blackflash2")
 						user.aftermiss()
+						var/attacking_item = user.get_active_held_item()
+						if(!(!src.mind || !user.mind)) // don't need to log if at least one of the mobs is without an initialized mind because this is used for escalation
+							log_defense(src, user, "dodged", attacking_atom = attacking_item, addition = "(INTENT:[uppertext(user.used_intent.name)])")
+						if(src.client)
+							GLOB.vanderlin_round_stats[STATS_DODGES]++
 						return TRUE
 					else
 						return FALSE
@@ -315,6 +326,8 @@
 				return FALSE
 
 /mob/proc/do_parry(obj/item/W, parrydrain as num, mob/living/user)
+	var/defending_item = W
+	var/attacking_item = user.get_active_held_item()
 	if(ishuman(src))
 		var/mob/living/carbon/human/H = src
 		if(H.adjust_stamina(parrydrain))
@@ -322,7 +335,7 @@
 				playsound(get_turf(src), pick(W.parrysound), 100, FALSE)
 			if(istype(rmb_intent, /datum/rmb_intent/riposte))
 				src.visible_message("<span class='boldwarning'><b>[src]</b> ripostes [user] with [W]!</span>")
-			else if(istype(W, /obj/item/rogueweapon/shield))
+			else if(istype(W, /obj/item/weapon/shield))
 				src.visible_message("<span class='boldwarning'><b>[src]</b> blocks [user] with [W]!</span>")
 				var/shieldur
 				shieldur = round(((W.obj_integrity / W.max_integrity) * 100), 1)
@@ -330,6 +343,10 @@
 					src.visible_message("<span class='boldwarning'><b>\The [W] is about to break!</b></span>")
 			else
 				src.visible_message("<span class='boldwarning'><b>[src]</b> parries [user] with [W]!</span>")
+			if(!(!src.mind || !user.mind)) // don't need to log if at least one of the mobs is without an initialized mind because this is used for escalation
+				log_defense(src, user, "parried", defending_item, attacking_item, "INTENT:[uppertext(user.used_intent.name)]")
+			if(src.client)
+				GLOB.vanderlin_round_stats[STATS_PARRIES]++
 			return TRUE
 		else
 			to_chat(src, "<span class='warning'>I'm too tired to parry!</span>")
@@ -337,66 +354,87 @@
 	else
 		if(W)
 			playsound(get_turf(src), pick(W.parrysound), 100, FALSE)
+		if(!(!src.mind || !user.mind)) // don't need to log if at least one of the mobs is without an initialized mind because this is used for escalation
+			log_defense(src, user, "parried", defending_item, attacking_item, "INTENT:[uppertext(user.used_intent.name)]")
+		if(src.client)
+			GLOB.vanderlin_round_stats[STATS_PARRIES]++
 		return TRUE
 
 /mob/proc/do_unarmed_parry(parrydrain as num, mob/living/user)
+	var/attacking_item = user.get_active_held_item()
 	if(ishuman(src))
 		var/mob/living/carbon/human/H = src
 		if(H.adjust_stamina(parrydrain))
 			playsound(get_turf(src), pick(parry_sound), 100, FALSE)
 			src.visible_message("<span class='warning'><b>[src]</b> parries [user] with their hands!</span>")
+			if(!(!src.mind || !user.mind)) // don't need to log if at least one of the mobs is without an initialized mind because this is used for escalation
+				log_defense(src, user, "parried", "hands", attacking_item, "INTENT:[uppertext(user.used_intent.name)]")
+			if(src.client)
+				GLOB.vanderlin_round_stats[STATS_PARRIES]++
 			return TRUE
 		else
 			to_chat(src, "<span class='boldwarning'>I'm too tired to parry!</span>")
 			return FALSE
 	else
 		playsound(get_turf(src), pick(parry_sound), 100, FALSE)
+		if(!(!src.mind || !user.mind)) // don't need to log if at least one of the mobs is without an initialized mind because this is used for escalation
+			log_defense(src, user, "unarmed parried", "hands", attacking_item, "INTENT:[uppertext(user.used_intent.name)]")
+		if(src.client)
+			GLOB.vanderlin_round_stats[STATS_PARRIES]++
 		return TRUE
 
 
 /mob/proc/do_dodge(mob/user, turf/turfy)
 	if(dodgecd)
 		return FALSE
-
-	var/mob/living/D = src
-	var/mob/living/A = user
-	var/mob/living/carbon/human/DH
-	var/mob/living/carbon/human/AH
-	var/obj/item/I
-	var/obj/item/DI = D.get_active_held_item()
+	/// defending mob
+	var/mob/living/defending_mob = src
+	/// attacking mob
+	var/mob/living/attacking_mob = user
+	/// defending human
+	var/mob/living/carbon/human/defending_human
+	/// attacking human
+	var/mob/living/carbon/human/attacking_human
+	/// the item used to attack
+	var/obj/item/attacking_item
+	var/obj/item/defending_item = defending_mob.get_active_held_item()
 	var/drained = 10
-	var/dodge_speed = floor(D.STASPD / 2)
+	var/dodge_speed = floor(defending_mob.STASPD / 2)
 
 	if(ishuman(src))
-		DH = src
+		defending_human = src
 	if(ishuman(user))
-		AH = user
-		I = AH.used_intent.masteritem
+		attacking_human = user
+		attacking_item = attacking_human.used_intent.masteritem
 
-	var/dodge_score = D.defprob
-	if(D.stamina >= D.maximum_stamina)
+	var/dodge_score = defending_mob.defprob
+	if(defending_mob.stamina >= defending_mob.maximum_stamina)
 		return FALSE
-	if(!(D.mobility_flags & MOBILITY_STAND))							//Can't dodge when knocked down
+	if(!(defending_mob.mobility_flags & MOBILITY_STAND))							//Can't dodge when knocked down
 		return FALSE
-	if(D)
-		if(D?.check_dodge_skill())
-			dodge_score += (D.STASPD * 12)
-		else
-			dodge_score += ((D.STASPD * 10))
-	if(A)
-		dodge_score -= A.STASPD * 5
-	if(I)
-		if(AH?.mind)
-			dodge_score -= (AH.mind.get_skill_level(I.associated_skill) * 10) //this means at legendary -60 dodge rating
-	if(I)
-		if(I.wbalance > 0)													//Enemy weapon is quick, so they get a bonus based on spddiff
-			dodge_score -= ((A.STASPD - D.STASPD) * 5)
+	if(defending_mob)
+		dodge_score += (defending_mob.STASPD * 15) ///this is now sharply harsher
+		dodge_score *= defending_mob.encumbrance_to_dodge()
 
-	dodge_score += (D.rmb_intent?.def_bonus)								//Dodge bonus from Poise
+	if(attacking_mob)
+		dodge_score -= attacking_mob.STASPD * 7.5
+	if(attacking_item)
+		if(attacking_human?.mind)
+			dodge_score -= (attacking_human.mind.get_skill_level(attacking_item.associated_skill) * 10) //this means at legendary -60 dodge rating
+	if(attacking_item)
+		if(attacking_item.wbalance > 0)													//Enemy weapon is quick, so they get a bonus based on spddiff
+			dodge_score -= ((attacking_mob.STASPD - defending_mob.STASPD) * 5)
+
+	dodge_score += (defending_mob.rmb_intent?.def_bonus)								//Dodge bonus from Poise
+
+	if(HAS_TRAIT(defending_mob, TRAIT_GUIDANCE))
+		dodge_score += 10
+	if(HAS_TRAIT(attacking_mob, TRAIT_GUIDANCE))
+		dodge_score -= 10
 
 				//// ADD WEAPON INTENT MODIFIERS HERE ////
-	if(istype(DI, /obj/item/rogueweapon))
-		switch(DI.wlength)
+	if(istype(defending_item, /obj/item/weapon))
+		switch(defending_item.wlength)
 			if(WLENGTH_NORMAL)
 				dodge_score -= 5
 				drained += 2
@@ -407,30 +445,28 @@
 				dodge_score -= 15
 				dodge_speed = floor(dodge_speed * 0.8)
 				drained += 8
-		dodge_score += (DI.wdodgebonus)
-
-	dodge_score += (D.used_intent.idodgebonus)							//Some weapon intents help with dodging
-
-	if(DH)
-		if(!DH?.check_armor_skill() || DH?.legcuffed)
-			DH.Knockdown(1)
+		dodge_score += (defending_item.wdodgebonus)
+	dodge_score += (defending_mob.used_intent?.idodgebonus)							//Some weapon intents help with dodging
+	if(istype(defending_human))
+		if((defending_human.get_encumbrance() > 0.7) || defending_human?.legcuffed)
+			defending_human.Knockdown(1)
 			return FALSE
-		if(I)															//Attacker attacked us with a weapon
-			if(!I.associated_skill)										//Attacker's weapon doesn't have a skill because its improvised, so penalty to attack
+		if(attacking_item)															//Attacker attacked us with a weapon
+			if(!attacking_item.associated_skill)										//Attacker's weapon doesn't have a skill because its improvised, so penalty to attack
 				dodge_score += 10
 			else
-				if(DH.mind)
-					dodge_score += (DH.mind.get_skill_level(I.associated_skill) * 10)
+				if(defending_human.mind)
+					dodge_score += (defending_human.mind.get_skill_level(attacking_item.associated_skill) * 10)
 
 		else //the enemy attacked us unarmed or is nonhuman
-			if(AH)
-				if(AH.used_intent.unarmed)
-					if(AH.mind)
-						dodge_score -= (AH.mind.get_skill_level(/datum/skill/combat/unarmed) * 10)
-					if(DH.mind)
-						dodge_score += (DH.mind.get_skill_level(/datum/skill/combat/unarmed) * 10)
+			if(attacking_human)
+				if(attacking_human.used_intent.unarmed)
+					if(attacking_human.mind)
+						dodge_score -= (attacking_human.mind.get_skill_level(/datum/skill/combat/unarmed) * 10)
+					if(defending_human.mind)
+						dodge_score += (defending_human.mind.get_skill_level(/datum/skill/combat/unarmed) * 10)
 
-		switch(DH.worn_armor_class)
+		switch(defending_human.worn_armor_class)
 			if(AC_LIGHT)
 				dodge_speed -= 10
 				drained += 5
@@ -446,18 +482,18 @@
 		dodge_score = clamp(dodge_score, 0, 95)
 		var/dodgeroll = rand(1, 100)
 
-		if(D.client?.prefs.showrolls)
+		if(defending_mob.client?.prefs.showrolls)
 			to_chat(src, span_info("Roll under [dodge_score] to dodge... [dodgeroll]"))
 		if(dodgeroll > dodge_score)
 			return FALSE
-		if(!DH.adjust_stamina(max(drained, 5)))
+		if(!defending_human.adjust_stamina(max(drained, 5)))
 			to_chat(src, span_warning("I'm too tired to dodge!"))
 			return FALSE
 	else																//Defender is non human
 		dodge_score = clamp(dodge_score, 0, 95)
 		var/dodgeroll = rand(1, 100)
 
-		if(D.client?.prefs.showrolls)
+		if(defending_mob.client?.prefs.showrolls)
 			to_chat(src, span_info("Roll under [dodge_score] to dodge... [dodgeroll]"))
 		if(dodgeroll > dodge_score)
 			return FALSE
@@ -479,6 +515,10 @@
 //			var/turf/T = loc
 //			if(T.landsound)
 //				playsound(T, T.landsound, 100, FALSE)
+	if(!(!src.mind || !user.mind)) // don't need to log if at least one of the mobs is without an initialized mind because this is used for escalation
+		log_defense(src, user, "dodged", defending_item, attacking_item, "INTENT:[uppertext(attacking_mob.used_intent.name)]")
+	if(src.client)
+		GLOB.vanderlin_round_stats[STATS_DODGES]++
 	return TRUE
 //	else
 		//return FALSE
@@ -514,3 +554,19 @@
 	var/datum/atom_hud/antag/hud = GLOB.huds[antag_hud_type]
 	hud.leave_hud(src)
 	set_antag_hud(src, null)
+
+
+/mob/living/carbon/human/proc/is_noble()
+	var/noble = FALSE
+	if (job in GLOB.noble_positions)
+		noble = TRUE
+	if (HAS_TRAIT(src, TRAIT_NOBLE))
+		noble = TRUE
+
+	return noble
+
+/mob/living/carbon/human/proc/is_yeoman()
+	return FALSE
+
+/mob/living/carbon/human/proc/is_courtier()
+	return FALSE

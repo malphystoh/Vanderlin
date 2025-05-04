@@ -25,11 +25,10 @@ GLOBAL_LIST_INIT(bitflags, list(1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 204
 #define PROCESSING_PROJECTILE	(1<<5)
 #define PROCESSING_TODCHANGE	(1<<6)
 #define PROCESSING_INCONE		(1<<7)
-#define PROCESSING_HUMANNPC		(1<<8)
-#define PROCESSING_WATERLEVEL	(1<<9)
-#define PROCESSING_LIGHTING		(1<<10)
-#define PROCESSING_LOBBY	(1<<11)
-#define PROCESSING_DAMOVERLAYS	(1<<12)
+#define PROCESSING_WATERLEVEL	(1<<8)
+#define PROCESSING_LIGHTING		(1<<9)
+#define PROCESSING_LOBBY	(1<<10)
+#define PROCESSING_DAMOVERLAYS	(1<<11)
 
 //FLAGS BITMASK
 
@@ -54,6 +53,12 @@ GLOBAL_LIST_INIT(bitflags, list(1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 204
 #define ADMIN_SPAWNED_1			    (1<<13)
 /// should not get harmed if this gets caught by an explosion?
 #define PREVENT_CONTENTS_EXPLOSION_1 (1<<14)
+/// Is the thing currently spinning?
+#define IS_SPINNING_1 (1<<15)
+/// Is this atom on top of another atom, and as such has click priority?
+#define IS_ONTOP_1 (1<<16)
+/// Are we in the overlay queue
+#define OVERLAY_QUEUED_1 (1<<17)
 
 //turf-only flags
 #define NOJAUNT_1					(1<<0)
@@ -66,6 +71,8 @@ GLOBAL_LIST_INIT(bitflags, list(1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 204
 #define NO_LAVA_GEN_1				(1<<6)
 /// Blocks ruins spawning on the turf
 #define NO_RUINS_1					(1<<10)
+/// If a turf can be damaged when attacked by items
+#define CAN_BE_ATTACKED_1			(1<<11)
 
 /*
 	These defines are used specifically with the atom/pass_flags bitmask
@@ -102,16 +109,6 @@ GLOBAL_LIST_INIT(bitflags, list(1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 204
 #define INDESTRUCTIBLE	(1<<6)
 /// can't be frozen
 #define FREEZE_PROOF	(1<<7)
-
-//tesla_zap
-#define TESLA_MACHINE_EXPLOSIVE		(1<<0)
-#define TESLA_ALLOW_DUPLICATES		(1<<1)
-#define TESLA_OBJ_DAMAGE			(1<<2)
-#define TESLA_MOB_DAMAGE			(1<<3)
-#define TESLA_MOB_STUN				(1<<4)
-
-#define TESLA_DEFAULT_FLAGS ALL
-#define TESLA_FUSION_FLAGS TESLA_OBJ_DAMAGE | TESLA_MOB_DAMAGE | TESLA_MOB_STUN
 
 //EMP protection
 #define EMP_PROTECT_SELF (1<<0)

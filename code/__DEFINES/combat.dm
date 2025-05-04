@@ -39,7 +39,8 @@
 #define CANKNOCKDOWN	(1<<1)
 #define CANUNCONSCIOUS	(1<<2)
 #define CANPUSH			(1<<3)
-#define GODMODE			(1<<4)
+#define CANSLOWDOWN		(1<<4)
+#define GODMODE			(1<<5)
 
 //Health Defines
 #define HEALTH_THRESHOLD_CRIT 0
@@ -75,7 +76,7 @@
 #define GRAB_KILL					3
 
 //Grab breakout odds
-#define BASE_GRAB_RESIST_CHANCE 	30
+#define BASE_GRAB_RESIST_CHANCE 	45
 
 //slowdown when in softcrit. Note that crawling slowdown will also apply at the same time!
 #define SOFTCRIT_ADD_SLOWDOWN 1
@@ -173,14 +174,22 @@
 #define TILL_INTENT			/datum/intent/till
 
 #define ROD_CAST			/datum/intent/cast
+#define ROD_AUTO			/datum/intent/auto
 #define ROD_REEL			/datum/intent/reel
 
+#define INTENT_FILL			/datum/intent/fill
 #define INTENT_SPLASH		/datum/intent/splash
 #define INTENT_POUR			/datum/intent/pour
+
+#define INTENT_SOAK			/datum/intent/soak
+#define INTENT_WRING		/datum/intent/wring
+
+#define INTENT_USE			/datum/intent/use
 
 //Intent blade class for dismember class
 #define BCLASS_BLUNT		"blunt"
 #define BCLASS_SMASH		"smashing"
+#define BCLASS_DRILL		"drilling"
 #define BCLASS_CUT			"slash"
 #define BCLASS_CHOP			"chopping"
 #define BCLASS_STAB			"stabbing"

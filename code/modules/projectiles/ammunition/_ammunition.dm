@@ -1,7 +1,6 @@
 /obj/item/ammo_casing
 	name = "bullet casing"
 	desc = ""
-	icon = 'icons/obj/ammo.dmi'
 	icon_state = "s-casing"
 	flags_1 = CONDUCT_1
 	slot_flags = ITEM_SLOT_BELT
@@ -44,7 +43,6 @@
 /obj/item/ammo_casing/update_icon()
 	..()
 	icon_state = "[initial(icon_state)]"
-	desc = ""
 
 //proc to magically refill a casing with a new projectile
 /obj/item/ammo_casing/proc/newshot() //For energy weapons, syringe gun, shotgun shells and wands (!).

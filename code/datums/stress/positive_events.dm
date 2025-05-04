@@ -16,7 +16,7 @@
 /datum/stressevent/viewdismembermaniac
 	timer = 2 MINUTES
 	stressadd = -1
-	desc = span_green("I've limbs fly. Hehe...")
+	desc = span_green("I saw limbs fly. Hehe...")
 
 /datum/stressevent/viewgibmaniac
 	timer = 2 MINUTES
@@ -25,8 +25,8 @@
 
 /datum/stressevent/viewexecution
 	timer = 5 MINUTES
-	stressadd = -2
-	desc = span_green("I saw a lawbreaker get punished!")
+	stressadd = -3 // to counteract the +1 from watching death
+	desc = span_green("Nice civilized entertainment.")
 
 /datum/stressevent/psyprayer
 	timer = 30 MINUTES
@@ -109,40 +109,46 @@
 	desc = span_green("That was an amazing bath.")
 
 /datum/stressevent/music
-	timer = 1 MINUTES
+	timer = 30 SECONDS
+	stressadd = 0 // you suck at music
+	desc = span_green("This music is pleasant.")
+
+/datum/stressevent/beautiful
+	timer = 2 MINUTES
+	stressadd = -2
+	desc = span_green("Their face is a work of art!")
+
+/datum/stressevent/music/two
 	stressadd = -1
 	desc = span_green("This music is relaxing.")
 
-/datum/stressevent/music/two
-	stressadd = -2
-	desc = span_green("This music is very relaxing.")
-
 /datum/stressevent/music/three
-	stressadd = -3
-	desc = span_green("This music saps my stress.")
-
-/datum/stressevent/music/four
-	stressadd = -4
-	desc = span_green("This music is heavenly.")
-	timer = 10 MINUTES
-
-/datum/stressevent/music/five
-	stressadd = -5
-	timer = 10 MINUTES
+	stressadd = -1
 	desc = span_green("This music is wonderful.")
 
-/datum/stressevent/music/six
-	stressadd = -6
-	timer = 10 MINUTES
+/datum/stressevent/music/four
+	stressadd = -2
 	desc = span_green("This music is exceptional.")
+
+/datum/stressevent/music/five
+	stressadd = -2
+	desc = span_green("This music is enchanting.")
+
+/datum/stressevent/music/six
+	stressadd = -3
+	desc = span_green("This music is divine.")
+
+/datum/stressevent/eora
+	stressadd = -4
+	timer = INFINITY
+	desc = span_boldgreen("Eora brings me peace.")
 
 // Bard buffs below
 
 /datum/stressevent/bardicbuff
-	timer = 1 MINUTES
-	desc = span_nicegreen("Bardic inspiration moves mine soul even more!\n")
-	stressadd = -2
-	timer = 10 MINUTES
+	timer = 30 SECONDS
+	desc = span_nicegreen("Bardic inspiration moves mine soul even more!")
+	stressadd = -1
 
 /datum/stressevent/vblood
 	stressadd = -5
@@ -152,7 +158,7 @@
 /datum/stressevent/bathwater
 	stressadd = -1
 	desc = span_blue("Relaxing.")
-	timer = 1 MINUTES
+	timer = 15 SECONDS
 
 /datum/stressevent/ozium
 	stressadd = -99
@@ -176,3 +182,28 @@
 	stressadd = -1
 	desc = span_green("A soothing fragrance envelops me.")
 	timer = 10 MINUTES
+
+/datum/stressevent/divine_beauty
+	stressadd = -2
+	desc = span_green("I feel touched by a divine beauty.")
+	timer = 5 MINUTES
+
+/datum/stressevent/apprentice_making_me_proud
+	timer = 5 MINUTES
+	stressadd = -3
+	desc = span_green("My apprentice is improving, all thanks to me!")
+
+/datum/stressevent/saw_old_party
+	timer = 2 MINUTES
+	stressadd = -2
+	desc = span_green("Its always good to see an old friends face.")
+
+/datum/stressevent/astrata_grandeur
+	timer = 30 MINUTES
+	stressadd = -2
+	desc = span_green("Astrata's light shines brightly through me. I must not let others ever forget that.")
+
+/datum/stressevent/graggar_culling_finished
+	stressadd = -1
+	desc = span_green("I have prevailed over my rival! Graggar favours me now!")
+	timer = INFINITY

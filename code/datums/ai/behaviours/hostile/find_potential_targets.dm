@@ -6,6 +6,9 @@
 /datum/ai_behavior/find_potential_targets/perform(seconds_per_tick, datum/ai_controller/controller, target_key, targetting_datum_key, hiding_location_key)
 	. = ..()
 	var/mob/living/living_mob = controller.pawn
+	if(living_mob.pet_passive)
+		finish_action(controller, succeeded = FALSE)
+		return
 	var/datum/targetting_datum/targetting_datum = controller.blackboard[targetting_datum_key]
 
 	if(!targetting_datum)
@@ -31,6 +34,9 @@
 			continue
 
 	for(var/mob/living/living_target in filtered_targets)
+		if(living_target.stat == DEAD)
+			filtered_targets -= living_target
+			continue
 		if(!living_target.rogue_sneaking)
 			continue
 		var/extra_chance = (living_mob.health <= living_mob.maxHealth * 50) ? 30 : 0 // if we're below half health, we're way more alert
@@ -84,10 +90,17 @@
 	vision_range = 7
 
 /datum/ai_behavior/find_potential_targets/bog_troll
-	vision_range = 2
+	vision_range = 3
 
 /datum/ai_behavior/find_potential_targets/bog_troll/finish_action(datum/ai_controller/controller, succeeded, ...)
 	. = ..()
-	if (succeeded)
-		controller.CancelActions()
-		controller.pawn.icon_state = "Trolla"
+	if(succeeded)
+		if(istype(controller.pawn, /mob/living/simple_animal/hostile/retaliate/troll))
+			var/mob/living/simple_animal/hostile/retaliate/troll/mob = controller.pawn
+			mob.ambush()
+
+/datum/ai_behavior/find_potential_targets/bum/finish_action(datum/ai_controller/controller, succeeded, ...)
+	. = ..()
+	if(succeeded)
+		var/mob/living/pawn = controller.pawn
+		pawn.say(pick(GLOB.bum_aggro))

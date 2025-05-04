@@ -31,6 +31,20 @@
 	/// List of Maniac datums that have inscribed on this heart
 	var/maniacs = list()
 
+	food_type = /obj/item/reagent_containers/food/snacks/organ/heart
+
+/obj/item/organ/heart/Destroy()
+	for(var/datum/culling_duel/D in GLOB.graggar_cullings)
+		var/obj/item/organ/heart/d_challenger_heart = D.challenger_heart?.resolve()
+		var/obj/item/organ/heart/d_target_heart = D.target_heart?.resolve()
+		if(src == d_challenger_heart)
+			D.handle_heart_destroyed("challenger")
+			continue
+		else if(src == d_target_heart)
+			D.handle_heart_destroyed("target")
+			continue
+	return ..()
+
 /obj/item/organ/heart/examine(mob/user)
 	. = ..()
 	if(IsAdminGhost(user) && inscryptions)

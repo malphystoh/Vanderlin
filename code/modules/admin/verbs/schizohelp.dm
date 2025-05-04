@@ -10,6 +10,9 @@ GLOBAL_LIST_EMPTY_TYPED(schizohelps, /datum/schizohelp)
 	if(!msg)
 		return
 
+	if(client?.prefs?.muted & MUTE_MEDITATE)
+		return
+
 	to_chat(src, span_info("<i>You meditate...</i>\n[msg]"))
 	var/datum/schizohelp/ticket = new(src)
 	var/display_name = get_schizo_name()
@@ -17,15 +20,18 @@ GLOBAL_LIST_EMPTY_TYPED(schizohelps, /datum/schizohelp)
 	var/message_admins = span_info("<i>[display_name] ([key || "NO KEY"]) [ADMIN_FLW(src)] [ADMIN_SM(src)] meditates...</i>\n[msg]")
 	log_game("([key || "NO KEY"]) mentorhelped: [msg]")
 	for(var/client/voice in (GLOB.clients - client))
+		var/added_text
+		if(voice in GLOB.admins)
+			added_text += " ([ckey]) <A href='?_src_=holder;[HrefToken()];mute=[ckey];mute_type=[MUTE_MEDITATE]'><font color='[(client?.prefs?.muted & MUTE_MEDITATE)?"red":"blue"]'>\[MUTE\]</font></a>"
 		if(!(voice.prefs.toggles & SCHIZO_VOICE) || check_rights_for(voice, R_ADMIN))
 			continue
-		var/answer_button = span_info("(<a href='?src=[voice];schizohelp=[REF(ticket)];'>ANSWER</a>)")
-		to_chat(voice, "[message] [answer_button]")
+		var/answer_button = span_info("(<a href='byond://?src=[voice];schizohelp=[REF(ticket)];'>ANSWER</a>)")
+		to_chat(voice, "[message] [added_text] [answer_button]")
 
 	for(var/client/admin in GLOB.admins)
 		if(!(admin.prefs.chat_toggles & CHAT_PRAYER))
 			continue
-		var/answer_button = span_info("(<a href='?src=[admin];schizohelp=[REF(ticket)];'>ANSWER</a>)")
+		var/answer_button = span_info("(<a href='byond://?src=[admin];schizohelp=[REF(ticket)];'>ANSWER</a>)")
 		to_chat(admin, "[message_admins] [answer_button]")
 	COOLDOWN_START(src, schizohelp_cooldown, 1 MINUTES)
 
@@ -64,7 +70,7 @@ GLOBAL_LIST_EMPTY_TYPED(schizohelps, /datum/schizohelp)
 	if(schizo.answers[src.key])
 		to_chat(src, span_warning("I have already answered this meditation!"))
 		return
-	var/answer = input("Answer their meditations...", "VOICE")
+	var/answer = browser_input_text(src, "Answer their meditations...", "THE VOICE", multiline = TRUE)
 	if(!answer || QDELETED(schizo))
 		return
 	schizo.answer_schizo(answer, src.mob)
@@ -87,7 +93,7 @@ GLOBAL_LIST_EMPTY_TYPED(schizohelps, /datum/schizohelp)
 	GLOB.schizohelps += src
 	if(timeout)
 		QDEL_IN(src, timeout)
-	
+
 /datum/schizohelp/Destroy(force)
 	. = ..()
 	owner = null

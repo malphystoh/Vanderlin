@@ -3,7 +3,6 @@
 /obj/structure/fluff
 	name = "fluff structure"
 	desc = ""
-	icon = 'icons/obj/stationobjs.dmi'
 	icon_state = "minibar"
 	anchored = TRUE
 	density = FALSE
@@ -11,21 +10,6 @@
 	blade_dulling = DULLING_BASHCHOP
 	max_integrity = 150
 	var/deconstructible = TRUE
-
-/obj/structure/fluff/paper
-	name = "dense lining of papers"
-	desc = ""
-	icon = 'icons/obj/fluff.dmi'
-	icon_state = "paper"
-	deconstructible = FALSE
-
-/obj/structure/fluff/paper/corner
-	icon_state = "papercorner"
-
-/obj/structure/fluff/paper/stack
-	name = "dense stack of papers"
-	desc = ""
-	icon_state = "paperstack"
 
 /obj/structure/fluff/big_chain
 	name = "giant chain"
@@ -40,7 +24,7 @@
 /obj/structure/fluff/railing
 	name = "railing"
 	desc = ""
-	icon = 'icons/obj/railing.dmi'
+	icon = 'icons/roguetown/misc/railing.dmi'
 	icon_state = "railing"
 	density = FALSE
 	anchored = TRUE
@@ -72,11 +56,15 @@
 /obj/structure/fluff/railing/CanPass(atom/movable/mover, turf/target)
 //	if(istype(mover) && (mover.pass_flags & PASSTABLE))
 //		return 1
+	if(istype(mover, /mob/camera))
+		return TRUE
 	if(istype(mover, /obj/projectile))
 		return 1
 	if(mover.throwing)
 		return 1
 	if(isobserver(mover))
+		return 1
+	if(mover.movement_type & FLYING)
 		return 1
 	if(isliving(mover))
 		var/mob/living/M = mover
@@ -100,6 +88,24 @@
 		return 0
 	return 1
 
+/obj/structure/fluff/railing/CanAStarPass(ID, to_dir, requester)
+	if(icon_state == "woodrailing" && (dir in CORNERDIRS))
+		var/list/baddirs = list()
+		switch(dir)
+			if(SOUTHEAST)
+				baddirs = list(SOUTHEAST, SOUTH, EAST)
+			if(SOUTHWEST)
+				baddirs = list(SOUTHWEST, SOUTH, WEST)
+			if(NORTHEAST)
+				baddirs = list(NORTHEAST, NORTH, EAST)
+			if(NORTHWEST)
+				baddirs = list(NORTHWEST, NORTH, WEST)
+		if(to_dir in baddirs)
+			return 0
+	else if(to_dir == dir)
+		return 0
+	return 1
+
 /obj/structure/fluff/railing/CheckExit(atom/movable/O, turf/target)
 //	if(istype(O) && (O.pass_flags & PASSTABLE))
 //		return 1
@@ -108,6 +114,8 @@
 	if(O.throwing)
 		return 1
 	if(isobserver(O))
+		return 1
+	if(O.movement_type & FLYING)
 		return 1
 	if(isliving(O))
 		var/mob/living/M = O
@@ -131,7 +139,7 @@
 		return 0
 	return 1
 
-/obj/structure/fluff/railing/OnCrafted(dirin)
+/obj/structure/fluff/railing/OnCrafted(dirin, mob/user)
 	dir = dirin
 	var/lay = getwlayer(dir)
 	if(lay)
@@ -151,7 +159,6 @@
 	name = "stone railing"
 	icon_state = "stonehedge"
 	blade_dulling = DULLING_BASHCHOP
-	layer = ABOVE_MOB_LAYER
 
 /obj/structure/fluff/railing/border
 	name = "border"
@@ -162,7 +169,6 @@
 /obj/structure/fluff/railing/fence
 	name = "palisade"
 	desc = "A sturdy fence of wooden stakes."
-	icon = 'icons/roguetown/misc/structure.dmi'
 	icon_state = "fence"
 	density = TRUE
 	opacity = TRUE
@@ -181,7 +187,7 @@
 	..()
 	smooth_fences()
 
-/obj/structure/fluff/railing/fence/OnCrafted(dirin)
+/obj/structure/fluff/railing/fence/OnCrafted(dirin, mob/user)
 	. = ..()
 	smooth_fences()
 
@@ -208,6 +214,8 @@
 					add_overlay(MA)
 
 /obj/structure/fluff/railing/fence/CanPass(atom/movable/mover, turf/target)
+	if(istype(mover, /mob/camera))
+		return TRUE
 	if(get_dir(loc, target) == dir)
 		return 0
 	return 1
@@ -237,11 +245,13 @@
 	attacked_sound = list("sound/combat/hits/onmetal/metalimpact (1).ogg", "sound/combat/hits/onmetal/metalimpact (2).ogg")
 
 /obj/structure/bars/CanPass(atom/movable/mover, turf/target)
+	if(istype(mover, /mob/camera))
+		return TRUE
 	if(isobserver(mover))
 		return 1
 	if(istype(mover) && (mover.pass_flags & PASSGRILLE))
 		return 1
-	if(mover.throwing && !ismob(mover))
+	if(mover.throwing && isitem(mover))
 		return prob(66)
 	return ..()
 
@@ -268,8 +278,9 @@
 	icon_state = "passage0"
 	density = TRUE
 	max_integrity = 2000
+	redstone_structure = TRUE
 
-/obj/structure/bars/passage/redstone_triggered()
+/obj/structure/bars/passage/redstone_triggered(mob/user)
 	if(obj_broken)
 		return
 	if(density)
@@ -283,8 +294,9 @@
 	icon_state = "shutter0"
 	density = TRUE
 	opacity = TRUE
+	redstone_structure = TRUE
 
-/obj/structure/bars/passage/shutter/redstone_triggered()
+/obj/structure/bars/passage/shutter/redstone_triggered(mob/user)
 	if(obj_broken)
 		return
 	if(density)
@@ -312,6 +324,7 @@
 	blade_dulling = DULLING_BASHCHOP
 	obj_flags = CAN_BE_HIT | BLOCK_Z_OUT_DOWN | BLOCK_Z_IN_UP
 	attacked_sound = list('sound/combat/hits/onmetal/grille (1).ogg', 'sound/combat/hits/onmetal/grille (2).ogg', 'sound/combat/hits/onmetal/grille (3).ogg')
+	redstone_structure = TRUE
 	var/togg = FALSE
 
 /obj/structure/bars/grille/Initialize()
@@ -323,7 +336,7 @@
 	obj_flags = CAN_BE_HIT
 	..()
 
-/obj/structure/bars/grille/redstone_triggered()
+/obj/structure/bars/grille/redstone_triggered(mob/user)
 	if(obj_broken)
 		return
 	testing("togge")
@@ -385,7 +398,7 @@
 	var/broke = FALSE
 	var/datum/looping_sound/clockloop/soundloop
 	drag_slowdown = 3
-	metalizer_result = /obj/item/roguegear
+	metalizer_result = /obj/item/gear/metal/bronze
 
 /obj/structure/fluff/clock/Initialize()
 	soundloop = new(src, FALSE)
@@ -422,10 +435,28 @@
 /obj/structure/fluff/clock/examine(mob/user)
 	. = ..()
 	if(!broke)
-		. += "Oh no, it's [station_time_timestamp("hh:mm")]."
-		. += "<span class='info'>(Round Time: [gameTimestamp("hh:mm:ss", REALTIMEOFDAY - SSticker.round_start_irl)].)</span>"
+		var/day = "... actually, WHAT dae is it?"
+		switch(GLOB.dayspassed)
+			if(1)
+				day = "Moon's dae"
+			if(2)
+				day = "Tiw's dae"
+			if(3)
+				day = "Wedding's dae"
+			if(4)
+				day = "Thule's dae"
+			if(5)
+				day = "Freyja's dae"
+			if(6)
+				day = "Saturn's dae"
+			if(7)
+				day = "Sun's dae"
+		. += "Oh no, it's [station_time_timestamp("hh:mm")] on a [day]."
+		// . += span_info("(Round Time: [gameTimestamp("hh:mm:ss", REALTIMEOFDAY - SSticker.round_start_irl)].)")
 
 /obj/structure/fluff/clock/CanPass(atom/movable/mover, turf/target)
+	if(istype(mover, /mob/camera))
+		return TRUE
 	if(get_dir(loc, mover) == dir)
 		return 0
 	return 1
@@ -456,7 +487,7 @@
 	attacked_sound = 'sound/combat/hits/onglass/glasshit.ogg'
 	var/broke = FALSE
 	pixel_y = 32
-	metalizer_result = /obj/item/roguegear
+	metalizer_result = /obj/item/gear/metal/bronze
 
 /obj/structure/fluff/wallclock/Destroy()
 	if(soundloop)
@@ -466,8 +497,24 @@
 /obj/structure/fluff/wallclock/examine(mob/user)
 	. = ..()
 	if(!broke)
-		. += "Oh no, it's [station_time_timestamp("hh:mm")]."
-		. += "(Round Time: [gameTimestamp("hh:mm:ss", REALTIMEOFDAY - SSticker.round_start_irl)].)"
+		var/day = "... actually, WHAT dae is it?"
+		switch(GLOB.dayspassed)
+			if(1)
+				day = "Moon's dae"
+			if(2)
+				day = "Tiw's dae"
+			if(3)
+				day = "Wedding's dae"
+			if(4)
+				day = "Thule's dae"
+			if(5)
+				day = "Freyja's dae"
+			if(6)
+				day = "Saturn's dae"
+			if(7)
+				day = "Sun's dae"
+		. += "Oh no, it's [station_time_timestamp("hh:mm")] on a [day]."
+		// . += span_info("(Round Time: [gameTimestamp("hh:mm:ss", REALTIMEOFDAY - SSticker.round_start_irl)].)")
 
 /obj/structure/fluff/wallclock/Initialize()
 	soundloop = new(src, FALSE)
@@ -530,7 +577,7 @@
 		user.mind.adjust_experience(/datum/skill/misc/reading, 2, FALSE)
 		. += "I have no idea what it says."
 	else
-		. += "It says \"TOWN ON ROCKHILL\""
+		. += "It says something."
 
 /obj/structure/fluff/buysign
 	icon_state = "signwrote"
@@ -543,7 +590,7 @@
 		user.mind.adjust_experience(/datum/skill/misc/reading, 2, FALSE)
 		. += "I have no idea what it says."
 	else
-		. += "It says \"IMPORTS\""
+		. += "It says something."
 
 /obj/structure/fluff/sellsign
 	icon_state = "signwrote"
@@ -556,7 +603,7 @@
 		user.mind.adjust_experience(/datum/skill/misc/reading, 2, FALSE)
 		. += "I have no idea what it says."
 	else
-		. += "It says \"EXPORTS\""
+		. += "It says something."
 
 
 /obj/structure/fluff/customsign
@@ -582,30 +629,16 @@
 		if(!user.is_literate())
 			to_chat(user, "<span class='warning'>I don't know any verba.</span>")
 			return
-		if((user.used_intent.blade_class == BCLASS_STAB) && (W.wlength == WLENGTH_SHORT))
+		if(((user.used_intent.blade_class == BCLASS_STAB) || (user.used_intent.blade_class == BCLASS_CUT)) && (W.wlength == WLENGTH_SHORT))
 			if(wrotesign)
 				to_chat(user, "<span class='warning'>Something is already carved here.</span>")
-				return
 			else
 				var/inputty = stripped_input(user, "What would you like to carve here?", "", null, 200)
 				if(inputty && !wrotesign)
 					wrotesign = inputty
 					icon_state = "signwrote"
+			return
 	..()
-
-/obj/structure/fluff/dryingrack
-	name = "drying rack"
-	desc = "A rack of sticks, made to dry produce and smokeleaves in the sun."
-	icon = 'icons/roguetown/misc/structure.dmi'
-	icon_state = "dryrack"
-	density = TRUE
-	anchored = TRUE
-	layer = BELOW_OBJ_LAYER
-	blade_dulling = DULLING_BASHCHOP
-	max_integrity = 150
-	destroy_sound = 'sound/combat/hits/onwood/destroyfurniture.ogg'
-	attacked_sound = list('sound/combat/hits/onwood/woodimpact (1).ogg','sound/combat/hits/onwood/woodimpact (2).ogg')
-
 
 /obj/structure/fluff/statue
 	name = "statue"
@@ -635,6 +668,8 @@
 
 
 /obj/structure/fluff/statue/CanPass(atom/movable/mover, turf/target)
+	if(istype(mover, /mob/camera))
+		return TRUE
 	if(get_dir(loc, mover) == dir)
 		return 0
 	return !density
@@ -659,6 +694,13 @@
 /obj/structure/fluff/statue/knight
 	icon_state = "knightstatue_l"
 
+/obj/structure/fluff/statue/OnCrafted(dirin, mob/user)
+	. = ..()
+	for(var/obj/structure/fluff/statue/carving_block in contents)
+		dir = carving_block.dir
+		qdel(carving_block)
+	update_icon_state()
+
 /obj/structure/fluff/statue/astrata
 	name = "statue of Astrata"
 	desc = "Astrata, the Sun Queen, reigns over light, order, and conquest. She is worshipped and feared in equal measure."
@@ -668,6 +710,13 @@
 	blade_dulling = DULLING_BASH
 	icon_state = "astrata"
 	icon = 'icons/roguetown/misc/tallandwide.dmi'
+
+/obj/structure/fluff/statue/astrata/OnCrafted(dirin, mob/user)
+	. = ..()
+	pixel_x = -16
+
+/obj/structure/fluff/statue/astrata/bling
+	icon_state = "astrata_bling"
 
 /obj/structure/fluff/statue/knight/r
 	icon_state = "knightstatue_r"
@@ -708,6 +757,31 @@
 	pixel_x = -32
 	pixel_y = -16
 
+/obj/structure/fluff/statue/femalestatue/clean
+	icon_state = "12"
+
+/obj/structure/fluff/statue/femalestatue/alt
+	icon_state = "2"
+
+/obj/structure/fluff/statue/femalestatue/dancer
+	icon_state = "4"
+
+/obj/structure/fluff/statue/femalestatue/lying
+	icon_state = "5"
+
+/obj/structure/fluff/statue/femalestatue/cleanlying
+	icon_state = "52"
+
+/obj/structure/fluff/statue/musician
+	icon = 'icons/roguetown/misc/ay.dmi'
+	icon_state = "3"
+	pixel_x = -32
+
+/obj/structure/fluff/statue/musician/OnCrafted(dirin, mob/user)
+	. = ..()
+	if(prob(20))
+		icon_state = "xylix"
+
 /obj/structure/fluff/telescope
 	name = "telescope"
 	desc = "A mysterious telescope pointing towards the stars."
@@ -737,11 +811,16 @@
 	to_chat(H, "<span class='notice'>[message2send]</span>")
 
 	if(random_message == 2)
-		if(do_after(H, 25, target = src))
+		if(do_after(H, 2.5 SECONDS, src))
 			var/obj/item/bodypart/affecting = H.get_bodypart("head")
 			to_chat(H, "<span class='warning'>The blinding light causes you intense pain!</span>")
 			if(affecting && affecting.receive_damage(0, 5))
 				H.update_damage_overlays()
+
+	if(message2send == "You can see noc rotating!")
+		if(do_after(H, 25, target = src))
+			to_chat(H, span_warning("Noc's glow seems to help clear your thoughts."))
+			H.apply_status_effect(/datum/status_effect/buff/nocblessing)
 
 /obj/structure/fluff/globe
 	name = "globe"
@@ -756,7 +835,7 @@
 		return
 
 	var/mob/living/carbon/human/H = user
-	var/random_message = pick("You spin the globe!", "You land on Rockhill!", "You land on Zybantu!", "You land on Port Thornvale!", "You land on Grenzelhoft!", "You land on Valoria!", "You land on the Fog Islands!")
+	var/random_message = pick("You spin the globe!", "You land on Rockhill!", "You land on Vanderlin!", "You land on Heartfelt!", "You land on Zybantu!", "You land on Port Thornvale!", "You land on Grenzelhoft!", "You land on Valoria!", "You land on the Fog Islands!")
 	to_chat(H, "<span class='notice'>[random_message]</span>")
 
 /obj/structure/fluff/statue/femalestatue/Initialize()
@@ -786,7 +865,7 @@
 					probby = min(probby, 99)
 					user.changeNext_move(CLICK_CD_MELEE)
 					if(W.max_blade_int)
-						W.remove_bintegrity(5)
+						W.remove_bintegrity(5, user)
 					if(!L.adjust_stamina(rand(4,6)))
 						if(ishuman(L))
 							var/mob/living/carbon/human/H = L
@@ -843,17 +922,15 @@
 	icon_state = "spidercore"
 
 /obj/structure/fluff/statue/spider/attackby(obj/item/W, mob/user, params)
-	if(istype(W, /obj/item/reagent_containers/food/snacks/rogue/honey))
+	if(istype(W, /obj/item/reagent_containers/food/snacks/spiderhoney))
 		if(user.mind)
 			if(user.mind.special_role == "Dark Elf")
 				playsound(loc,'sound/misc/eat.ogg', rand(30,60), TRUE)
-				if(SSticker.mode)
-					var/datum/game_mode/chaosmode/C = SSticker.mode
-					C.delfcontrib += 1
-					if(C.delfcontrib >= C.delfgoal)
-						say("YOU HAVE DONE WELL, MY CHILD.",language = /datum/language/elvish)
-					else
-						say("BRING ME [C.delfgoal-C.delfcontrib] MORE. I HUNGER.",language = /datum/language/elvish)
+				SSmapping.retainer.delf_contribute += 1
+				if(SSmapping.retainer.delf_contribute >= SSmapping.retainer.delf_goal)
+					say("YOU HAVE DONE WELL, MY CHILD.",language = /datum/language/elvish)
+				else
+					say("BRING ME [SSmapping.retainer.delf_goal - SSmapping.retainer.delf_contribute] MORE. I HUNGER.",language = /datum/language/elvish)
 				qdel(W)
 				return TRUE
 	..()
@@ -868,14 +945,20 @@
 	if(user.mind)
 		var/datum/antagonist/bandit/B = user.mind.has_antag_datum(/datum/antagonist/bandit)
 		if(B)
-			if(istype(W, /obj/item/roguecoin) || istype(W, /obj/item/roguegem) || istype(W, /obj/item/reagent_containers/glass/cup/silver) || istype(W, /obj/item/reagent_containers/glass/cup/golden) || istype(W, /obj/item/clothing/ring) || istype(W, /obj/item/clothing/head/roguetown/crown/circlet) || istype(W, /obj/item/roguestatue))
+			if(istype(W, /obj/item/reagent_containers/lux))
+				user.adjust_triumphs(1, reason = "Offered Lux")
+				qdel(W)
+				return
+			if(istype(W, /obj/item/coin) || istype(W, /obj/item/gem) || istype(W, /obj/item/reagent_containers/glass/cup/silver) || istype(W, /obj/item/reagent_containers/glass/cup/golden) || istype(W, /obj/item/reagent_containers/glass/carafe) || istype(W, /obj/item/clothing/ring) || istype(W, /obj/item/clothing/head/crown/circlet) || istype(W, /obj/item/statue))
 				if(B.tri_amt >= 10)
 					to_chat(user, "<span class='warning'>The mouth doesn't open.</span>")
 					return
-				if(!istype(W, /obj/item/roguecoin))
+				if(!istype(W, /obj/item/coin))
 					B.contrib += (W.get_real_price() / 2) //sell jewerly and other fineries, though at a lesser price compared to fencing them first
+					GLOB.vanderlin_round_stats[STATS_SHRINE_VALUE] += (W.get_real_price() / 2)
 				else
 					B.contrib += W.get_real_price()
+					GLOB.vanderlin_round_stats[STATS_SHRINE_VALUE] += W.get_real_price()
 				if(B.contrib >= 100)
 					B.tri_amt++
 					user.mind.adjust_triumphs(1)
@@ -883,25 +966,25 @@
 					var/obj/item/I
 					switch(B.tri_amt)
 						if(1)
-							I = new /obj/item/reagent_containers/glass/bottle/rogue/healthpot(user.loc)
+							I = new /obj/item/reagent_containers/glass/bottle/healthpot(user.loc)
 						if(2)
 							if(HAS_TRAIT(user, TRAIT_MEDIUMARMOR))
-								I = new /obj/item/clothing/suit/roguetown/armor/medium/scale(user.loc)
+								I = new /obj/item/clothing/armor/medium/scale(user.loc)
 							else
-								I = new /obj/item/clothing/suit/roguetown/armor/chainmail/iron(user.loc)
+								I = new /obj/item/clothing/armor/chainmail/iron(user.loc)
 						if(4)
-							I = new /obj/item/clothing/head/roguetown/helmet/horned(user.loc)
+							I = new /obj/item/clothing/head/helmet/horned(user.loc)
 						if(6)
 							if(user.mind.get_skill_level(/datum/skill/combat/polearms) > 2)
-								I = new /obj/item/rogueweapon/polearm/spear/billhook(user.loc)
+								I = new /obj/item/weapon/polearm/spear/billhook(user.loc)
 							else if(user.mind.get_skill_level(/datum/skill/combat/bows) > 2)
 								I = new /obj/item/gun/ballistic/revolver/grenadelauncher/bow/long(user.loc)
 							else if(user.mind.get_skill_level(/datum/skill/combat/swords) > 2)
-								I = new /obj/item/rogueweapon/sword/long(user.loc)
+								I = new /obj/item/weapon/sword/long(user.loc)
 							else
-								I = new /obj/item/rogueweapon/mace/steel(user.loc)
+								I = new /obj/item/weapon/mace/steel(user.loc)
 						if(8)
-							I = new /obj/item/clothing/under/roguetown/chainlegs(user.loc)
+							I = new /obj/item/clothing/pants/chainlegs(user.loc)
 					if(I)
 						I.sellprice = 0
 					playsound(loc,'sound/items/matidol2.ogg', 50, TRUE)
@@ -925,7 +1008,6 @@
 	layer = BELOW_MOB_LAYER
 	max_integrity = 100
 	sellprice = 40
-	flags_1 = HEAR_1
 	var/chance2hear = 30
 	buckleverb = "crucifie"
 	can_buckle = 1
@@ -935,6 +1017,10 @@
 	buckle_requires_restraints = 1
 	buckle_prevents_pull = 1
 	var/shrine = FALSE	// used for some checks
+
+/obj/structure/fluff/psycross/Initialize()
+	. = ..()
+	become_hearing_sensitive()
 
 /obj/structure/fluff/psycross/post_buckle_mob(mob/living/M)
 	..()
@@ -946,6 +1032,8 @@
 	M.reset_offsets("bed_buckle")
 
 /obj/structure/fluff/psycross/CanPass(atom/movable/mover, turf/target)
+	if(istype(mover, /mob/camera))
+		return TRUE
 	if(shrine)
 		return
 	else if(get_dir(loc, mover) == dir)
@@ -975,7 +1063,7 @@
 
 /obj/structure/fluff/psycross/crafted/shrine
 	density = TRUE
-	plane = -1	// to keep the 3d effect when mob behind it
+	plane = -3	// to keep the 3d effect when mob behind it
 	layer = 4.1
 	can_buckle = FALSE
 	dir = SOUTH
@@ -988,12 +1076,18 @@
 
 /obj/structure/fluff/psycross/crafted/shrine/dendor_saiga
 	name = "shrine to Dendor"
-	desc = "The life force of a Saiga has consecrated this holy place.<br/> Present jacksberries, westleach leaves, and silk grubs for crafting a worthy sacrifice."
+	desc = "The life force of a Saiga has consecrated this holy place.<br/> Present jacksberries, westleach leaves, and eels for crafting a worthy sacrifice."
 	icon_state = "shrine_dendor_saiga"
+
+/obj/structure/fluff/psycross/crafted/shrine/dendor_gote
+	name = "shrine to Dendor"
+	desc = "The life force of a Gote has consecrated this holy place.<br/> Present poppies, swampweed leaves, and silk grubs for crafting a worthy sacrifice."
+	icon_state = "shrine_dendor_gote"
 
 /obj/structure/fluff/psycross/attackby(obj/item/W, mob/living/carbon/human/user, params)
 	if(user.mind)
-		if((user.mind.assigned_role == "Priest")	||	(user.mind.assigned_role == "Acolyte") && (user.patron.type == /datum/patron/divine/eora))
+		if((is_priest_job(user.mind.assigned_role)) \
+			|| (is_monk_job(user.mind.assigned_role) && (user.patron.type == /datum/patron/divine/eora)))
 
 			if(istype(W, /obj/item/reagent_containers/food/snacks/produce/apple))
 				if(!istype(get_area(user), /area/rogue/indoors/town/church/chapel))
@@ -1009,7 +1103,7 @@
 						var/mob/living/carbon/human/thegroom
 						var/mob/living/carbon/human/thebride
 						//Did anyone get cold feet on the wedding?
-						for(var/mob/M in viewers(src, 7))
+						for(var/mob/M in viewers(src, 2))
 							testing("check [M]")
 							if(thegroom && thebride)
 								break
@@ -1083,6 +1177,9 @@
 						thebride.adjust_triumphs(1)
 						//Bite the apple first if you want to be the groom.
 						priority_announce("[thegroom.real_name] has married [bridefirst]!", title = "Holy Union!", sound = 'sound/misc/bell.ogg')
+						thegroom.remove_stress(/datum/stressevent/eora_marriage_call)
+						thebride.remove_stress(/datum/stressevent/eora_marriage_call)
+						GLOB.vanderlin_round_stats[STATS_MARRIAGES]++
 						marriage = TRUE
 						qdel(A)
 
@@ -1091,208 +1188,6 @@
 					A.burn()
 					return
 	return ..()
-
-
-/*
-/obj/structure/fluff/psycross/attackby(obj/item/W, mob/living/carbon/human/user, params)
-	if(user.mind)
-		if(user.mind.assigned_role == "Priest")
-			if(istype(W, /obj/item/reagent_containers/food/snacks/produce/apple))
-				if(!istype(get_area(user), /area/rogue/indoors/town/church/chapel))
-					to_chat(user, "<span class='warning'>I need to do this in the chapel.</span>")
-					return FALSE
-				var/marriage
-				var/obj/item/reagent_containers/food/snacks/produce/apple/A = W
-
-				//The MARRIAGE TEST BEGINS
-				if(A.bitten_names.len)
-					if(A.bitten_names.len == 2)
-						//Groom provides the surname that the bride will take
-						var/mob/living/carbon/human/thegroom
-						var/mob/living/carbon/human/thebride
-						//Did anyone get cold feet on the wedding?
-						for(var/mob/M in viewers(src, 7))
-							testing("check [M]")
-							if(thegroom && thebride)
-								break
-							if(!ishuman(M))
-								continue
-							var/mob/living/carbon/human/C = M
-							/*
-							* This is for making the first biters name
-							* always be applied to the groom.
-							* second. This seems to be the best way
-							* to use the least amount of variables.
-							*/
-							var/name_placement = 1
-							for(var/X in A.bitten_names)
-								//I think that guy is dead.
-								if(C.stat == DEAD)
-									continue
-								//That person is not a player or afk.
-								if(!C.client)
-									continue
-								//Gotta get a divorce first
-								if(C.IsWedded())
-									continue
-								if(C.real_name == X)
-									//I know this is very sloppy but its alot less code.
-									switch(name_placement)
-										if(1)
-											if(thegroom)
-												continue
-											thegroom = C
-										if(2)
-											if(thebride)
-												continue
-											thebride = C
-									testing("foundbiter [C.real_name]")
-								name_placement++
-
-						//WE FOUND THEM LETS GET THIS SHOW ON THE ROAD!
-						if(!thegroom || !thebride)
-							testing("fail22")
-							return
-						//Alright now for the boring surname formatting.
-						var/surname2use
-						var/index = findtext(thegroom.real_name, " ")
-						var/bridefirst
-						thegroom.original_name = thegroom.real_name
-						thebride.original_name = thebride.real_name
-						if(!index)
-							surname2use = thegroom.dna.species.random_surname()
-						else
-							/*
-							* This code prevents inheriting the last name of
-							* " of wolves" or " the wolf"
-							* remove this if you want "Skibbins of wolves" to
-							* have his bride become "Sarah of wolves".
-							*/
-							if(findtext(thegroom.real_name, " of ") || findtext(thegroom.real_name, " the "))
-								surname2use = thegroom.dna.species.random_surname()
-								thegroom.change_name(copytext(thegroom.real_name, 1,index))
-							else
-								surname2use = copytext(thegroom.real_name, index)
-								thegroom.change_name(copytext(thegroom.real_name, 1,index))
-						index = findtext(thebride.real_name, " ")
-						if(index)
-							thebride.change_name(copytext(thebride.real_name, 1,index))
-						bridefirst = thebride.real_name
-						thegroom.change_name(thegroom.real_name + surname2use)
-						thebride.change_name(thebride.real_name + surname2use)
-						thegroom.MarryTo(thebride)
-						thegroom.adjust_triumphs(1)
-						thebride.adjust_triumphs(1)
-						//Bite the apple first if you want to be the groom.
-						priority_announce("[thegroom.real_name] has married [bridefirst]!", title = "Holy Union!", sound = 'sound/misc/bell.ogg')
-						marriage = TRUE
-						qdel(A)
-
-				if(!marriage)
-					A.burn()
-					return
-*/
-/*
-		if(user.mind.assigned_role == "Acolyte"  && user.patron.type == /datum/patron/divine/eora)
-			if(istype(W, /obj/item/reagent_containers/food/snacks/produce/apple))
-				if(!istype(get_area(user), /area/rogue/indoors/town/church/chapel))
-					to_chat(user, "<span class='warning'>I need to do this in the chapel.</span>")
-					return FALSE
-				var/marriage
-				var/obj/item/reagent_containers/food/snacks/produce/apple/A = W
-
-				//The MARRIAGE TEST BEGINS
-				if(A.bitten_names.len)
-					if(A.bitten_names.len == 2)
-						//Groom provides the surname that the bride will take
-						var/mob/living/carbon/human/thegroom
-						var/mob/living/carbon/human/thebride
-						//Did anyone get cold feet on the wedding?
-						for(var/mob/M in viewers(src, 7))
-							testing("check [M]")
-							if(thegroom && thebride)
-								break
-							if(!ishuman(M))
-								continue
-							var/mob/living/carbon/human/C = M
-							/*
-							* This is for making the first biters name
-							* always be applied to the groom.
-							* second. This seems to be the best way
-							* to use the least amount of variables.
-							*/
-							var/name_placement = 1
-							for(var/X in A.bitten_names)
-								//I think that guy is dead.
-								if(C.stat == DEAD)
-									continue
-								//That person is not a player or afk.
-								if(!C.client)
-									continue
-								//Gotta get a divorce first
-								if(C.IsWedded())
-									continue
-								if(C.real_name == X)
-									//I know this is very sloppy but its alot less code.
-									switch(name_placement)
-										if(1)
-											if(thegroom)
-												continue
-											thegroom = C
-										if(2)
-											if(thebride)
-												continue
-											thebride = C
-									testing("foundbiter [C.real_name]")
-								name_placement++
-
-						//WE FOUND THEM LETS GET THIS SHOW ON THE ROAD!
-						if(!thegroom || !thebride)
-							testing("fail22")
-							return
-						//Alright now for the boring surname formatting.
-						var/surname2use
-						var/index = findtext(thegroom.real_name, " ")
-						var/bridefirst
-						thegroom.original_name = thegroom.real_name
-						thebride.original_name = thebride.real_name
-						if(!index)
-							surname2use = thegroom.dna.species.random_surname()
-						else
-							/*
-							* This code prevents inheriting the last name of
-							* " of wolves" or " the wolf"
-							* remove this if you want "Skibbins of wolves" to
-							* have his bride become "Sarah of wolves".
-							*/
-							if(findtext(thegroom.real_name, " of ") || findtext(thegroom.real_name, " the "))
-								surname2use = thegroom.dna.species.random_surname()
-								thegroom.change_name(copytext(thegroom.real_name, 1,index))
-							else
-								surname2use = copytext(thegroom.real_name, index)
-								thegroom.change_name(copytext(thegroom.real_name, 1,index))
-						index = findtext(thebride.real_name, " ")
-						if(index)
-							thebride.change_name(copytext(thebride.real_name, 1,index))
-						bridefirst = thebride.real_name
-						thegroom.change_name(thegroom.real_name + surname2use)
-						thebride.change_name(thebride.real_name + surname2use)
-						thegroom.MarryTo(thebride)
-						thegroom.adjust_triumphs(1)
-						thebride.adjust_triumphs(1)
-						//Bite the apple first if you want to be the groom.
-						priority_announce("[thegroom.real_name] has married [bridefirst]!", title = "Holy Union!", sound = 'sound/misc/bell.ogg')
-						marriage = TRUE
-						qdel(A)
-
-				if(!marriage)
-					A.burn()
-					return
-
-	return ..()
-
-*/
-
 
 /obj/structure/fluff/psycross/copper/Destroy()
 	addomen("psycross")
@@ -1325,79 +1220,6 @@
 		var/diff = power - M.confused
 		M.confused += min(power, diff)
 
-
-//================================
-/obj/structure/fluff/beach_towel
-	name = "beach towel"
-	desc = ""
-	icon = 'icons/obj/fluff.dmi'
-	icon_state = "railing"
-	density = FALSE
-	anchored = TRUE
-	deconstructible = FALSE
-
-/obj/structure/fluff/beach_umbrella
-	name = "beach umbrella"
-	desc = ""
-	icon = 'icons/obj/fluff.dmi'
-	icon_state = "brella"
-	density = FALSE
-	anchored = TRUE
-	deconstructible = FALSE
-
-/obj/structure/fluff/beach_umbrella/security
-	icon_state = "hos_brella"
-
-/obj/structure/fluff/beach_umbrella/science
-	icon_state = "rd_brella"
-
-/obj/structure/fluff/beach_umbrella/engine
-	icon_state = "ce_brella"
-
-/obj/structure/fluff/beach_umbrella/cap
-	icon_state = "cap_brella"
-
-/obj/structure/fluff/beach_umbrella/syndi
-	icon_state = "syndi_brella"
-
-/obj/structure/fluff/clockwork
-	name = "Clockwork Fluff"
-	icon = 'icons/obj/clockwork_objects.dmi'
-	deconstructible = FALSE
-
-/obj/structure/fluff/clockwork/alloy_shards
-	name = "replicant alloy shards"
-	desc = ""
-	icon_state = "alloy_shards"
-
-/obj/structure/fluff/clockwork/alloy_shards/small
-	icon_state = "shard_small1"
-
-/obj/structure/fluff/clockwork/alloy_shards/medium
-	icon_state = "shard_medium1"
-
-/obj/structure/fluff/clockwork/alloy_shards/medium_gearbit
-	icon_state = "gear_bit1"
-
-/obj/structure/fluff/clockwork/alloy_shards/large
-	icon_state = "shard_large1"
-
-/obj/structure/fluff/clockwork/blind_eye
-	name = "blind eye"
-	desc = ""
-	icon_state = "blind_eye"
-
-/obj/structure/fluff/clockwork/fallen_armor
-	name = "fallen armor"
-	desc = ""
-	icon_state = "fallen_armor"
-
-/obj/structure/fluff/clockwork/clockgolem_remains
-	name = "clockwork golem scrap"
-	desc = ""
-	icon_state = "clockgolem_dead"
-
-
 /obj/structure/fluff/statue/shisha
 	name = "shisha pipe"
 	desc = "A traditional shisha pipe, this one is broken."
@@ -1409,3 +1231,123 @@
 	plane = GAME_PLANE_UPPER
 	blade_dulling = DULLING_BASH
 	max_integrity = 300
+
+//..................................................................................................................................
+/*------------------------------------------------------------------------------------------------------------------------------------\
+|  Gaffer shit, yes I'm making my own place here just for that and maaan its cozy, in this gated community for myself and no one else |
+\------------------------------------------------------------------------------------------------------------------------------------*/
+
+/obj/structure/fluff/statue/gaffer
+	name = "Subdued Statue"
+	icon_state = "subduedstatue"
+	anchored = TRUE
+	density = FALSE
+	opacity = 0
+	blade_dulling = DULLING_BASHCHOP
+	max_integrity = 999999
+	deconstructible = FALSE
+	var/ring_destroyed = FALSE
+
+/obj/structure/fluff/statue/gaffer/Initialize()
+	. = ..()
+	RegisterSignal(SSdcs, COMSIG_GAFFER_RING_DESTROYED, PROC_REF(ringdied))
+
+/obj/structure/fluff/statue/gaffer/proc/ringdied(datum/source)
+	SIGNAL_HANDLER
+	if(ring_destroyed == FALSE)
+		ring_destroyed = TRUE
+		update_icon()
+
+/obj/structure/fluff/statue/gaffer/update_icon()
+	if(ring_destroyed == TRUE)
+		icon_state = "subduedstatue_hasring"
+	if(ring_destroyed == FALSE)
+		icon_state = "subduedstatue"
+
+/obj/structure/fluff/statue/gaffer/examine(mob/user)
+	. = ..()
+	if(HAS_TRAIT(user, TRAIT_BURDEN))
+		. += "slumped and tortured, broken body pertrified and in pain, its chest rose and fell in synch with mine banishing any doubt left, it is me! my own visage glares back at me!"
+		user.add_stress(/datum/stressevent/ring_madness)
+		return
+	if(ring_destroyed == TRUE)
+		. += "a statue depicting a decapitated man writhing in chains on the ground, it holds its hands out, pleading, in its palms is a glowing ring..."
+		return
+	. += "a statue depicting a decapitated man writhing in chains on the ground, it holds its hands out, pleading"
+
+/obj/structure/fluff/statue/gaffer/attack_hand(mob/living/user)
+	. = ..()
+	if(!user.mind)
+		return
+	if(!ring_destroyed)
+		return
+	if(is_gaffer_assistant_job(user.mind?.assigned_role))
+		to_chat(user, span_danger("It is not mine to have..."))
+		return
+	to_chat(user, span_danger("As you extend your hand over to the glowing ring, you feel a shiver go up your spine, as if unseen eyes turned to glare at you..."))
+	var/gaffed = alert(user, "Will you bear the burden? (Be the next Gaffer)", "YOUR DESTINY", "Yes", "No")
+
+	if(gaffed == "No" && ring_destroyed == TRUE)
+		to_chat(user, span_danger("yes...best to leave it alone."))
+		return
+
+	if((gaffed == "Yes") && Adjacent(user) && ring_destroyed == TRUE)
+		var/obj/item/ring = new /obj/item/clothing/ring/gold/burden(loc)
+		ADD_TRAIT(user, TRAIT_BURDEN, type)
+		user.put_in_hands(ring)
+		user.equip_to_slot_if_possible(ring, SLOT_RING, FALSE, FALSE, TRUE, TRUE)
+		to_chat(user, span_danger("Once your hand is close enough to the ring, it jumps upwards and burrows itself onto your palm"))
+		ring_destroyed = FALSE
+		update_icon()
+
+/obj/structure/fluff/statue/knight/interior/gen/update_icon_state()
+	. = ..()
+	if(dir == EAST)
+		icon_state = "oknightstatue_l"
+	else if(dir == WEST)
+		icon_state = "oknightstatue_r"
+	else
+		icon_state = pick("oknightstatue_l", "oknightstatue_r")
+
+/obj/structure/fluff/statue/knightalt/gen/update_icon_state()
+	. = ..()
+	if(dir == EAST)
+		icon_state = "knightstatue2_l"
+	else if(dir == WEST)
+		icon_state = "knightstatue2_r"
+	else
+		icon_state = pick("knightstatue2_l", "knightstatue2_r")
+
+/obj/structure/fluff/statue/carving_block
+	name = "carving block"
+	desc = "Ready for sculpting."
+	icon_state = "block"
+	density = TRUE
+	anchored = FALSE
+	max_integrity = 100
+	debris = list(/obj/item/natural/stoneblock = 1)
+	drag_slowdown = 3
+
+/obj/structure/fluff/statue/carving_block/ComponentInitialize()
+	. = ..()
+	AddComponent(/datum/component/simple_rotation,ROTATION_ALTCLICK | ROTATION_CLOCKWISE, CALLBACK(src, PROC_REF(can_user_rotate)),CALLBACK(src, PROC_REF(can_be_rotated)),null)
+
+/obj/structure/fluff/statue/carving_block/proc/can_be_rotated(mob/user)
+	return TRUE
+
+/obj/structure/fluff/statue/carving_block/proc/can_user_rotate(mob/user)
+	var/mob/living/L = user
+
+	if(istype(L))
+		if(!user.canUseTopic(src, BE_CLOSE))
+			return FALSE
+		else
+			return TRUE
+	else if(isobserver(user) && CONFIG_GET(flag/ghost_interaction))
+		return TRUE
+	return FALSE
+
+/obj/structure/fluff/statue/carving_block/attack_right(mob/user)
+	var/datum/component/simple_rotation/rotcomp = GetComponent(/datum/component/simple_rotation)
+	if(rotcomp)
+		rotcomp.HandRot(rotcomp,user,ROTATION_CLOCKWISE)

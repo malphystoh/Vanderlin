@@ -26,7 +26,7 @@
 	var/downgrade_wave
 	/// If defined, this will be the wave type to increment for purposes of checking `max_spawns`
 	var/shared_wave_type = null
-		/// Whether we want to spawn people on the rolled location, this may not be desired for bandits or other things that set the location
+	/// Whether we want to spawn people on the rolled location, this may not be desired for bandits or other things that set the location
 	var/spawn_on_location = TRUE
 
 /datum/migrant_wave/proc/get_roles_amount()
@@ -41,7 +41,7 @@
 	roles = list(
 		/datum/migrant_role/pilgrim = 4,
 	)
-	greet_text = "Fleeing from misfortune and hardship, you and a handful of survivors get closer to Rockhill, looking for refuge and work, finally almost being there, almost..."
+	greet_text = "Fleeing from misfortune and hardship, you and a handful of survivors get closer to Vanderlin, looking for refuge and work, finally almost being there, almost..."
 
 /datum/migrant_wave/pilgrim_down_one
 	name = "Pilgrimage"
@@ -50,7 +50,7 @@
 	roles = list(
 		/datum/migrant_role/pilgrim = 3,
 	)
-	greet_text = "Fleeing from misfortune and hardship, you and a handful of survivors get closer to Rockhill, looking for refuge and work, finally almost being there, almost..."
+	greet_text = "Fleeing from misfortune and hardship, you and a handful of survivors get closer to Vanderlin, looking for refuge and work, finally almost being there, almost..."
 
 /datum/migrant_wave/pilgrim_down_two
 	name = "Pilgrimage"
@@ -59,7 +59,7 @@
 	roles = list(
 		/datum/migrant_role/pilgrim = 2,
 	)
-	greet_text = "Fleeing from misfortune and hardship, you and a handful of survivors get closer to Rockhill, looking for refuge and work, finally almost being there, almost..."
+	greet_text = "Fleeing from misfortune and hardship, you and a handful of survivors get closer to Vanderlin, looking for refuge and work, finally almost being there, almost..."
 
 /datum/migrant_wave/pilgrim_down_three
 	name = "Pilgrimage"
@@ -67,7 +67,7 @@
 	roles = list(
 		/datum/migrant_role/pilgrim = 1,
 	)
-	greet_text = "Fleeing from misfortune and hardship, you and a handful of survivors get closer to Rockhill, looking for refuge and work, finally almost being there, almost..."
+	greet_text = "Fleeing from misfortune and hardship, you and a handful of survivors get closer to Vanderlin, looking for refuge and work, finally almost being there, almost..."
 
 /datum/migrant_wave/adventurer
 	name = "Adventure Party"
@@ -75,7 +75,7 @@
 	roles = list(
 		/datum/migrant_role/adventurer = 4,
 	)
-	greet_text = "Together with a party of trusted friends we decided to venture out, seeking thrills, glory and treasure, ending up in the misty and damp bog underneath Rockhill, perhaps getting ourselves into more than what we bargained for."
+	greet_text = "Together with a party of trusted friends we decided to venture out, seeking thrills, glory and treasure, ending up in the misty and damp bog underneath Vanderlin, perhaps getting ourselves into more than what we bargained for."
 
 /datum/migrant_wave/adventurer_down_one
 	name = "Adventure Party"
@@ -84,7 +84,7 @@
 	roles = list(
 		/datum/migrant_role/adventurer = 3,
 	)
-	greet_text = "Together with a party of trusted friends we decided to venture out, seeking thrills, glory and treasure, ending up in the misty and damp bog underneath Rockhill, perhaps getting ourselves into more than what we bargained for."
+	greet_text = "Together with a party of trusted friends we decided to venture out, seeking thrills, glory and treasure, ending up in the misty and damp bog underneath Vanderlin, perhaps getting ourselves into more than what we bargained for."
 
 /datum/migrant_wave/adventurer_down_two
 	name = "Adventure Party"
@@ -93,7 +93,7 @@
 	roles = list(
 		/datum/migrant_role/adventurer = 2,
 	)
-	greet_text = "Together with a party of trusted friends we decided to venture out, seeking thrills, glory and treasure, ending up in the misty and damp bog underneath Rockhill, perhaps getting ourselves into more than what we bargained for."
+	greet_text = "Together with a party of trusted friends we decided to venture out, seeking thrills, glory and treasure, ending up in the misty and damp bog underneath Vanderlin, perhaps getting ourselves into more than what we bargained for."
 
 /datum/migrant_wave/adventurer_down_three
 	name = "Adventure Party"
@@ -101,18 +101,21 @@
 	roles = list(
 		/datum/migrant_role/adventurer = 1,
 	)
-	greet_text = "Together with a party of trusted friends we decided to venture out, seeking thrills, glory and treasure, ending up in the misty and damp bog underneath Rockhill, perhaps getting ourselves into more than what we bargained for."
+	greet_text = "Together with a party of trusted friends we decided to venture out, seeking thrills, glory and treasure, ending up in the misty and damp bog underneath Vanderlin, perhaps getting ourselves into more than what we bargained for."
 
 /datum/migrant_wave/bandit
 	name = "Bandit Raid"
+	spawn_landmark = "Bandit"
 	downgrade_wave = /datum/migrant_wave/bandit_down_one
 	weight = 8
 	roles = list(
 		/datum/migrant_role/bandit = 4,
 	)
+	can_roll = FALSE
 
 /datum/migrant_wave/bandit_down_one
 	name = "Bandit Raid"
+	spawn_landmark = "Bandit"
 	downgrade_wave = /datum/migrant_wave/bandit_down_two
 	can_roll = FALSE
 	roles = list(
@@ -121,6 +124,7 @@
 
 /datum/migrant_wave/bandit_down_two
 	name = "Bandit Raid"
+	spawn_landmark = "Bandit"
 	downgrade_wave = /datum/migrant_wave/bandit_down_three
 	can_roll = FALSE
 	roles = list(
@@ -129,6 +133,7 @@
 
 /datum/migrant_wave/bandit_down_three
 	name = "Bandit Raid"
+	spawn_landmark = "Bandit"
 	can_roll = FALSE
 	roles = list(
 		/datum/migrant_role/bandit = 1,

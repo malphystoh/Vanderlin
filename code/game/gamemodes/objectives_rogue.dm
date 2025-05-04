@@ -3,19 +3,12 @@
 	explanation_text = "Feed valuables to the idol."
 
 /datum/objective/bandit/check_completion()
-	if(SSticker.mode)
-		var/datum/game_mode/chaosmode/C = SSticker.mode
-		if(C.banditcontrib >= C.banditgoal)
-			return TRUE
+	if(SSmapping.retainer.bandit_contribute >= SSmapping.retainer.bandit_goal)
+		return TRUE
 
 /datum/objective/bandit/update_explanation_text()
 	..()
-	if(SSticker.mode)
-		var/datum/game_mode/chaosmode/C = SSticker.mode
-		if(C)
-			explanation_text = "Feed [C.banditgoal] mammon to an idol of greed."
-		else
-			explanation_text = "Pray to ZIZO."
+	explanation_text = "Feed [SSmapping.retainer.bandit_goal] mammon to an idol of greed."
 
 
 /datum/objective/delf
@@ -23,19 +16,13 @@
 	explanation_text = "Feed honeys to the mother."
 
 /datum/objective/delf/check_completion()
-	if(SSticker.mode)
-		var/datum/game_mode/chaosmode/C = SSticker.mode
-		if(C.delfcontrib >= C.delfgoal)
-			return TRUE
+	if(SSmapping.retainer.delf_contribute >= SSmapping.retainer.delf_goal)
+		return TRUE
 
 /datum/objective/delf/update_explanation_text()
 	..()
-	if(SSticker.mode)
-		var/datum/game_mode/chaosmode/C = SSticker.mode
-		if(C)
-			explanation_text = "Feed [C.delfgoal] honeys to the mother."
-		else
-			explanation_text = "Pray to ZIZO."
+	explanation_text = "Feed [SSmapping.retainer.delf_goal] honeys to the mother."
+
 
 /datum/objective/rt_maniac
 	name = "slaying"
@@ -48,26 +35,59 @@
 	if(people_seen.len >= 4)
 		return TRUE
 
-/datum/objective/werewolf
-	name = "conquer"
-	explanation_text = "Destroy all elder vampires in ROGUETOWN. I can sniff them in my true form."
-	team_explanation_text = ""
+/// Vamp VS. Wolves, be the last faction standing
+/datum/objective/dominate
+	name = "dominate"
+	triumph_count = 5
+	var/faction_ident
+
+/datum/objective/dominate/check_completion()
+	return (vampire_werewolf() == faction_ident)
+
+/datum/objective/dominate/vampire
+	explanation_text = "Purge this land of all alpha werevolves."
+	faction_ident = "vampire"
+
+/datum/objective/dominate/werewolf
+	explanation_text = "Purge this land of all elder vampires."
+	faction_ident = "werewolf"
+
+/datum/objective/werewolf/spread
+	name = "spread"
+	explanation_text = "Have 6 lesser werewolf."
 	triumph_count = 5
 
-/datum/objective/werewolf/check_completion()
-	var/datum/game_mode/chaosmode/C = SSticker.mode
-	if(istype(C))
-		if(C.vampire_werewolf() == "werewolf")
-			return TRUE
+/datum/objective/werewolf/spread/check_completion()
+	if(length(SSmapping.retainer.werewolves) >= 6)
+		return TRUE
 
-/datum/objective/vampire
-	name = "conquer"
-	explanation_text = "Destroy all alpha werewolves in ROGUETOWN. I can detect them in my true form."
-	team_explanation_text = ""
+/datum/objective/werewolf/infiltrate/one
+	name = "infiltrate1"
+	explanation_text = "Infect a member of the Church my spawn."
 	triumph_count = 5
 
-/datum/objective/vampire/check_completion()
-	var/datum/game_mode/chaosmode/C = SSticker.mode
-	if(istype(C))
-		if(C.vampire_werewolf() == "vampire")
+/datum/objective/werewolf/infiltrate/one/check_completion()
+	var/list/churchjobs = list("Priest", "Priestess", "Cleric", "Acolyte", "Templar", "Churchling", "Crusader", "Inquisitor")
+	for(var/datum/mind/V in SSmapping.retainer.werewolves)
+		if(V.current.job in churchjobs)
 			return TRUE
+
+/datum/objective/werewolf/infiltrate/two
+	name = "infiltrate2"
+	explanation_text = "Infect a member of the Nobility."
+	triumph_count = 5
+
+/datum/objective/werewolf/infiltrate/two/check_completion()
+	var/list/noblejobs = list("Monarch", "Consort", "Prince", "Captain", "Hand", "Steward")
+	for(var/datum/mind/V in SSmapping.retainer.werewolves)
+		if(V.current.job in noblejobs)
+			return TRUE
+
+/datum/objective/werewolf/survive
+	name = "survive"
+	explanation_text = "My lycanthropia won't allow me to die, I musn't die."
+	triumph_count = 3
+
+/datum/objective/werewolf/survive/check_completion()
+	if(considered_alive(owner))
+		return TRUE

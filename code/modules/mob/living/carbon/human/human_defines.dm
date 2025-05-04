@@ -2,35 +2,24 @@
 	name = "Unknown"
 	real_name = "Unknown"
 	icon = 'icons/mob/human.dmi'
-	icon_state = "human_basic"
+	// Appearance is built by overlays
+	icon_state = MAP_SWITCH("", "human_basic")
 	appearance_flags = KEEP_TOGETHER|TILE_BOUND|PIXEL_SCALE
 	hud_possible = list(ANTAG_HUD)
 	hud_type = /datum/hud/human
 	base_intents = list(INTENT_HELP, INTENT_DISARM, INTENT_GRAB, INTENT_HARM)
 	possible_mmb_intents = list(INTENT_STEAL, INTENT_JUMP, INTENT_KICK, INTENT_BITE, INTENT_GIVE)
-	pressure_resistance = 25
 	can_buckle = TRUE
 	buckle_lying = FALSE
 	mob_biotypes = MOB_ORGANIC|MOB_HUMANOID
 
-	ambushable = 1
+	ambushable = TRUE //! DEPRECATED VAR, USE TRAIT_NOAMBUSH
 
 	voice_pitch = 1
 
 	var/footstep_type = FOOTSTEP_MOB_HUMAN
 
 	var/last_sound //last emote so we have no doubles
-
-	//Hair colour and style
-	var/hair_color = "000"
-	var/hairstyle = "Bald"
-
-	//Facial hair colour and style
-	var/facial_hair_color = "000"
-	var/facial_hairstyle = "Shaved"
-
-	//Eye colour
-	var/eye_color = "000"
 
 	var/voice_color = "a0a0a0"
 
@@ -56,8 +45,6 @@
 	var/shavelevel = 0
 
 	var/socks = "Nude" //Which socks the player wants
-	var/backpack = DBACKPACK		//Which backpack type the player has chosen.
-	var/jumpsuit_style = PREF_SUIT		//suit/skirt
 
 	//Equipment slots
 	var/obj/item/clothing/skin_armor = null
@@ -88,21 +75,13 @@
 	var/static/list/can_ride_typecache = typecacheof(list(/mob/living/carbon/human, /mob/living/simple_animal/parrot))
 	var/lastpuke = 0
 	var/last_fire_update
-	var/account_id
+	var/account_id //! DEPRECATED
 
 	canparry = TRUE
 	candodge = TRUE
 
 	dodgecd = FALSE
 	dodgetime = 0
-
-	var/list/possibleclass = list()
-	var/list/special_classes = list()
-	var/list/shuffle_special= list()
-	var/list/shuffle_combat = list()
-	var/classesunlocked = FALSE
-	var/advsetup = 0
-
 
 //	var/alignment = ALIGNMENT_TN
 
@@ -112,7 +91,8 @@
 	//Familytree datum
 	//I dont know how to do UI huds so this will have to do for now.
 	var/family_UI = FALSE
-	var/spouse_name
+	var/mob/living/carbon/spouse_mob
+	var/image/spouse_indicator
 	var/setspouse
 	var/familytree_pref = FAMILY_NONE
 	var/datum/heritage/family_datum
@@ -125,10 +105,14 @@
 	var/buried = FALSE // Whether the body is buried or not.
 	var/funeral = FALSE // Whether the body has received rites or not.
 
-	var/cleric = null // Used for cleric_holder for priests
+	var/datum/devotion/cleric_holder/cleric = null // Used for cleric_holder for priests
+
+	var/headshot_link = null
+	var/flavortext = null
 
 	var/confession_points = 0 // Used to track how many confessions the Inquisitor has gotten signed. Used to buy items at mailboxes.
 	var/purchase_history = null // Used to track what the Inquisitor has bought from the mailbox.
+	var/has_confessed = FALSE // Used to track if they have confessed it was written onto a confession paper
 
 	var/merctype = 0 // Used for mercenary backgrounds - check mail.dm
 	var/tokenclaimed = FALSE // Check for one-time tri reward.

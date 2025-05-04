@@ -17,14 +17,8 @@
 	///Name of the outfit (shows up in the equip admin verb)
 	var/name = "Naked"
 
-	/// Type path of item to go in uniform slot
-	var/uniform = null
-
 	/// Type path of item to go in suit slot
 	var/suit = null
-
-	/// Type path of item to go in back slot
-	var/back = null
 
 	/// Type path of item to go in belt slot
 	var/belt = null
@@ -44,14 +38,8 @@
 	/// Type path of item to go in neck slot
 	var/neck = null
 
-	/// Type path of item to go in ears slot
-	var/ears = null
-
 	/// Type path of item to go in the glasses slot
 	var/glasses = null
-
-	/// Type path of item to go in the idcard slot
-	var/id = null
 
 	/// Type path of item to go in the idcard slot
 	var/wrists = null
@@ -80,12 +68,7 @@
 
 	var/armor = null
 
-	/**
-	 * Type path of item to go in suit storage slot
-	 *
-	 * (make sure it's valid for that suit)
-	 */
-	var/suit_store = null
+	var/ring = null
 
 	///Type path of item to go in the right hand
 	var/r_hand = null
@@ -102,9 +85,6 @@
 	 * Format of this list should be: list(path=count,otherpath=count)
 	 */
 	var/list/backpack_contents = null
-
-	/// Internals box. Will be inserted at the start of backpack_contents
-	var/box
 
 	/// Any undershirt. While on humans it is a string, here we use paths to stay consistent with the rest of the equips.
 	var/datum/sprite_accessory/undershirt = null
@@ -123,7 +103,6 @@
 	 * These are all added and returns in the list for get_chamelon_diguise_info proc
 	 */
 	var/list/chameleon_extras
-
 
 /**
  * Called at the start of the equip proc
@@ -166,13 +145,6 @@
 /datum/outfit/proc/equip(mob/living/carbon/human/H, visualsOnly = FALSE)
 	pre_equip(H, visualsOnly)
 
-	//Start with uniform,suit,backpack for additional slots
-	if(uniform) // this is for legacy/base SS13 outfits, pants are spawned later
-		H.equip_to_slot_or_del(new uniform(H),SLOT_PANTS, TRUE)
-	if(suit)
-		H.equip_to_slot_or_del(new suit(H),SLOT_ARMOR, TRUE)
-	if(back)
-		H.equip_to_slot_or_del(new back(H),SLOT_BACK, TRUE)
 	if(belt)
 		H.equip_to_slot_or_del(new belt(H),SLOT_BELT, TRUE)
 	if(gloves)
@@ -185,16 +157,10 @@
 		H.equip_to_slot_or_del(new mask(H),SLOT_WEAR_MASK, TRUE)
 	if(neck)
 		H.equip_to_slot_or_del(new neck(H),SLOT_NECK, TRUE)
-	if(ears)
-		H.equip_to_slot_or_del(new ears(H),SLOT_WEAR_MASK, TRUE)
-	if(glasses)
-		H.equip_to_slot_or_del(new glasses(H),SLOT_GLASSES, TRUE)
-	if(id)
-		H.equip_to_slot_or_del(new id(H),SLOT_RING, TRUE)
+	if(ring)
+		H.equip_to_slot_or_del(new ring(H),SLOT_RING, TRUE)
 	if(wrists)
 		H.equip_to_slot_or_del(new wrists(H),SLOT_WRISTS, TRUE)
-	if(suit_store)
-		H.equip_to_slot_or_del(new suit_store(H),SLOT_S_STORE, TRUE)
 	if(cloak)
 		H.equip_to_slot_or_del(new cloak(H),SLOT_CLOAK, TRUE)
 	if(beltl)
@@ -216,7 +182,7 @@
 	if(shirt)
 		H.equip_to_slot_or_del(new shirt(H),SLOT_SHIRT, TRUE)
 	if(accessory)
-		var/obj/item/clothing/under/U = H.wear_pants
+		var/obj/item/clothing/pants/U = H.wear_pants
 		if(U)
 			U.attach_accessory(new accessory(H))
 		else
@@ -227,7 +193,6 @@
 	//		H.put_in_hands(new l_hand(get_turf(H)),TRUE)
 			H.equip_to_slot_or_del(new l_hand(H),SLOT_HANDS, TRUE)
 		if(r_hand)
-			testing("PIH")
 		//	H.put_in_hands(new r_hand(get_turf(H)),TRUE)
 			H.equip_to_slot_or_del(new r_hand(H),SLOT_HANDS, TRUE)
 
@@ -249,7 +214,18 @@
 				if(!isnum(number))//Default to 1
 					number = 1
 				for(var/i in 1 to number)
-					H.equip_to_slot_or_del(new path(H),SLOT_IN_BACKPACK, TRUE)
+					var/obj/item/new_item = new path(H)
+					var/obj/item/item = H.get_item_by_slot(SLOT_BACK_L)
+					if(!item)
+						item = H.get_item_by_slot(SLOT_BACK_R)
+					if(!item || !SEND_SIGNAL(item, COMSIG_TRY_STORAGE_INSERT, new_item, null, TRUE, TRUE))
+						item = H.get_item_by_slot(SLOT_BACK_R)
+						if(!item || !SEND_SIGNAL(item, COMSIG_TRY_STORAGE_INSERT, new_item, null, TRUE, TRUE))
+							item = H.get_item_by_slot(SLOT_BELT)
+							if(!item || !SEND_SIGNAL(item, COMSIG_TRY_STORAGE_INSERT, new_item, null, TRUE, TRUE))
+								new_item.forceMove(get_turf(H))
+								message_admins("[type] had backpack_contents set but no room to store:[new_item]")
+
 
 	post_equip(H, visualsOnly)
 
@@ -259,6 +235,11 @@
 	H.update_body()
 	return TRUE
 
+/client/proc/test_spawn_outfits()
+	for(var/path in subtypesof(/datum/outfit/job))
+		var/mob/living/carbon/human/new_human = new(mob.loc)
+		var/datum/outfit/new_outfit = new path()
+		new_outfit.equip(new_human)
 /**
  * Apply a fingerprint from the passed in human to all items in the outfit
  *
@@ -291,8 +272,6 @@
 		H.gloves.add_fingerprint(H,1)
 	if(H.ears)
 		H.ears.add_fingerprint(H,1)
-	if(H.glasses)
-		H.glasses.add_fingerprint(H,1)
 	if(H.belt)
 		H.belt.add_fingerprint(H,1)
 		for(var/obj/item/I in H.belt.contents)
@@ -309,7 +288,7 @@
 
 /// Return a list of all the types that are required to disguise as this outfit type
 /datum/outfit/proc/get_chameleon_disguise_info()
-	var/list/types = list(uniform, suit, back, belt, gloves, shoes, head, mask, neck, ears, glasses, id, l_pocket, r_pocket, suit_store, r_hand, l_hand)
+	var/list/types = list(suit, belt, gloves, shoes, head, mask, neck, glasses, ring, l_pocket, r_pocket, r_hand, l_hand)
 	types += chameleon_extras
 	listclearnulls(types)
 	return types
@@ -319,27 +298,20 @@
 	. = list()
 	.["outfit_type"] = type
 	.["name"] = name
-	.["uniform"] = uniform
-	.["suit"] = suit
-	.["toggle_helmet"] = toggle_helmet
-	.["back"] = back
-	.["belt"] = belt
-	.["gloves"] = gloves
-	.["shoes"] = shoes
 	.["head"] = head
 	.["mask"] = mask
 	.["neck"] = neck
-	.["ears"] = ears
-	.["glasses"] = glasses
-	.["id"] = id
-	.["l_pocket"] = l_pocket
-	.["r_pocket"] = r_pocket
-	.["suit_store"] = suit_store
-	.["r_hand"] = r_hand
-	.["l_hand"] = l_hand
-	.["backpack_contents"] = backpack_contents
-	.["box"] = box
-	.["accessory"] = accessory
+	.["cloak"] = cloak
+	.["backl"] = backl
+	.["backr"] = backr
+	.["ring"] = ring
+	.["wrists"] = wrists
+	.["gloves"] = gloves
+	.["shirt"] = shirt
+	.["armor"] = armor
+	.["pants"] = pants
+	.["belt"] = belt
+	.["shoes"] = shoes
 
 /// Prompt the passed in mob client to download this outfit as a json blob
 /datum/outfit/proc/save_to_file(mob/admin)
@@ -354,31 +326,20 @@
 /// Create an outfit datum from a list of json data
 /datum/outfit/proc/load_from(list/outfit_data)
 	//This could probably use more strict validation
+
 	name = outfit_data["name"]
-	uniform = text2path(outfit_data["uniform"])
-	suit = text2path(outfit_data["suit"])
-	toggle_helmet = outfit_data["toggle_helmet"]
-	back = text2path(outfit_data["back"])
-	belt = text2path(outfit_data["belt"])
-	gloves = text2path(outfit_data["gloves"])
-	shoes = text2path(outfit_data["shoes"])
 	head = text2path(outfit_data["head"])
 	mask = text2path(outfit_data["mask"])
 	neck = text2path(outfit_data["neck"])
-	ears = text2path(outfit_data["ears"])
-	glasses = text2path(outfit_data["glasses"])
-	id = text2path(outfit_data["id"])
-	l_pocket = text2path(outfit_data["l_pocket"])
-	r_pocket = text2path(outfit_data["r_pocket"])
-	suit_store = text2path(outfit_data["suit_store"])
-	r_hand = text2path(outfit_data["r_hand"])
-	l_hand = text2path(outfit_data["l_hand"])
-	var/list/backpack = outfit_data["backpack_contents"]
-	backpack_contents = list()
-	for(var/item in backpack)
-		var/itype = text2path(item)
-		if(itype)
-			backpack_contents[itype] = backpack[item]
-	box = text2path(outfit_data["box"])
-	accessory = text2path(outfit_data["accessory"])
+	cloak = text2path(outfit_data["cloak"])
+	backl = text2path(outfit_data["backl"])
+	backr = text2path(outfit_data["backr"])
+	ring = text2path(outfit_data["ring"])
+	wrists = text2path(outfit_data["wrists"])
+	gloves = text2path(outfit_data["gloves"])
+	shirt = text2path(outfit_data["shirt"])
+	armor = text2path(outfit_data["armor"])
+	pants = text2path(outfit_data["pants"])
+	belt = text2path(outfit_data["belt"])
+	shoes = text2path(outfit_data["shoes"])
 	return TRUE

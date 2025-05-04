@@ -47,7 +47,7 @@
 	var/list/dat = list()
 	var/current_migrants = SSmigrants.get_active_migrant_amount()
 	dat += "WAVE: \Roman[SSmigrants.wave_number]"
-	dat += "<center><b>BE A MIGRANT: <a href='?src=[REF(src)];task=toggle_active'>[active ? "YES" : "NO"]</a></b></center>"
+	dat += "<center><b>BE A MIGRANT: <a href='byond://?src=[REF(src)];task=toggle_active'>[active ? "YES" : "NO"]</a></b></center>"
 	dat += "<br><center>Wandering fools: [current_migrants ? "\Roman[current_migrants]" : "None"]</center>"
 	if(!SSmigrants.current_wave)
 		dat += "<br><center>The mist will clear out of the way in [(SSmigrants.time_until_next_wave / (1 SECONDS))] seconds...</center>"
@@ -64,18 +64,24 @@
 			var/stars_string = ""
 			if(stars_amount)
 				stars_string = "(*\Roman[stars_amount])"
-			dat += "<center><a href='?src=[REF(src)];task=toggle_role_preference;role=[role_type]'>[role_name]</a> - \Roman[role_amount] [stars_string]</center>"
+			dat += "<center><a href='byond://?src=[REF(src)];task=toggle_role_preference;role=[role_type]'>[role_name]</a> - \Roman[role_amount] [stars_string]</center>"
 		dat += "<br><center>They will arrive in [(SSmigrants.wave_timer / (1 SECONDS))] seconds...</center>"
-	var/datum/browser/popup = new(client.mob, "migration", "<center>Find a purpose</center>", 330, 410)
-	//popup.set_window_options("can_close=0")
+	var/datum/browser/popup = new(client.mob, "migration", "<center>Find a purpose</center>", 330, 410, src)
 	popup.set_content(dat.Join())
-	popup.open(FALSE)
+	popup.open()
 	client.prefs.migrant.viewer = TRUE
 
 /datum/migrant_pref/Topic(href, href_list)
 	var/client/client = prefs.parent
 	if(!client)
 		return
+
+	if(href_list["close"])
+		if(active)
+			client.prefs.migrant.set_active(FALSE)
+		hide_ui()
+		return
+
 	switch(href_list["task"])
 		if("toggle_active")
 			set_active(!active)
@@ -90,7 +96,6 @@
 		return
 	client.mob << browse(null, "window=migration")
 	client.prefs.migrant.viewer = FALSE
-
 
 /mob/living/carbon/human/proc/adv_hugboxing_start()
 	to_chat(src, span_warning("I will be in danger once I start moving."))
@@ -115,3 +120,7 @@
 	status_flags &= ~GODMODE
 	REMOVE_TRAIT(src, TRAIT_PACIFISM, "hugbox")
 	to_chat(src, span_danger("My joy is gone! Danger surrounds me."))
+
+/mob/living/carbon/human/proc/adv_hugboxing_cancel()
+	adv_hugboxing_end()
+	SSrole_class_handler.cancel_class_handler(src)

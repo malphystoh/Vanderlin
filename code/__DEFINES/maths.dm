@@ -40,7 +40,7 @@
 #define WRAP(val, min, max) ( min == max ? min : (val) - (round(((val) - (min))/((max) - (min))) * ((max) - (min))) )
 
 // Real modulus that handles decimals
-#define MODULUS(x, y) ( (x) - (y) * round((x) / (y)) )
+#define MODULUS(x, y) ( (x) - FLOOR(x, y))
 
 
 #define TAN(x) tan(x)
@@ -213,3 +213,6 @@
 
 #define RULE_OF_THREE(a, b, x) ((a*x)/b)
 // )
+
+/// Avoids division by zero by returning 0 if the divisor is 0 or null.
+#define SAFE_DIVIDE(dividend, divisor) (!divisor ? 0 : dividend/divisor)

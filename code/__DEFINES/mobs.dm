@@ -9,7 +9,7 @@
 #define STATKEY_SPD "speed"
 #define STATKEY_LCK "fortune"
 
-#define MOBSTATS list(STATKEY_STR, STATKEY_PER, STATKEY_INT, STATKEY_CON, STATKEY_END, STATKEY_SPD , STATKEY_LCK)
+#define MOBSTATS list(STATKEY_STR, STATKEY_PER, STATKEY_INT, STATKEY_CON, STATKEY_END, STATKEY_SPD, STATKEY_LCK)
 
 //Misc mob defines
 
@@ -58,16 +58,16 @@
 #define BLOODCRAWL_EAT 2
 
 //Mob bio-types flags
-#define MOB_ORGANIC 	1 << 0
-#define MOB_MINERAL		1 << 1
-#define MOB_ROBOTIC 	1 << 2
-#define MOB_UNDEAD		1 << 3
-#define MOB_HUMANOID 	1 << 4
-#define MOB_BUG 		1 << 5
-#define MOB_BEAST		1 << 6
-#define MOB_EPIC		1 << 7 //megafauna
-#define MOB_REPTILE		1 << 8
-#define MOB_SPIRIT		1 << 9
+#define MOB_ORGANIC 	(1<<0)
+#define MOB_MINERAL		(1<<1)
+#define MOB_ROBOTIC 	(1<<2)
+#define MOB_UNDEAD		(1<<3)
+#define MOB_HUMANOID 	(1<<4)
+#define MOB_BUG 		(1<<5)
+#define MOB_BEAST		(1<<6)
+#define MOB_EPIC		(1<<7) //megafauna
+#define MOB_REPTILE		(1<<8)
+#define MOB_SPIRIT		(1<<9)
 
 //Organ defines for carbon mobs
 #define ORGAN_ORGANIC   1
@@ -84,7 +84,6 @@
 #define BODYPART_DISABLED_CLAMPED 5 //limb is clamped by a hemostat or speculum
 
 #define DEFAULT_BODYPART_ICON_ORGANIC 'icons/mob/human_parts_greyscale.dmi'
-#define DEFAULT_BODYPART_ICON_ROBOTIC 'icons/mob/augmentation/augments.dmi'
 
 #define MONKEY_BODYPART "monkey"
 #define DEVIL_BODYPART "devil"
@@ -344,6 +343,7 @@
 #define REAGENTS_METABOLISM 1	//How many units of reagent are consumed per tick, by default.
 #define REAGENTS_SLOW_METABOLISM 0.1 // needed to have poisons have powerful effect at low doses without making it too fast
 #define REAGENTS_EFFECT_MULTIPLIER (REAGENTS_METABOLISM / 0.4)	// By defining the effect multiplier this way, it'll exactly adjust all effects according to how they originally were with the 0.4 metabolism
+#define REM REAGENTS_EFFECT_MULTIPLIER
 
 // Eye protection
 #define FLASH_PROTECTION_SENSITIVE -1
@@ -389,6 +389,11 @@
 #define WABBAJACK     (1<<6)
 
 #define SLEEP_CHECK_DEATH(X) sleep(X); if(QDELETED(src) || stat == DEAD) return;
+
+#define DOING_INTERACTION(user, interaction_key) (LAZYACCESS(user.do_afters, interaction_key))
+#define DOING_INTERACTION_LIMIT(user, interaction_key, max_interaction_count) ((LAZYACCESS(user.do_afters, interaction_key) || 0) >= max_interaction_count)
+#define DOING_INTERACTION_WITH_TARGET(user, target) (LAZYACCESS(user.do_afters, target))
+#define DOING_INTERACTION_WITH_TARGET_LIMIT(user, target, max_interaction_count) ((LAZYACCESS(user.do_afters, target) || 0) >= max_interaction_count)
 
 //defense intents
 #define INTENT_DODGE 1
@@ -454,14 +459,14 @@
 #define SKIN_COLOR_CRIMSONLANDS "4e3729" //Black
 
 //AASIMAR SKIN TONES
-#define SKIN_COLOR_PLANETAR "ffd859" //Gold
+#define SKIN_COLOR_PLANETAR "474a4c" //Grey
 #define SKIN_COLOR_DEVA "b6f1f2" //Sky blue
 #define SKIN_COLOR_SOLAR "daeaeb" //WHITE
 #define SKIN_COLOR_EMPYREA "a9ded1" //Periwinkle blue
 #define SKIN_COLOR_GAEIA "db874f" //Orange
 #define SKIN_COLOR_CELESTIAL "e1c565" //Yellow
 #define SKIN_COLOR_OLYMPIA "c7f9cc" //Seafoam green
-#define SKIN_COLOR_NECRAL "23130c" //Black
+#define SKIN_COLOR_NECRAL "19132a" //Black
 #define SKIN_COLOR_ABYSSAL "22577a" //Deep blue
 
 //HALF ELF SKIN TONES
@@ -482,7 +487,7 @@
 #define SKIN_COLOR_SUNSTAINED "99401B" //Dark orange
 #define SKIN_COLOR_SUNDERED "D25E31" //Orange
 #define SKIN_COLOR_ARCANA "702845" //Dark violet
-#define SKIN_COLOR_FLAYER "590e8b" //Purple!
+#define SKIN_COLOR_FLAYER "450e47" //Purple!
 #define SKIN_COLOR_ZARCONUM "BA6A92" //Pink!
 #define SKIN_COLOR_ABYSS "41577C" //Navy blue
 #define SKIN_COLOR_ASH "A0AFC9" //Pale blue
@@ -491,5 +496,15 @@
 #define SKIN_COLOR_VAQUERO	"a74a4a" //Earthly red
 #define SKIN_COLOR_ARLENNETH "9197C5" //Lavendar blue
 
+//KOBOLD SKIN TONES
+#define SKIN_COLOR_EMBERHIDE "8B3A2F"//White - Pale
+#define SKIN_COLOR_STONEPAW "6D6D6D" //White - Tan
+#define SKIN_COLOR_SUNSTREAK "b77614" //White - Tan
+#define SKIN_COLOR_MOONSHADE "C0C0C0" //Middle-eastern
+#define SKIN_COLOR_SANDSWEPT "fcccb3" //White - Tan
+
 //SPECIAL SKIN TONES
 #define SKIN_COLOR_ROT "878f79" //Sickly green
+
+/// Humans are slowed by the difference between bodytemp and BODYTEMP_COLD_DAMAGE_LIMIT divided by this
+#define COLD_SLOWDOWN_FACTOR				20

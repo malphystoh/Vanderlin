@@ -161,7 +161,7 @@
 	held_items[hand_index] = I
 	I.layer = ABOVE_HUD_LAYER
 	I.plane = ABOVE_HUD_PLANE
-	I.equipped(src, ITEM_SLOT_HANDS)
+	I.equipped(src, SLOT_HANDS)
 	if(QDELETED(I)) // this is here because some ABSTRACT items like slappers and circle hands could be moved from hand to hand then delete, which meant you'd have a null in your hand until you cleared it (say, by dropping it)
 		held_items[hand_index] = null
 		return FALSE
@@ -176,6 +176,12 @@
 		hud_used.throw_icon?.update_icon()
 		hud_used.give_intent?.update_icon()
 	givingto = null
+	if((istype(I, /obj/item/weapon) || istype(I, /obj/item/gun) || I.force >= 15) && !forced && client)
+		// is this the right hand?
+		var/right_hand = FALSE
+		if(hand_index == LEFT_HANDS)
+			right_hand = TRUE
+		log_message("[key_name(src)] has equipped [I] in their [right_hand ? "right hand" : "left hand"], combat mode: [cmode ? "COMBAT" : "PASSIVE"].", LOG_ATTACK, color="#3333ff") // into attack logs
 	return hand_index
 
 //Puts the item into the first available left hand if possible and calls all necessary triggers/updates. returns 1 on success.
@@ -212,26 +218,6 @@
 /mob/proc/put_in_hands(obj/item/I, del_on_fail = FALSE, merge_stacks = TRUE, forced = FALSE)
 	if(!I)
 		return FALSE
-
-	// If the item is a stack and we're already holding a stack then merge
-	if (istype(I, /obj/item/stack))
-		var/obj/item/stack/I_stack = I
-		var/obj/item/stack/active_stack = get_active_held_item()
-
-		if (I_stack.zero_amount())
-			return FALSE
-
-		if (merge_stacks)
-			if (istype(active_stack) && istype(I_stack, active_stack.merge_type))
-				if (I_stack.merge(active_stack))
-					to_chat(usr, "<span class='notice'>My [active_stack.name] stack now contains [active_stack.get_amount()] [active_stack.singular_name]\s.</span>")
-					return TRUE
-			else
-				var/obj/item/stack/inactive_stack = get_inactive_held_item()
-				if (istype(inactive_stack) && istype(I_stack, inactive_stack.merge_type))
-					if (I_stack.merge(inactive_stack))
-						to_chat(usr, "<span class='notice'>My [inactive_stack.name] stack now contains [inactive_stack.get_amount()] [inactive_stack.singular_name]\s.</span>")
-						return TRUE
 
 	if(put_in_active_hand(I, forced))
 		return TRUE
@@ -289,6 +275,7 @@
 	if(. && I) //ensure the item exists and that it was dropped properly.
 		I.pixel_x = initial(I.pixel_x) + rand(-6,6)
 		I.pixel_y = initial(I.pixel_x) + rand(-6,6)
+		I.afterdrop()
 
 //for when the item will be immediately placed in a loc other than the ground
 /mob/proc/transferItemToLoc(obj/item/I, newloc = null, force = FALSE, silent = TRUE)
@@ -311,6 +298,9 @@
 		return TRUE
 
 	if(HAS_TRAIT(I, TRAIT_NODROP) && !force)
+		return FALSE
+
+	if((SEND_SIGNAL(I, COMSIG_ITEM_PRE_UNEQUIP, force, newloc, no_move, invdrop, silent) & COMPONENT_ITEM_BLOCK_UNEQUIP) && !force)
 		return FALSE
 
 	var/hand_index = get_held_index_of_item(I)
@@ -336,6 +326,8 @@
 		hud_used.give_intent?.update_icon()
 	givingto = null
 	update_a_intents()
+	SEND_SIGNAL(I, COMSIG_ITEM_POST_UNEQUIP, force, newloc, no_move, invdrop, silent)
+	SEND_SIGNAL(src, COMSIG_MOB_UNEQUIPPED_ITEM, I, force, newloc, no_move, invdrop, silent)
 	return TRUE
 
 //Outdated but still in use apparently. This should at least be a human proc.
@@ -369,8 +361,6 @@
 		items += backl
 	if(ears)
 		items += ears
-	if(glasses)
-		items += glasses
 	if(gloves)
 		items += gloves
 	if(shoes)
@@ -419,8 +409,6 @@
 		obscured |= SLOT_NECK
 	if(hidden_slots & HIDEMASK)
 		obscured |= SLOT_WEAR_MASK
-	if(hidden_slots & HIDEEYES)
-		obscured |= SLOT_GLASSES
 	if(hidden_slots & HIDEGLOVES)
 		obscured |= SLOT_GLOVES
 	if(hidden_slots & HIDEJUMPSUIT)
@@ -467,6 +455,10 @@
 	set name = "quick-equip"
 	set hidden = 1
 
+	DEFAULT_QUEUE_OR_CALL_VERB(VERB_CALLBACK(src, PROC_REF(execute_quick_equip)))
+
+///proc extender of [/mob/verb/quick_equip] used to make the verb queuable if the server is overloaded
+/mob/proc/execute_quick_equip()
 	var/obj/item/I = get_active_held_item()
 	if (I)
 		I.equip_to_best_slot(src)

@@ -27,24 +27,13 @@ GLOBAL_PROTECT(exp_to_update)
 		return (job_requirement - my_exp)
 
 /datum/job/proc/get_exp_req_amount()
-	if(title in (GLOB.command_positions | list("AI")))
-		var/uerhh = CONFIG_GET(number/use_exp_restrictions_heads_hours)
-		if(uerhh)
-			return uerhh * 60
 	return exp_requirements
 
 /datum/job/proc/get_exp_req_type()
-	if(title in (GLOB.command_positions | list("AI")))
-		if(CONFIG_GET(flag/use_exp_restrictions_heads_department) && exp_type_department)
-			return exp_type_department
 	return exp_type
 
 /proc/job_is_xp_locked(jobtitle)
-	if(!CONFIG_GET(flag/use_exp_restrictions_heads) && (jobtitle in (GLOB.command_positions | list("AI"))))
-		return FALSE
-	if(!CONFIG_GET(flag/use_exp_restrictions_other) && !(jobtitle in (GLOB.command_positions | list("AI"))))
-		return FALSE
-	return TRUE
+	return FALSE
 
 /client/proc/calc_exp_type(exptype)
 	var/list/explist = prefs.exp.Copy()
@@ -75,7 +64,7 @@ GLOBAL_PROTECT(exp_to_update)
 		else
 			exp_data[category] = 0
 	for(var/category in GLOB.exp_specialmap)
-		if(category == EXP_TYPE_SPECIAL || category == EXP_TYPE_ANTAG)
+		if(category == EXP_TYPE_ANTAG)
 			if(GLOB.exp_specialmap[category])
 				for(var/innercat in GLOB.exp_specialmap[category])
 					if(play_records[innercat])
@@ -102,7 +91,7 @@ GLOBAL_PROTECT(exp_to_update)
 	return_text += "</UL>"
 	var/list/jobs_locked = list()
 	var/list/jobs_unlocked = list()
-	for(var/datum/job/job in SSjob.occupations)
+	for(var/datum/job/job in SSjob.joinable_occupations)
 		if(job.exp_requirements && job.exp_type)
 			if(!job_is_xp_locked(job.title))
 				continue
@@ -217,20 +206,13 @@ GLOBAL_PROTECT(exp_to_update)
 			play_records[EXP_TYPE_LIVING] += minutes
 			if(announce_changes)
 				to_chat(src,"<span class='notice'>I got: [minutes] Living EXP!</span>")
-			if(mob.mind.assigned_role)
+			if(!is_unassigned_job(mob.mind.assigned_role))
 				for(var/job in SSjob.name_occupations)
-					if(mob.mind.assigned_role == job)
+					if(mob.mind.assigned_role.title == job)
 						rolefound = TRUE
 						play_records[job] += minutes
 						if(announce_changes)
 							to_chat(src,"<span class='notice'>I got: [minutes] [job] EXP!</span>")
-				if(!rolefound)
-					for(var/role in GLOB.exp_specialmap[EXP_TYPE_SPECIAL])
-						if(mob.mind.assigned_role == role)
-							rolefound = TRUE
-							play_records[role] += minutes
-							if(announce_changes)
-								to_chat(mob,"<span class='notice'>I got: [minutes] [role] EXP!</span>")
 				if(mob.mind.special_role && !(mob.mind.datum_flags & DF_VAR_EDITED))
 					var/trackedrole = mob.mind.special_role
 					play_records[trackedrole] += minutes

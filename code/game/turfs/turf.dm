@@ -11,7 +11,7 @@
 	// This shouldn't be modified directly, use the helper procs.
 	var/list/baseturfs = /turf/open/transparent/openspace
 
-	var/temperature = T20C
+	var/temperature = 293.15
 	var/to_be_destroyed = 0 //Used for fire, if a melting temperature was reached, it will be destroyed
 	var/max_fire_temperature_sustained = 0 //The max temperature of the fire which it was subjected to
 
@@ -24,7 +24,6 @@
 	var/explosion_level = 0	//for preventing explosion dodging
 	var/explosion_id = 0
 
-	var/requires_activation	//add to air processing after initialize?
 	var/changing_turf = FALSE
 
 	var/bullet_bounce_sound = 'sound/blank.ogg' //sound played when a shell casing is ejected ontop of the turf.
@@ -84,10 +83,6 @@
 	if(!IS_DYNAMIC_LIGHTING(src) && IS_DYNAMIC_LIGHTING(A))
 		add_overlay(/obj/effect/fullbright)
 
-	if(requires_activation)
-		CALCULATE_ADJACENT_TURFS(src)
-		SSair.add_to_active(src)
-
 	if (light_power && (light_outer_range || light_inner_range))
 		update_light()
 
@@ -112,10 +107,10 @@
 
 	queue_smooth_neighbors(src)
 
-	return INITIALIZE_HINT_NORMAL
+	if(shine)
+		make_shiny(shine)
 
-/turf/proc/Initalize_Atmos(times_fired)
-	CALCULATE_ADJACENT_TURFS(src)
+	return INITIALIZE_HINT_NORMAL
 
 /turf/Destroy(force)
 	. = QDEL_HINT_IWILLGC
@@ -128,7 +123,6 @@
 	T = GET_TURF_BELOW(src)
 	if(T)
 		T.multiz_turf_del(src, UP)
-	STOP_PROCESSING(SSweather,src)
 	if(force)
 		..()
 		//this will completely wipe turf state
@@ -138,87 +132,14 @@
 		for(var/I in B.vars)
 			B.vars[I] = null
 		return
-	SSair.remove_from_active(src)
 	QDEL_LIST(blueprint_data)
 	flags_1 &= ~INITIALIZED_1
-	requires_activation = FALSE
 	..()
 
-#define SEE_SKY_YES 1
-#define SEE_SKY_NO 2
-
-/turf
-	var/can_see_sky //1, 2
-	var/primary_area
-
 /turf/proc/can_see_sky()
-	if(can_see_sky)
-		if(can_see_sky == SEE_SKY_YES)
-			return TRUE
-		else
-			return FALSE
-	if(isclosedturf(src))
-		can_see_sky = SEE_SKY_NO
-		return can_see_sky()
-	var/turf/CT = src
-	var/area/A = get_area(src)
-	for(var/i in 1 to 6)
-		CT = get_step_multiz(CT, UP)
-		if(!CT)
-			if(!A.outdoors)
-				can_see_sky = SEE_SKY_NO
-			else
-				can_see_sky = SEE_SKY_YES
-			return can_see_sky()
-		A = get_area(CT)
-		if(!istype(CT, /turf/open/transparent/openspace))
-			can_see_sky = SEE_SKY_NO
-			return can_see_sky()
-
-/turf/proc/update_see_sky()
-	can_see_sky = null
-	var/can = can_see_sky()
-	var/area/A = get_area(src)
-	if(istype(A,/area/shuttle))
-		return
-	if(can)
-		if(!A.outdoors)
-			var/area2new = /area/rogue/outdoors
-			if(A.converted_type)
-				area2new = A.converted_type
-			var/area/nuarea
-			if(primary_area)
-				nuarea = type2area(primary_area)
-				if(!nuarea.outdoors)
-					nuarea = null
-			if(!nuarea)
-				nuarea = type2area(area2new)
-				primary_area = A.type
-			if(nuarea)
-				A.contents -= src
-				nuarea.contents += src
-				change_area(A, nuarea)
-	else
-		if(A.outdoors)
-			var/area2new = /area/rogue/indoors/shelter
-			if(A.converted_type)
-				area2new = A.converted_type
-			var/area/nuarea
-			if(primary_area)
-				nuarea = type2area(primary_area)
-				if(nuarea.outdoors)
-					nuarea = null
-			if(!nuarea)
-				nuarea = type2area(area2new)
-				primary_area = A.type
-			if(!nuarea)
-				var/area/NA = new area2new()
-				nuarea = NA
-				primary_area = NA.type
-			if(nuarea)
-				A.contents -= src
-				nuarea.contents += src
-				change_area(A, nuarea)
+	if(outdoor_effect?.state == SKY_VISIBLE)
+		return TRUE
+	return FALSE
 
 /turf/attack_hand(mob/user)
 	. = ..()
@@ -231,6 +152,30 @@
 
 /turf/proc/multiz_turf_new(turf/T, dir)
 	reassess_stack()
+
+
+/turf/proc/is_blocked_turf(exclude_mobs = FALSE, source_atom = null, list/ignore_atoms, type_list = FALSE)
+	if((!isnull(source_atom) && !CanPass(source_atom, get_dir(src, source_atom))) || density)
+		return TRUE
+
+	for(var/atom/movable/movable_content as anything in contents)
+		// We don't want to block ourselves
+		if((movable_content == source_atom))
+			continue
+		// don't consider ignored atoms or their types
+		if(length(ignore_atoms))
+			if(!type_list && (movable_content in ignore_atoms))
+				continue
+			else if(type_list && is_type_in_list(movable_content, ignore_atoms))
+				continue
+
+		// If the thing is dense AND we're including mobs or the thing isn't a mob AND if there's a source atom and
+		// it cannot pass through the thing on the turf,  we consider the turf blocked.
+		if(movable_content.density && (!exclude_mobs || !ismob(movable_content)))
+			if(source_atom && movable_content.CanPass(source_atom, get_dir(src, source_atom)))
+				continue
+			return TRUE
+	return FALSE
 
 //zPassIn doesn't necessarily pass an atom!
 //direction is direction of travel of air
@@ -250,6 +195,10 @@
 	return FALSE
 
 /turf/proc/zImpact(atom/movable/A, levels = 1, turf/prev_turf)
+	if(levels == 1 && A.ai_controller)
+		for(var/obj/structure/stairs/S in contents)
+			return FALSE
+
 	var/flags = NONE
 	var/mov_name = A.name
 	for(var/i in contents)
@@ -258,7 +207,7 @@
 		if(flags & FALL_STOP_INTERCEPTING)
 			break
 	if(prev_turf && !(flags & FALL_NO_MESSAGE))
-		prev_turf.visible_message("<span class='danger'>[mov_name] falls through [prev_turf]!</span>")
+		prev_turf.visible_message("<span class='danger'>\The [mov_name] falls through [prev_turf]!</span>")
 	if(flags & FALL_INTERCEPTED)
 		return
 	if(zFall(A, ++levels))
@@ -312,21 +261,17 @@
 		return FALSE
 	if(!force && (!can_zFall(A, levels, target) || !A.can_zFall(src, levels, target, DOWN)))
 		return FALSE
-	A.zfalling = TRUE
+	A.atom_flags |= Z_FALLING
 	A.forceMove(target)
-	A.zfalling = FALSE
+	A.atom_flags &= ~Z_FALLING
 	target.zImpact(A, levels, src)
 	return TRUE
-
-/turf/attackby(obj/item/C, mob/user, params)
-	if(..())
-		return TRUE
-	return FALSE
 
 /turf/CanPass(atom/movable/mover, turf/target)
 	if(!target)
 		return FALSE
-
+	if(iscameramob(mover))
+		return TRUE
 	if(istype(mover)) // turf/Enter(...) will perform more advanced checks
 		return !density
 
@@ -384,6 +329,9 @@
 
 /turf/Entered(atom/movable/AM)
 	..()
+	SEND_SIGNAL(src, COMSIG_TURF_ENTERED, AM)
+	SEND_SIGNAL(AM, COMSIG_MOVABLE_TURF_ENTERED, src)
+
 	if(explosion_level && AM.ex_check(explosion_id))
 		AM.ex_act(explosion_level)
 
@@ -395,13 +343,12 @@
 /turf/open/Entered(atom/movable/AM)
 	..()
 	//melting
-	if(isobj(AM) && air && air.temperature > T0C)
+	if(isobj(AM) && temperature > 273.15)
 		var/obj/O = AM
 		if(O.obj_flags & FROZEN)
 			O.make_unfrozen()
-	if(!AM.zfalling)
+	if(!(AM.atom_flags & Z_FALLING))
 		zFall(AM)
-	trigger_weather(AM)
 
 /turf/proc/is_plasteel_floor()
 	return FALSE
@@ -460,12 +407,6 @@
 		if(O.level == 1 && (O.flags_1 & INITIALIZED_1))
 			O.hide(src.intact)
 
-// Removes all signs of lattice on the pos of the turf -Donkieyo
-/turf/proc/RemoveLattice()
-	var/obj/structure/lattice/L = locate(/obj/structure/lattice, src)
-	if(L && (L.flags_1 & INITIALIZED_1))
-		qdel(L)
-
 /turf/proc/phase_damage_creatures(damage,mob/U = null)//>Ninja Code. Hurts and knocks out creatures on this turf //NINJACODE
 	for(var/mob/living/M in src)
 		if(M==U)
@@ -482,14 +423,14 @@
 		return
 	if(length(src_object.contents()))
 		to_chat(usr, "<span class='notice'>I start dumping out the contents...</span>")
-		if(!do_after(usr,20,target=src_object.parent))
+		if(!do_after(usr, 2 SECONDS, src_object.parent))
 			return FALSE
 
 	var/list/things = src_object.contents()
 	var/datum/progressbar/progress = new(user, things.len, src)
-	while (do_after(usr, 10, TRUE, src, FALSE, CALLBACK(src_object, TYPE_PROC_REF(/datum/component/storage, mass_remove_from_storage), src, things, progress)))
+	while (do_after(usr, 1 SECONDS, src, NONE, FALSE, CALLBACK(src_object, TYPE_PROC_REF(/datum/component/storage, mass_remove_from_storage), src, things, progress)))
 		stoplag(1)
-	qdel(progress)
+	progress.end_progress()
 
 	return TRUE
 
@@ -499,6 +440,11 @@
 
 //Distance associates with all directions movement
 /turf/proc/Distance(turf/T)
+	while(T.z != z)
+		if(T.z > z)
+			T = GET_TURF_BELOW(T)
+		else
+			T = GET_TURF_ABOVE(T)
 	return get_dist(src,T)
 
 //  This Distance proc assumes that only cardinal movement is
@@ -550,22 +496,6 @@
 	underlay_appearance.icon_state = icon_state
 	underlay_appearance.dir = adjacency_dir
 	return TRUE
-
-/turf/proc/add_blueprints(atom/movable/AM)
-	var/image/I = new
-	I.appearance = AM.appearance
-	I.appearance_flags = RESET_COLOR|RESET_ALPHA|RESET_TRANSFORM
-	I.loc = src
-	I.setDir(AM.dir)
-	I.alpha = 128
-	LAZYADD(blueprint_data, I)
-
-/turf/proc/add_blueprints_preround(atom/movable/AM)
-	if(!SSticker.HasRoundStarted())
-		if(AM.layer == WIRE_LAYER)	//wires connect to adjacent positions after its parent init, meaning we need to wait (in this case, until smoothing) to take its image
-			SSicon_smooth.blueprint_queue += AM
-		else
-			add_blueprints(AM)
 
 /turf/proc/is_transition_turf()
 	return
@@ -644,4 +574,3 @@
 //Should return new turf
 /turf/proc/Melt()
 	return ScrapeAway(flags = CHANGETURF_INHERIT_AIR)
-

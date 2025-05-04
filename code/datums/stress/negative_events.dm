@@ -1,21 +1,21 @@
 /datum/stressevent/vice
 	timer = 5 MINUTES
-	stressadd = 5
+	stressadd = 3
 	desc = list(span_boldred("I don't indulge my vice."),span_boldred("I need to sate my vice."))
 
 /datum/stressevent/vice1
 	timer = 5 MINUTES
-	stressadd = 8
+	stressadd = 2
 	desc = list("<span class='red'>I don't indulge my vice.</span>","<span class='red'>I need to sate my vice.</span>")
 
 /datum/stressevent/vice2
 	timer = 5 MINUTES
-	stressadd = 10
+	stressadd = 4
 	desc = list("<span class='red'>I don't need it. I don't need it. I don't need it.</span>","<span class='red'>I'm better than my vices.</span>")
 
 /datum/stressevent/vice3
 	timer = 5 MINUTES
-	stressadd = 20
+	stressadd = 6
 	desc = list("<span class='red'>If I don't sate my desire soon, I am going to kill myself..</span>","<span class='red'>I need it. I need it. I need it.</span>")
 
 /*
@@ -31,32 +31,26 @@
 	desc = "<span class='red'>Smells like death here.</span>"
 
 /datum/stressevent/peckish
-	timer = 10 MINUTES
 	stressadd = 1
 	desc = "<span class='red'>I'm peckish.</span>"
 
 /datum/stressevent/hungry
-	timer = 10 MINUTES
 	stressadd = 2
 	desc = "<span class='red'>I'm hungry.</span>"
 
 /datum/stressevent/starving
-	timer = 10 MINUTES
-	stressadd = 5
+	stressadd = 3
 	desc = "<span class='red'>I'm starving.</span>"
 
 /datum/stressevent/drym
-	timer = 10 MINUTES
 	stressadd = 1
 	desc = "<span class='red'>I'm a little thirsty.</span>"
 
 /datum/stressevent/thirst
-	timer = 10 MINUTES
-	stressadd = 3
+	stressadd = 2
 	desc = "<span class='red'>I'm thirsty.</span>"
 
 /datum/stressevent/parched
-	timer = 10 MINUTES
 	stressadd = 3
 	desc = "<span class='red'>I'm going to die of thirst.</span>"
 
@@ -147,8 +141,13 @@
 	stressadd = 4
 	desc = "<span class='red'>YUCK! MAGGOTS!</span>"
 
+/datum/stressevent/psycurselight
+	timer = 1 MINUTES
+	stressadd = 5
+	desc = "<span class='red'>Oh no! I've received divine punishment!</span>"
+
 /datum/stressevent/psycurse
-	timer = 5 MINUTES
+	timer = INFINITY
 	stressadd = 5
 	desc = "<span class='red'>Oh no! I've received divine punishment!</span>"
 
@@ -171,20 +170,42 @@
 	stressadd_per_extra_stack = 2
 	desc = "<span class='red'>I puked on myself!</span>"
 
+/datum/stressevent/mouthsoap
+	timer = 3 MINUTES
+	stressadd = 2
+	max_stacks = 2
+	stressadd_per_extra_stack = 2
+	desc = "<span class='red'>I taste soap...</span>"
+
 /datum/stressevent/leechcult
 	timer = 1 MINUTES
 	stressadd = 3
-	desc = list("<span class='red'>There's a little goblin in my head telling me to do things and I don't like it!</span>","<span class='red'>\"Kill your friends.\"</span>","<span class='red'>\"Make them bleed.\"</span>","<span class='red'>\"Give them no time to squeal.\"</span>","<span class='red'>\"Praise Zizo.\"</span>","<span class='red'>\"Death to the Ten.\"</span>","<span class='red'>\"The Weeper weeps his last.\"</span>")
+	desc = list("<span class='red'>There's a little goblin in my head telling me to do things and I don't like it!</span>","<span class='red'>\"Kill your friends.\"</span>","<span class='red'>\"Make them bleed.\"</span>","<span class='red'>\"Give them no time to squeal.\"</span>","<span class='red'>\"Praise Zizo.\"</span>","<span class='red'>\"Death to the Ten.\"</span>","<span class='red'>\"We will recycle them.\"</span>")
+
+/datum/stressevent/ugly
+	timer = 30 SECONDS
+	stressadd = 1
+	desc = span_red("How can one possibly be so ugly?")
+
+/datum/stressevent/ugly_self
+	timer = 30 SECONDS
+	stressadd = 1
+	desc = span_red("Same old ugly mug...")
 
 /datum/stressevent/delf
-	timer = 1 MINUTES
+	timer = 30 SECONDS
 	stressadd = 1
 	desc = "<span class='red'>A loathesome dark elf.</span>"
 
 /datum/stressevent/tieb
-	timer = 1 MINUTES
+	timer = 30 SECONDS
 	stressadd = 1
 	desc = "<span class='red'>Helldweller... better stay away.</span>"
+
+/datum/stressevent/horc
+	timer = 30 SECONDS
+	stressadd = 1
+	desc = "<span class='red'>A beast in human skin.</span>"
 
 /datum/stressevent/paracrowd
 	timer = 15 SECONDS
@@ -205,6 +226,11 @@
 	timer = 2 MINUTES
 	stressadd = 2
 	desc = "<span class='red'>They are plotting against me in evil tongues..</span>"
+
+/datum/stressevent/paraforeigner
+	timer = 2 MINUTES
+	stressadd = 2
+	desc = "<span class='red'>A foreigner... are they planning to invade us?</span>"
 
 /datum/stressevent/crowd
 	timer = 2 MINUTES
@@ -244,17 +270,22 @@
 /datum/stressevent/tortured
 	stressadd = 3
 	max_stacks = 5
-	desc = "<span class='red'>I'm broken.</span>"
-	timer = 60 SECONDS
+	stressadd_per_extra_stack = 1
+	desc = span_red("I'm broken.")
+	timer = 5 MINUTES
 
-/datum/stressevent/confessed
-	stressadd = 3
-	desc = "<span class='red'>I've confessed to sin.</span>"
-	timer = 15 MINUTES
-
-/datum/stressevent/confessedgood
+/datum/stressevent/torture_small_penalty
 	stressadd = 1
-	desc = "<span class='red'>I've confessed to sin, it feels good.</span>"
+	max_stacks = 3
+	stressadd_per_extra_stack = 1
+	desc = span_red("I tortured an innocent...")
+	timer = 5 MINUTES
+
+/datum/stressevent/torture_large_penalty
+	stressadd = 3
+	max_stacks = 3
+	stressadd_per_extra_stack = 3
+	desc = span_red("I tortured a fellow believer!")
 	timer = 15 MINUTES
 
 /datum/stressevent/maniac
@@ -278,13 +309,13 @@
 
 /datum/stressevent/sleepfloor
 	timer = 1 MINUTES
-	stressadd = 3
+	stressadd = 2
 	desc = "<span class='red'>I slept on the floor. It was uncomfortable.</span>"
 
 /datum/stressevent/sleepfloornoble
 	timer = 3 MINUTES
-	stressadd = 6
-	desc = "<span class='red'>I slept on the floor! What am I?! An animal?!</span>"
+	stressadd = 4
+	desc = "<span class='red'>I slept on the floor! What am I, an animal?!</span>"
 
 /datum/stressevent/sadfate
 	timer = 60 MINUTES
@@ -300,3 +331,64 @@
 	stressadd = 10
 	desc = span_boldred("No... I want to go back...")
 	timer = 999 MINUTES
+
+/datum/stressevent/guillotinefail
+	timer = 5 MINUTES
+	stressadd = 3
+	desc = span_red("This execution is horrifying!")
+
+/datum/stressevent/guillotineexecutorfail
+	timer = 15 MINUTES
+	stressadd = 5
+	desc = span_boldred("I have failed the guillotine drop! What a shame!")
+
+
+/datum/stressevent/noble_impoverished_food
+	stressadd = 3
+	desc = span_boldred("This is disgusting. How can anyone eat this?")
+	timer = 10 MINUTES
+
+/datum/stressevent/noble_desperate
+	stressadd = 6
+	desc = span_boldred("What level of desperation have I fallen to?")
+	timer = 60 MINUTES
+
+/datum/stressevent/noble_bland_food
+	stressadd = 2
+	desc = span_red("This fare is really beneath me. I deserve better than this...")
+	timer = 5 MINUTES
+
+/datum/stressevent/tortured/on_apply(mob/living/user)
+	. = ..()
+	if(user.client)
+		GLOB.vanderlin_round_stats[STATS_TORTURES]++
+
+/datum/stressevent/noble_bad_manners
+	stressadd = 1
+	desc = span_red("I should've used a spoon...")
+	timer = 5 MINUTES
+
+/datum/stressevent/noble_ate_without_table
+	stressadd = 1
+	desc = span_red("Eating such a meal without a table? Churlish.")
+	timer = 2 MINUTES
+
+/datum/stressevent/destroyed_past //gaffer destroying their trophies
+	stressadd = 4
+	desc = span_red("A piece of my history is destroyed, how will they know my great past?")
+	timer = 10 MINUTES
+
+/datum/stressevent/ring_madness // ring bearer examines at HEAD EATER related thing
+	stressadd = 1
+	desc = span_red("It mocks me, toys with my mind!")
+	timer = 1 MINUTES
+
+/datum/stressevent/eora_marriage_call
+	stressadd = 2
+	desc = span_rose("Eora calls for me to be wed! I must find my destined partner before I die all alone...")
+	timer = 30 MINUTES
+
+/datum/stressevent/graggar_culling_unfinished
+	stressadd = 1
+	desc = span_red("I must eat my opponent's heart before he eats MINE!")
+	timer = INFINITY

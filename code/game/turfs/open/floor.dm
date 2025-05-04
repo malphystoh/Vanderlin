@@ -3,18 +3,20 @@
 	//- you should use istype() if you want to find out whether a floor has a certain type
 	//- floor_tile is now a path, and not a tile obj
 	name = "floor"
+	desc = ""
 	icon = 'icons/turf/floors.dmi'
 	baseturfs = /turf/open/transparent/openspace
-
+	smooth = SMOOTH_FALSE
+	neighborlay = ""
+	canSmoothWith = null
 	footstep = FOOTSTEP_FLOOR
 	barefootstep = FOOTSTEP_HARD_BAREFOOT
 	clawfootstep = FOOTSTEP_HARD_CLAW
 	heavyfootstep = FOOTSTEP_GENERIC_HEAVY
+	attacked_sound = list('sound/combat/hits/onwood/woodimpact (1).ogg','sound/combat/hits/onwood/woodimpact (2).ogg')
 
 	var/icon_regular_floor = "floor" //used to remember what icon the tile should have by default
 	var/icon_plating = "plating"
-	thermal_conductivity = 0.040
-	heat_capacity = 10000
 	intact = 1
 	var/broken = 0
 	var/burnt = 0
@@ -22,10 +24,19 @@
 	var/list/broken_states
 	var/list/burnt_states
 
+	///the chance this turf has to spread, basically 1.75% by default
+	spread_chance = 1.75
+	///means fires last at base 9 seconds
+	burn_power = 9
+
 	tiled_dirt = TRUE
 
-/turf/open/floor/Initialize(mapload)
+	var/smooth_icon = null
+	var/prettifyturf = FALSE
 
+/turf/open/floor/Initialize(mapload)
+	if(smooth_icon)
+		icon = smooth_icon
 	if (!broken_states)
 		broken_states = typelist("broken_states", list("damaged1", "damaged2", "damaged3", "damaged4", "damaged5"))
 	else
@@ -54,6 +65,9 @@
 		icon_regular_floor = "floor"
 	else
 		icon_regular_floor = icon_state
+
+/turf/open/floor/turf_destruction(damage_flag)
+	return
 
 /turf/open/floor/ex_act(severity, target, epicenter, devastation_range, heavy_impact_range, light_impact_range, flame_range)
 	var/shielded = is_shielded()
@@ -93,10 +107,6 @@
 		if(A.level == 3)
 			return 1
 
-/turf/open/floor/update_icon()
-	. = ..()
-	update_visuals()
-
 /turf/open/floor/attack_paw(mob/user)
 	return attack_hand(user)
 
@@ -104,19 +114,10 @@
 	return
 
 /turf/open/floor/proc/break_tile()
-	if(broken)
-		return
-	icon_state = pick(broken_states)
-	broken = 1
+	return
 
 /turf/open/floor/burn_tile()
-	if(broken || burnt)
-		return
-	if(burnt_states.len)
-		icon_state = pick(burnt_states)
-	else
-		icon_state = pick(broken_states)
-	burnt = 1
+	return
 
 /turf/open/floor/proc/make_plating()
 	return ScrapeAway(flags = CHANGETURF_INHERIT_AIR)

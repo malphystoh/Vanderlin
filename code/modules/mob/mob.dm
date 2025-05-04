@@ -30,6 +30,7 @@ GLOBAL_VAR_INIT(mobids, 1)
 	GLOB.alive_mob_list -= src
 	GLOB.mob_directory -= tag
 	focus = null
+
 	for (var/alert in alerts)
 		clear_alert(alert, TRUE)
 	if(observers && observers.len)
@@ -85,6 +86,7 @@ GLOBAL_VAR_INIT(mobids, 1)
 	. = ..()
 	update_config_movespeed()
 	update_movespeed(TRUE)
+	become_hearing_sensitive()
 
 /**
  * Generate the tag for this mob
@@ -111,27 +113,6 @@ GLOBAL_VAR_INIT(mobids, 1)
 				var/image/I = image('icons/mob/hud.dmi', src, "")
 				I.appearance_flags = RESET_COLOR|RESET_TRANSFORM
 				hud_list[hud] = I
-
-/**
- * Some kind of debug verb that gives atmosphere environment details
- */
-/mob/proc/Cell()
-	set category = "Admin"
-	set hidden = 1
-
-	if(!loc)
-		return 0
-
-	var/datum/gas_mixture/environment = loc.return_air()
-
-	var/t =	"<span class='notice'>Coordinates: [x],[y] \n</span>"
-	t +=	"<span class='danger'>Temperature: [environment.temperature] \n</span>"
-	for(var/id in environment.gases)
-		var/gas = environment.gases[id]
-		if(gas[MOLES])
-			t+="<span class='notice'>[gas[GAS_META][META_GAS_NAME]]: [gas[MOLES]] \n</span>"
-
-	to_chat(usr, t)
 
 /**
  * Show a message to this mob (visual or audible)
@@ -255,7 +236,7 @@ GLOBAL_VAR_INIT(mobids, 1)
 	return
 
 ///Is the mob incapacitated
-/mob/proc/incapacitated(ignore_restraints = FALSE, ignore_grab = TRUE, check_immobilized = FALSE)
+/mob/proc/incapacitated(ignore_restraints = FALSE, ignore_grab = TRUE)
 	return
 
 /**
@@ -306,6 +287,8 @@ GLOBAL_VAR_INIT(mobids, 1)
 		return FALSE
 	equip_to_slot(W, slot, redraw_mob, initial) //This proc should not ever fail.
 	update_a_intents()
+	if(isliving(src))
+		src:update_reflection()
 	return TRUE
 
 /**
@@ -345,15 +328,15 @@ GLOBAL_VAR_INIT(mobids, 1)
 
 	if(!slot_priority)
 		slot_priority = list( \
-			SLOT_BACK, SLOT_RING, SLOT_WRISTS,\
+			SLOT_RING, SLOT_WRISTS,\
 			SLOT_PANTS, SLOT_ARMOR,\
 			SLOT_WEAR_MASK, SLOT_HEAD, SLOT_NECK,\
 			SLOT_SHOES, SLOT_GLOVES,\
-			SLOT_HEAD, SLOT_GLASSES,\
-			SLOT_BELT, SLOT_S_STORE,\
+			SLOT_BELT,\
 			SLOT_MOUTH,SLOT_BACK_R,SLOT_BACK_L,SLOT_BELT_L,SLOT_BELT_R,SLOT_CLOAK,SLOT_SHIRT,\
 			SLOT_L_STORE, SLOT_R_STORE,\
-			SLOT_GENERC_DEXTROUS_STORAGE\
+			SLOT_GENERC_DEXTROUS_STORAGE,\
+			SLOT_HANDS\
 		)
 
 	for(var/slot in slot_priority)
@@ -413,7 +396,9 @@ GLOBAL_VAR_INIT(mobids, 1)
 	set name = "Examine"
 	set category = "IC"
 	set hidden = 1
+	DEFAULT_QUEUE_OR_CALL_VERB(VERB_CALLBACK(src, PROC_REF(run_examinate), A))
 
+/mob/proc/run_examinate(atom/A)
 	if(isturf(A) && !(sight & SEE_TURFS) && !(A in view(client ? client.view : world.view, src)))
 		// shift-click catcher may issue examinate() calls for out-of-sight turfs
 		return
@@ -445,7 +430,16 @@ GLOBAL_VAR_INIT(mobids, 1)
  */
 /mob/verb/pointed(atom/A as mob|obj|turf in view())
 	set name = "Point To"
-	set hidden = 1
+	set category = "Object"
+
+	if(istype(A, /obj/effect/temp_visual/point))
+		return FALSE
+
+	DEFAULT_QUEUE_OR_CALL_VERB(VERB_CALLBACK(src, PROC_REF(_pointed), A))
+
+/// possibly delayed verb that finishes the pointing process starting in [/mob/verb/pointed()].
+/// either called immediately or in the tick after pointed() was called, as per the [DEFAULT_QUEUE_OR_CALL_VERB()] macro
+/mob/proc/_pointed(atom/A)
 	if(!src || !isturf(src.loc) || !(A in view(client.view, src)))
 		return FALSE
 	if(istype(A, /obj/effect/temp_visual/point))
@@ -456,6 +450,7 @@ GLOBAL_VAR_INIT(mobids, 1)
 		return FALSE
 
 	new /obj/effect/temp_visual/point(src,invisibility)
+	SEND_SIGNAL(src, COMSIG_MOB_POINTED, A)
 
 	return TRUE
 
@@ -476,6 +471,7 @@ GLOBAL_VAR_INIT(mobids, 1)
 
 	var/turf/our_tile = get_turf(src)
 	var/obj/visual = new /obj/effect/temp_visual/point/still(our_tile, invisibility)
+	SEND_SIGNAL(src, COMSIG_MOB_POINTED, A)
 	animate(visual, pixel_x = (tile.x - our_tile.x) * world.icon_size + A.pixel_x, pixel_y = (tile.y - our_tile.y) * world.icon_size + A.pixel_y, time = 2, easing = EASE_OUT)
 
 	lastpoint = world.time
@@ -497,6 +493,8 @@ GLOBAL_VAR_INIT(mobids, 1)
 	var/D = dir
 	if((spintime < 1)||(speed < 1)||!spintime||!speed)
 		return
+
+	flags_1 |= IS_SPINNING_1
 	while(spintime >= speed)
 		sleep(speed)
 		switch(D)
@@ -510,6 +508,7 @@ GLOBAL_VAR_INIT(mobids, 1)
 				D = NORTH
 		setDir(D)
 		spintime -= speed
+	flags_1 &= ~IS_SPINNING_1
 
 ///Update the pulling hud icon
 /mob/proc/update_pull_hud_icon()
@@ -718,30 +717,25 @@ GLOBAL_VAR_INIT(mobids, 1)
 /mob/Stat()
 	..()
 	// && check_rights(R_ADMIN,0)
-	if(client && client.holder)
-		if(statpanel("Status"))
-			if (client)
-				stat(null, "Ping: [round(client.lastping, 1)]ms (Average: [round(client.avgping, 1)]ms)")
-			stat(null, "Map: [SSmapping.config?.map_name || "Loading..."]")
-			var/datum/map_config/cached = SSmapping.next_map_config
-			if(cached)
-				stat(null, "Next Map: [cached.map_name]")
-			stat(null, "Round ID: [GLOB.rogue_round_id ? GLOB.rogue_round_id : "NULL"]")
-//			stat(null, "Server Time: [time2text(world.timeofday, "YYYY-MM-DD hh:mm:ss")]")
-			stat(null, "Round Time: [gameTimestamp("hh:mm:ss", world.time - SSticker.round_start_time)] [world.time - SSticker.round_start_time]")
-			stat(null, "Round TrueTime: [worldtime2text()] [world.time]")
-			stat(null, "TimeOfDay: [GLOB.tod]")
-			stat(null, "IC Time: [station_time_timestamp()] [station_time()]")
-			stat(null, "Time Dilation: [round(SStime_track.time_dilation_current,1)]% AVG:([round(SStime_track.time_dilation_avg_fast,1)]%, [round(SStime_track.time_dilation_avg,1)]%, [round(SStime_track.time_dilation_avg_slow,1)]%)")
-			if(SSshuttle.emergency)
-				var/ETA = SSshuttle.emergency.getModeStr()
-				if(ETA)
-					stat(null, "[ETA] [SSshuttle.emergency.getTimerStr()]")
+	var/ticker_time = world.time - SSticker.round_start_time
+	var/time_left = SSgamemode.round_ends_at - ticker_time
 	if(client)
 		if(statpanel("RoundInfo"))
 			stat("Round ID: [GLOB.rogue_round_id]")
 			stat("Round Time: [gameTimestamp("hh:mm:ss", world.time - SSticker.round_start_time)] [world.time - SSticker.round_start_time]")
-			stat("TimeOfDay: [GLOB.tod]")
+			if(client?.holder)
+				stat("Round TrueTime: [worldtime2text()] [world.time]")
+			if(SSgamemode.roundvoteend)
+				stat("Round End: [DisplayTimeText(time_left)]")
+			stat("Map: [SSmapping.config?.map_name || "Loading..."]")
+			var/datum/map_config/cached = SSmapping.next_map_config
+			if(cached)
+				stat("Next Map: [cached.map_name]")
+			stat("Time of Day: [GLOB.tod]")
+			if(client?.holder)
+				stat("Real Time: [station_time_timestamp()] [station_time()]")
+			stat("Ping: [round(client?.lastping, 1)]ms (Average: [round(client?.avgping, 1)]ms)")
+			stat("Time Dilation: [round(SStime_track.time_dilation_current,1)]% AVG: ([round(SStime_track.time_dilation_avg_fast,1)]%, [round(SStime_track.time_dilation_avg,1)]%, [round(SStime_track.time_dilation_avg_slow,1)]%)")
 
 	if(client && client.holder && check_rights(R_ADMIN,0))
 		if(statpanel("MC"))
@@ -797,26 +791,6 @@ GLOBAL_VAR_INIT(mobids, 1)
 					continue
 				statpanel(listed_turf.name, null, A)
 
-
-//	if(mind)
-//		add_spells_to_statpanel(mind.spell_list)
-//	add_spells_to_statpanel(mob_spell_list)
-
-/**
- * Convert a list of spells into a displyable list for the statpanel
- *
- * Shows charge and other important info
- */
-/mob/proc/add_spells_to_statpanel(list/spells)
-	for(var/obj/effect/proc_holder/spell/S in spells)
-		if(S.can_be_cast_by(src))
-			switch(S.charge_type)
-				if("recharge")
-					statpanel("[S.panel]","[S.charge_counter/10.0]/[S.charge_max/10]",S)
-				if("charges")
-					statpanel("[S.panel]","[S.charge_counter]/[S.charge_max]",S)
-				if("holdervar")
-					statpanel("[S.panel]","[S.holder_var_type] [S.holder_var_amount]",S)
 
 #define MOB_FACE_DIRECTION_DELAY 1
 
@@ -1053,13 +1027,14 @@ GLOBAL_VAR_INIT(mobids, 1)
  *
  * Calling this proc without an oldname will only update the mob and skip updating the pda, id and records ~Carn
  */
-/mob/proc/fully_replace_character_name(oldname,newname)
+/mob/proc/fully_replace_character_name(oldname, newname)
 	log_message("[src] name changed from [oldname] to [newname]", LOG_OWNERSHIP)
 	if(!newname)
-		return 0
+		return FALSE
 
 	log_played_names(ckey,newname)
 
+	GLOB.chosen_names += newname
 	real_name = newname
 	name = newname
 	if(mind)
@@ -1067,21 +1042,25 @@ GLOBAL_VAR_INIT(mobids, 1)
 		if(mind.key)
 			log_played_names(mind.key,newname) //Just in case the mind is unsynced at the moment.
 
+	GLOB.character_ckey_list[real_name] = ckey
+
 	if(oldname)
-		//update the datacore records! This is goig to be a bit costly.
+		GLOB.chosen_names -= oldname
+		//update the datacore records! This is going to be a bit costly.
 		replace_records_name(oldname,newname)
+		if(GLOB.character_ckey_list[oldname])
+			GLOB.character_ckey_list -= oldname
 
 		for(var/datum/mind/T in SSticker.minds)
 			for(var/datum/objective/obj in T.get_all_objectives())
 				// Only update if this player is a target
-				if(obj.target && obj.target.current && obj.target.current.real_name == name)
+				if(obj.target?.current?.real_name == name)
 					obj.update_explanation_text()
-	return 1
+	return TRUE
 
 ///Updates GLOB.data_core records with new name , see mob/living/carbon/human
 /mob/proc/replace_records_name(oldname,newname)
 	return
-
 
 /mob/proc/update_stat()
 	return
@@ -1124,11 +1103,11 @@ GLOBAL_VAR_INIT(mobids, 1)
 /mob/proc/can_read(obj/O, silent = FALSE)
 	if(is_blind(src) || eye_blurry)
 		if(!silent)
-			to_chat(src, "<span class='warning'>I'm too blind to read.</span>")
+			to_chat(src, span_warning("I'm too blind to read."))
 		return
 	if(!is_literate())
 		if(!silent)
-			to_chat(src, "<span class='warning'>I can't make sense of these verba.</span>")
+			to_chat(src, span_warning("I can't make sense of these verbs."))
 		return
 	return TRUE
 
@@ -1157,6 +1136,7 @@ GLOBAL_VAR_INIT(mobids, 1)
 	VV_DROPDOWN_OPTION(VV_HK_REGEN_ICONS, "Regenerate Icons")
 	VV_DROPDOWN_OPTION(VV_HK_PLAYER_PANEL, "Show player panel")
 	VV_DROPDOWN_OPTION(VV_HK_DIRECT_CONTROL, "Assume Direct Control")
+	VV_DROPDOWN_OPTION(VV_HK_GIVE_CONTROL_TO_PLAYER, "Give Control To Player")
 	VV_DROPDOWN_OPTION(VV_HK_OFFER_GHOSTS, "Offer Control to Ghosts")
 
 /mob/vv_do_topic(list/href_list)
@@ -1193,6 +1173,10 @@ GLOBAL_VAR_INIT(mobids, 1)
 		if(!check_rights(NONE))
 			return
 		usr.client.cmd_assume_direct_control(src)
+	if(href_list[VV_HK_GIVE_CONTROL_TO_PLAYER])
+		if(!check_rights(NONE))
+			return
+		usr.client.cmd_give_control_to_player(src, input(usr, "Choose player.", "Player:") as anything in GLOB.clients)
 	if(href_list[VV_HK_OFFER_GHOSTS])
 		if(!check_rights(NONE))
 			return
@@ -1285,6 +1269,12 @@ GLOBAL_VAR_INIT(mobids, 1)
 		if(I.item_flags & SLOWS_WHILE_IN_HAND)
 			. += I.slowdown
 
+/mob/proc/set_stat(new_stat)
+	if(new_stat == stat)
+		return
+	. = stat
+	stat = new_stat
+	SEND_SIGNAL(src, COMSIG_MOB_STATCHANGE, new_stat, .)
 
 /mob/say_mod(input, message_mode)
 	var/customsayverb = findtext(input, "*")
@@ -1298,3 +1288,24 @@ GLOBAL_VAR_INIT(mobids, 1)
 		input = capitalize(copytext(input, customsayverb+1))
 	return "[message_spans_start(spans)][input]</span>"
 
+/// Send a menu that allows for the selection of an item. Randomly selects one after time_limit. selection_list should be an associative list of string and typepath
+/mob/proc/select_equippable(client/player_client, selection_list = list(), time_limit = 20 SECONDS, message = "", title = "")
+	set waitfor = FALSE
+	if(!length(selection_list))
+		return
+	var/client/client_to_use = player_client
+	if(!client_to_use)
+		client_to_use = client
+	if(!client_to_use)
+		return
+	var/random_choice = selection_list[pick(selection_list)]
+	var/timerid = addtimer(CALLBACK(src, PROC_REF(equip_to_appropriate_slot), new random_choice()), time_limit, TIMER_STOPPABLE)
+	var/choice = input(player_client, message, title) as anything in selection_list
+	if(SStimer.timer_id_dict[timerid])
+		deltimer(timerid)
+	else
+		return
+	var/spawn_item = selection_list[choice]
+	if(!spawn_item)
+		spawn_item = selection_list[pick(selection_list)]
+	equip_to_appropriate_slot(new spawn_item(get_turf(src)))

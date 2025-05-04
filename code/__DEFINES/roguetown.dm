@@ -1,11 +1,35 @@
 //used in various places
-#define ALL_RACES_LIST			list("human", "dwarf", "elf", "tiefling", "aasimar", "halforc", "orc", "zizombie")
+#define ALL_RACES_LIST					list("human", "rakshari", "dwarf", "elf", "tiefling", "aasimar", "halforc", "orc", "zizombie", "kobold")
 
-#define ALL_PLAYER_RACES_BY_NAME		list("Humen", "Half-Elf", "Dark Elf", "Elf", "Dwarf","Tiefling", "Half-Orc", "Aasimar")
+/// All playable races from character selection menu.
+#define RACES_PLAYER_ALL				list("Humen", "Rakshari", "Half-Elf", "Dark Elf", "Elf", "Dwarf", "Tiefling", "Half-Orc", "Aasimar", "Kobold")
 
-#define ALL_TEMPLE_PATRONS 		list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/eora, /datum/patron/divine/necra, /datum/patron/divine/pestra, /datum/patron/divine/dendor, /datum/patron/divine/abyssor)
-#define ALL_CLERIC_PATRONS 		list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/eora, /datum/patron/divine/necra, /datum/patron/divine/pestra, /datum/patron/divine/dendor, /datum/patron/divine/abyssor)
-#define ALL_TEMPLAR_PATRONS 	list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/eora, /datum/patron/divine/necra, /datum/patron/divine/pestra, /datum/patron/divine/dendor, /datum/patron/divine/abyssor)
+/// Races not considered discriminated against in Vanderlin. Used for nobility, guards, etc.
+#define RACES_PLAYER_NONDISCRIMINATED	list("Humen", "Half-Elf", "Elf", "Dwarf", "Aasimar")
+/// Races who are nonheretical to the church. Excluded races typically have an inhumen god associated, like Zizo. Used for church/faith roles.
+#define RACES_PLAYER_NONHERETICAL		list("Humen", "Half-Elf", "Elf", "Dwarf", "Aasimar")
+/// Races who are non-exotic to Vanderlin. These are races from foreign lands with no local pull or uncommon races. Used in miscellaneous cases, when they would not be that role.
+#define RACES_PLAYER_NONEXOTIC			list("Humen", "Half-Elf", "Dark Elf", "Elf", "Dwarf", "Tiefling", "Half-Orc", "Aasimar")
+///Races that lack lux
+#define RACES_PLAYER_LUXLESS			list("Kobold", "Rakshari", "Dark Elf", "Tiefling", "Half-Orc", "Dark Elf")
+
+/// Races who are affiliated with Grenzelhoft or Psydon specifically.
+#define RACES_PLAYER_GRENZ				list("Humen", "Dwarf", "Aasimar")
+/// Elves and Half-Elves
+#define RACES_PLAYER_ELF				list("Half-Elf", "Elf")
+/// Elves, Half-Elves, Dark Elves
+#define RACES_PLAYER_ELF_D				list("Half-Elf", "Dark Elf", "Elf")
+
+/// Patreon only races.
+#define RACES_PLAYER_PATREON			list("Kobold")
+
+
+
+#define ALL_TEMPLE_PATRONS 		list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/dendor, /datum/patron/divine/abyssor, /datum/patron/divine/necra, /datum/patron/divine/ravox, /datum/patron/divine/xylix, /datum/patron/divine/pestra, /datum/patron/divine/malum, /datum/patron/divine/eora)
+#define ALL_CLERIC_PATRONS 		list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/dendor, /datum/patron/divine/abyssor, /datum/patron/divine/necra, /datum/patron/divine/ravox, /datum/patron/divine/xylix, /datum/patron/divine/pestra, /datum/patron/divine/malum, /datum/patron/divine/eora)
+#define ALL_TEMPLAR_PATRONS 	list(/datum/patron/divine/astrata, /datum/patron/divine/noc, /datum/patron/divine/eora, /datum/patron/divine/necra, /datum/patron/divine/ravox, /datum/patron/divine/pestra, /datum/patron/divine/dendor, /datum/patron/divine/abyssor, /datum/patron/divine/malum)
+
+GLOBAL_LIST_INIT(curse_names, list())
 
 #define TEN_CURSES list(\
 	/datum/curse/astrata,\
@@ -62,9 +86,6 @@
 			else
 				return pick('sound/combat/hits/armor/light_blunt (1).ogg','sound/combat/hits/armor/light_blunt (2).ogg','sound/combat/hits/armor/light_blunt (3).ogg')
 
-GLOBAL_LIST_INIT(lockhashes, list())
-GLOBAL_LIST_INIT(lockids, list())
-GLOBAL_LIST_EMPTY(credits_icons)
 GLOBAL_LIST_EMPTY(confessors)
 
 GLOBAL_LIST_INIT(wolf_prefixes, list("Red", "Moon", "Bloody", "Hairy", "Eager", "Sharp"))
@@ -91,7 +112,7 @@ GLOBAL_LIST_EMPTY(job_respawn_delays)
 #define STRESS_BAD 3
 #define STRESS_NEUTRAL 2
 #define STRESS_GOOD 1
-#define STRESS_VGOOD 0
+#define STRESS_VGOOD -1
 
 /*	........   Nutrition defines   ................ */
 #define MEAL_FILLING 30
@@ -103,15 +124,23 @@ GLOBAL_LIST_EMPTY(job_respawn_delays)
 #define SNACK_DECENT 6
 #define SNACK_POOR 3
 
-#define DOUGH_NUTRITION MEAL_MEAGRE
+
+#define MEATPIE_NUTRITION MINCE_NUTRITION + MINCE_NUTRITION + MINCE_NUTRITION + BUTTERDOUGH_NUTRITION
+#define FRUITPIE_NUTRITION SNACK_POOR + SNACK_POOR + SNACK_POOR + BUTTERDOUGH_NUTRITION
+#define BREADSLICE_NUTRITION SNACK_POOR
+#define DOUGH_NUTRITION BREADSLICE_NUTRITION * 6
 #define SMALLDOUGH_NUTRITION MEAL_MEAGRE/2
-#define BUTTERDOUGH_NUTRITION DOUGH_NUTRITION+3
+#define BUTTERDOUGH_NUTRITION DOUGH_NUTRITION+2
 #define BUTTERDOUGHSLICE_NUTRITION BUTTERDOUGH_NUTRITION/2
 #define BUTTER_NUTRITION SNACK_POOR
-#define MEATSLAB_NUTRITION SNACK_NUTRITIOUS
-#define SAUSAGE_NUTRITION SNACK_NUTRITIOUS
-#define MINCE_NUTRITION MEATSLAB_NUTRITION/2
-#define FRESHCHEESE_NUTRITION SNACK_DECENT
+#define RAWMEAT_NUTRITION SNACK_DECENT
+#define COOKED_MEAT_NUTRITION SNACK_NUTRITIOUS
+#define MINCE_NUTRITION SNACK_DECENT
+#define SAUSAGE_NUTRITION MINCE_NUTRITION+COOKED_FAT_NUTRITION
+#define CHEESE_NUTRITION SNACK_DECENT
+#define EGG_NUTRITION SNACK_DECENT
+#define FRYVEGGIE_NUTRITION SNACK_POOR
+#define COOKED_FAT_NUTRITION SNACK_DECENT
 
 /*	........   Rotting Food defines   ................ */
 #define SHELFLIFE_EXTREME 90 MINUTES
@@ -135,9 +164,18 @@ GLOBAL_LIST_EMPTY(job_respawn_delays)
 #define CTAG_CHALLENGE 		"CAT_CHALLENGE"  	// Challenge class - Meant to be free for everyone
 #define CTAG_MERCENARY		"CAT_MERCENARY"
 #define CTAG_GARRISON		"CAT_GARRISON"
+#define CTAG_FORGARRISON	"CAT_FORGARRISON"
 #define CTAG_ADEPT			"CAT_ADEPT" // Used for Adept class selection
 #define CTAG_SQUIRE 		"CAT_SQUIRE" // Squire Love, Classes, as above.
 #define CTAG_HEIR			"CAT_HEIR"
+#define CTAG_HAND			"CAT_HAND"			// Hand class - Handles Hand class selector
+#define CTAG_CONSORT 		"CAT_CONSORT" 		// Consort classes
+#define CTAG_VETERAN		"CAT_VETERAN"		// Veteran class - Handles Veteran class selector
+#define CTAG_TOWN_ELDER		"CAT_TOWN_ELDER"		// Town Elder class - Handles Town Elder class selector
+#define CTAG_MENATARMS		"CAT_MENATARMS"
+#define CTAG_SERVANT		"CAT_SERVANT" 		// Servant class - 4 type of servant to fill in someplace.
+#define CTAG_GATEMASTER		"CAT_GATEMASTER"
+
 /*
 	Defines for the triumph buy datum categories
 */
@@ -305,14 +343,14 @@ Thing can move up or down an armor class by significant changes to coverage & cr
 #define	ARMOR_LEATHER_GOOD	list("blunt" = 40, "slash" = 40, "stab" = 40, "piercing" = 20, "fire" = 0, "acid" = 0)
 
 // Medium AC
-#define ARMOR_MAILLE_IRON	list("blunt" = 5, "slash" = 5, "stab" = 50, "piercing" = 30, "fire" = 0, "acid" = 0)
-#define ARMOR_MAILLE		list("blunt" = 5, "slash" = 5, "stab" = 55, "piercing" = 40, "fire" = 0, "acid" = 0)
+#define ARMOR_MAILLE_IRON	list("blunt" = 45, "slash" = 45, "stab" = 50, "piercing" = 30, "fire" = 0, "acid" = 0)
+#define ARMOR_MAILLE		list("blunt" = 55, "slash" = 55, "stab" = 55, "piercing" = 40, "fire" = 0, "acid" = 0)
 #define ARMOR_MAILLE_GOOD	list("blunt" = 60, "slash" = 60, "stab" = 60, "piercing" = 45, "fire" = 0, "acid" = 0)
-
 #define ARMOR_SCALE			list("blunt" = 65, "slash" = 65, "stab" = 65, "piercing" = 65, "fire" = 0, "acid" = 0)
+#define ARMOR_BRIGANDINE	list("blunt" = 70, "slash" = 70, "stab" = 70, "piercing" = 50, "fire" = 0, "acid" = 0)
 
 // Heavy AC
-#define ARMOR_PLATE_BAD		list("blunt" = 70, "slash" = 70, "stab" = 70, "piercing" = 50, "fire" = 0, "acid" = 0)
+#define ARMOR_PLATE_BAD		list("blunt" = 75, "slash" = 75, "stab" = 75, "piercing" = 55, "fire" = 0, "acid" = 0)
 #define ARMOR_PLATE			list("blunt" = 85, "slash" = 85, "stab" = 85, "piercing" = 70, "fire" = 0, "acid" = 0)
 #define ARMOR_PLATE_GOOD	list("blunt" = 90, "slash" = 90, "stab" = 90, "piercing" = 85, "fire" = 0, "acid" = 0)
 
@@ -356,7 +394,8 @@ BCLASS_CHOP, \
 BCLASS_BLUNT, \
 BCLASS_STAB, \
 BCLASS_BITE, \
-BCLASS_TWIST)
+BCLASS_TWIST, \
+BCLASS_SHOT)
 
 #define ALL_EXCEPT_STAB list(\
 BCLASS_CUT, \
@@ -378,6 +417,7 @@ BCLASS_TWIST)
 // Plates cover only a few organs and bones
 #define ONLY_VITAL_ORGANS list(\
 BCLASS_CHOP, \
+BCLASS_STAB, \
 BCLASS_BLUNT)
 
 #define ALL_EXCEPT_CHOP_AND_STAB list(\
@@ -521,3 +561,14 @@ BCLASS_TWIST)
 		"Windmill"="windmill_bascinet",\
 		"Oathtaker"="oathtaker_bascinet",\
 		"Skull"="skull_bascinet")
+
+#define SKULLMET_ICONS list(\
+		"volf"="skullmet_volf",\
+		"bear"="skullmet_bear",\
+		"gote"="skullmet_goat")
+
+#define DENDOR_TAME_PROB_NONE 0
+#define DENDOR_TAME_PROB_LOW 25
+#define DENDOR_TAME_PROB_MEDIUM 50
+#define DENDOR_TAME_PROB_HIGH 75
+#define DENDOR_TAME_PROB_GURANTEED 100

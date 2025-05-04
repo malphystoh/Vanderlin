@@ -60,7 +60,6 @@
 	actions_types = list()
 	heat = 1000
 	light_color = LIGHT_COLOR_FLARE
-	grind_results = list(/datum/reagent/sulfur = 15)
 
 	var/fuel = 12000
 	var/on_damage = 7
@@ -132,18 +131,22 @@
 	item_state = "torch"
 	lefthand_file = 'icons/mob/inhands/items_lefthand.dmi'
 	righthand_file = 'icons/mob/inhands/items_righthand.dmi'
-	light_color = "#ff7b00"
+	light_color = "#ffb773"
 	on_damage = 2
 	flags_1 = null
-	possible_item_intents = list(/datum/intent/hit, /datum/intent/use)
+	possible_item_intents = list(/datum/intent/use, /datum/intent/hit)
 	slot_flags = ITEM_SLOT_HIP
-	var/datum/looping_sound/torchloop/soundloop
+	var/datum/looping_sound/torchloop/soundloop = null         //remove the = null to re-add the torch crackle sounds.
 	var/should_self_destruct = TRUE //added for torch burnout
 	max_integrity = 40
 	fuel = 30 MINUTES
 	light_depth = 0
 	light_height = 0
 	metalizer_result = /obj/item/flashlight/flare/torch/lantern
+
+	grid_width = 32
+	grid_height = 32
+	var/extinguish_prob = 100
 
 /obj/item/flashlight/flare/torch/getonmobprop(tag)
 	. = ..()
@@ -156,7 +159,8 @@
 
 /obj/item/flashlight/flare/torch/Initialize()
 	. = ..()
-	soundloop = new(src, FALSE)
+	if(soundloop)
+		soundloop = new(src, FALSE)
 
 /obj/item/flashlight/flare/torch/process()
 	open_flame(heat)
@@ -166,7 +170,7 @@
 		if(!fuel)
 			icon_state = "torch-empty"
 		return
-	if(!istype(loc,/obj/machinery/light/rogue/torchholder))
+	if(!istype(loc,/obj/machinery/light/fueled/torchholder))
 		if(!ismob(loc))
 			if(prob(23))
 				turn_off()
@@ -191,12 +195,12 @@
 		turn_off()
 
 /obj/item/flashlight/flare/torch/extinguish()
-	if(on)
+	if(on && prob(extinguish_prob))
 		turn_off()
 
 /obj/item/flashlight/flare/torch/turn_off()
-	playsound(src.loc, 'sound/items/firesnuff.ogg', 100)
-	soundloop.stop()
+	playsound(src.loc, 'sound/items/firesnuff.ogg', 50)
+	soundloop?.stop()
 	STOP_PROCESSING(SSobj, src)
 	..()
 	if(ismob(loc))
@@ -206,6 +210,7 @@
 	damtype = BRUTE
 
 /obj/item/flashlight/flare/torch/fire_act(added, maxstacks)
+	. = ..()
 	if(fuel)
 		if(!on)
 			playsound(src.loc, 'sound/items/firelight.ogg', 100)
@@ -213,12 +218,12 @@
 			damtype = BURN
 			update_brightness()
 			force = on_damage
-			soundloop.start()
+			soundloop?.start()
 			if(ismob(loc))
 				var/mob/M = loc
 				M.update_inv_hands()
 			START_PROCESSING(SSobj, src)
-	..()
+			return TRUE
 
 /obj/item/flashlight/flare/torch/afterattack(atom/movable/A, mob/user, proximity)
 	. = ..()
@@ -241,7 +246,7 @@
 
 /obj/item/flashlight/flare/torch/get_temperature()
 	if(on)
-		return FIRE_MINIMUM_TEMPERATURE_TO_SPREAD
+		return 150+T0C
 	return ..()
 
 /obj/item/flashlight/flare/torch/prelit/Initialize() //Prelit version, testing to see if it causes less issues with pre_equip dropping stuff in your hands
@@ -286,7 +291,9 @@
 	fuel = 120 MINUTES
 	should_self_destruct = FALSE
 	metalizer_result = null
-	smeltresult = /obj/item/ingot/iron
+	extinguish_prob = 10
+	melting_material = /datum/material/iron
+	melt_amount = 75
 
 /obj/item/flashlight/flare/torch/lantern/afterattack(atom/movable/A, mob/user, proximity)
 	. = ..()
@@ -305,9 +312,6 @@
 		turn_off()
 		STOP_PROCESSING(SSobj, src)
 
-/obj/item/flashlight/flare/torch/lantern/extinguish()
-	return
-
 /obj/item/flashlight/flare/torch/lantern/getonmobprop(tag)
 	. = ..()
 	if(tag)
@@ -322,10 +326,13 @@
 	icon_state = "bronzelamp"
 	item_state = "bronzelamp"
 	desc = "A marvel of engineering that emits a strange green glow."
-	light_outer_range = 8
-	light_color ="#4ac77e"
+	light_outer_range = 9
+	light_power = 2
+	light_color ="#3fff8f"
 	on = FALSE
-	smeltresult = /obj/item/ingot/bronze
+	extinguish_prob = 0
+	melting_material = /datum/material/bronze
+	melt_amount = 75
 
 /obj/item/flashlight/flare/torch/lantern/copper
 	name = "copper lamptern"
@@ -339,6 +346,9 @@
 	on_damage = 5
 	fuel = 120 MINUTES
 	should_self_destruct = FALSE
+	extinguish_prob = 15
+	melting_material = /datum/material/copper
+	melt_amount = 75
 
 /obj/item/flashlight/flare/torch/lantern/copper/getonmobprop(tag)
 	. = ..()

@@ -50,7 +50,7 @@
 		BT.on_gain()
 
 	//Update the body's icon so it doesnt appear debrained anymore
-	C.update_hair()
+	C.update_body()
 
 /obj/item/organ/brain/Remove(mob/living/carbon/C, special = 0, no_id_transfer = FALSE)
 	. = ..()
@@ -61,7 +61,7 @@
 
 	if((!gc_destroyed || (owner && !owner.gc_destroyed)) && !no_id_transfer)
 		transfer_identity(C)
-	C.update_hair()
+	C.update_body()
 
 /obj/item/organ/brain/prepare_eat(mob/living/carbon/human/H)
 	if( HAS_TRAIT(H, TRAIT_ROTMAN))//braaaaaains... otherwise, too important to eat.
@@ -97,7 +97,7 @@
 			return
 
 		user.visible_message("<span class='notice'>[user] starts to pour the contents of [O] onto [src].</span>", "<span class='notice'>I start to slowly pour the contents of [O] onto [src].</span>")
-		if(!do_after(user, 60, TRUE, src))
+		if(!do_after(user, 6 SECONDS, src, (IGNORE_HELD_ITEM)))
 			to_chat(user, "<span class='warning'>I failed to pour [O] onto [src]!</span>")
 			return
 
@@ -331,3 +331,6 @@
 	var/list/traumas = get_traumas_type(resilience = resilience)
 	for(var/X in traumas)
 		qdel(X)
+
+/obj/item/organ/brain/smooth
+	icon_state = "brain-smooth"

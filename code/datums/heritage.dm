@@ -108,54 +108,53 @@
 	* H is who examines us so the
 	* perspective is looker looking at lookee.
 	*/
+	var/p_He = p_they(TRUE)
+	var/is_male = FALSE
+	///Son or daughter?
+	var/progeny_title = "daughter"
 	var/txt = ""
 	//With the addition of uncle/aunt this does look a bit like spagetti code.
 	//Perspective Mother/Father
+	if(lookee.gender == MALE)
+		is_male = TRUE
+		progeny_title = "son"
 	if(familialrole_a in list(FAMILY_FATHER, FAMILY_MOTHER))
 		if(familialrole_b in FAMILY_PROGENY)
-			txt += "It's my progeny."
+			txt += "[p_He] is my [progeny_title]!"
 		if(familialrole_b == FAMILY_OMMER)
-			txt += "It's my sibling."
+			txt += "[p_He] is my [progeny_title]!"
 		if(familialrole_b == FAMILY_INLAW)
-			switch(lookee.gender)
-				if(MALE)
-					txt += "It's my son in law."
-				if(FEMALE)
-					txt += "It's my daughter in law."
+			txt += "[p_He] is my [progeny_title] in law!"
 		if(familialrole_b == FAMILY_ADOPTED)
 			if(looker.dna.species.type == lookee.dna.species.type)
-				txt += "It's my bastard."
+				txt +="[p_He] is my bastard [progeny_title]."
 			else
-				txt += "It's the adopted one."
+				txt += "[p_He] is my adopted [progeny_title]."
 
 	//Perspective Offspring
 	if(familialrole_a in list(FAMILY_PROGENY, FAMILY_ADOPTED))
 		if(familialrole_b in list(FAMILY_PROGENY, FAMILY_ADOPTED))
-			txt += "It's my sibling."
+			txt += "[p_He] is my [is_male ? "brother" : "sister"]."
 		if(familialrole_b == FAMILY_FATHER)
-			txt += "It's my father."
+			txt += "[p_He] my father."
 		if(familialrole_b == FAMILY_MOTHER)
-			txt += "It's my mother."
+			txt += "[p_He] my mother."
 		if(familialrole_b == FAMILY_OMMER)
 			switch(lookee.gender)
 				if(MALE)
-					txt += "It's my uncle."
+					txt += "[p_He] my uncle."
 				if(FEMALE)
-					txt += "It's my aunt."
+					txt += "[p_He] my aunt."
 
 	//Perspective Uncle/Aunt
 	if(familialrole_a == FAMILY_OMMER)
 		if(familialrole_b in list(FAMILY_FATHER, FAMILY_MOTHER, FAMILY_OMMER))
-			txt += "It's my sibling."
+			txt += "[p_He] is my [is_male ? "brother" : "sister"]."
 		if(familialrole_b in list(FAMILY_PROGENY, FAMILY_ADOPTED))
-			switch(lookee.gender)
-				if(MALE)
-					txt += "It's my nephew."
-				if(FEMALE)
-					txt += "It's my niece."
+			txt += "[p_He] is my [is_male ? "nephew" : "niece"]"
 	if(txt == "")
 		return
-	return span_nicegreen("<B>[txt]</B>")
+	return span_love(span_bold("[txt]"))
 
 /*
 * Transfers someone from another family to
@@ -175,7 +174,7 @@
 */
 /datum/heritage/proc/ExpelFromHouse(mob/living/carbon/human/shunned)
 	family.Remove(shunned)
-	to_chat(src, "Your no longer part of the [housename] household.")
+	to_chat(src, "You're no longer part of the [housename] household.")
 
 /*
 * Mechanical proc for listing families.
@@ -242,6 +241,7 @@
 /datum/heritage/proc/SpeciesCalculation(datum/species/fledgling_species, datum/species/dad_species, datum/species/mom_species)
 	var/list/mixes = list(
 		"human+elf+" = /datum/species/human/halfelf,
+		"human+horc+" = /datum/species/halforc,
 		)
 	var/mix_text = ""
 	//Extremely straightforward basic parentage
@@ -253,6 +253,15 @@
 		mix_text += "human+"
 	if(istype(dad_species, /datum/species/elf) || istype(mom_species, /datum/species/elf))
 		mix_text += "elf+"
+	if(istype(dad_species, /datum/species/elf/dark) || istype(mom_species, /datum/species/elf/dark))
+		mix_text += "darkelf+"
+	if(istype(dad_species, /datum/species/dwarf/mountain) || istype(mom_species, /datum/species/dwarf/mountain))
+		mix_text += "dwarf+"
+	if(istype(dad_species, /datum/species/tieberian) || istype(mom_species, /datum/species/tieberian))
+		mix_text += "tiefling+"
+	if(istype(dad_species, /datum/species/rakshari	) || istype(mom_species, /datum/species/rakshari	))
+		mix_text += "rakshari+"
+
 	//If new hyrbids are made add the logic of their conception here.
 	if(istype(fledgling_species, mixes[mix_text]))
 		return TRUE
@@ -264,6 +273,14 @@
 	. = list(core_species.type)
 	if(istype(core_species, /datum/species/human/northern) || istype(core_species, /datum/species/elf))
 		. += /datum/species/human/halfelf
+	if(istype(core_species, /datum/species/elf/dark) || istype(core_species, /datum/species/human/northern))
+		. += /datum/species/human/halfelf
+	if(istype(core_species, /datum/species/human/northern) || istype(core_species, /datum/species/dwarf/mountain))
+		. += /datum/species/dwarf/mountain
+	if(istype(core_species, /datum/species/human/northern) || istype(core_species, /datum/species/halforc))
+		. += /datum/species/halforc
+	if(istype(core_species, /datum/species/elf/dark) || istype(core_species, /datum/species/elf))
+		. += list(/datum/species/elf,/datum/species/elf/dark)
 
 /*
 * Taken from marriage alter. This formats a name into its surname
@@ -319,12 +336,10 @@
 		return FALSE
 	for(var/mob/living/carbon/human/H in family_icons)
 		if(toggle_true)
-			iconer.family_UI = FALSE
 			iconer.client.images.Remove(family_icons[H])
 			continue
 		if(!H || H == iconer)
 			continue
-		iconer.family_UI = TRUE
 		iconer.client.images.Add(family_icons[H])
 
 //Sloppy bandaid way to apply latejoin family member icons.
@@ -346,6 +361,15 @@
 	family_icons[famicon] = I
 	return list(famicon = I)
 
+/mob/living/carbon/human/proc/ApplySpouseUI(toggle_true = FALSE)
+	if(!spouse_mob)
+		return
+	if(!spouse_indicator)
+		spouse_indicator = new('icons/relations.dmi', loc = spouse_mob, icon_state = "related")
+	if(toggle_true)
+		client.images.Remove(spouse_indicator)
+		return
+	client.images.Add(spouse_indicator)
 /*
 * Returns what UI icon this person should have.
 */
@@ -358,6 +382,8 @@
 /mob/living/carbon/human/verb/ReturnFamilyList()
 	set name = "List Family"
 	set category = "Memory"
+	if(spouse_mob)
+		to_chat(src, span_info("[spouse_mob.real_name] the [spouse_mob.dna.species.name] [spouse_mob.mind?.assigned_role.get_informed_title(spouse_mob)] is your lover."))
 	if(family_datum)
 		family_datum.ListFamily(src)
 	else
@@ -367,8 +393,14 @@
 /mob/living/carbon/human/verb/ToggleFamilyUI()
 	set name = "Toggle Family UI"
 	set category = "Memory"
+	if(spouse_mob)
+		ApplySpouseUI(family_UI)
 	if(family_datum)
 		family_datum.ApplyUI(src, family_UI)
-		to_chat(src, "FamilyUI Toggled [family_UI ? "On" : "Off"]")
 	else
 		to_chat(src, "Your not part of any notable family.")
+	if(family_UI)
+		family_UI = FALSE
+	else
+		family_UI = TRUE
+	to_chat(src, "FamilyUI Toggled [family_UI ? "On" : "Off"]")

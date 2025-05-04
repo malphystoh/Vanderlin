@@ -16,7 +16,12 @@
 	return 0
 
 /turf/open/get_slowdown(mob/user)
-	return slowdown
+	var/total_slowdown = slowdown
+	for(var/obj/obj in contents)
+		if(obj.obj_flags & BLOCK_Z_OUT_DOWN)
+			return slowdown
+		total_slowdown += obj.object_slowdown
+	return total_slowdown
 
 /turf
 	var/landsound = null
@@ -52,30 +57,6 @@
 //direction is direction of travel of air
 /turf/open/zAirOut(direction, turf/source)
 	return (direction == UP)
-
-/turf/open/Initalize_Atmos(times_fired)
-	excited = 0
-	update_visuals()
-
-	current_cycle = times_fired
-	ImmediateCalculateAdjacentTurfs()
-	for(var/i in atmos_adjacent_turfs)
-		var/turf/open/enemy_tile = i
-		var/datum/gas_mixture/enemy_air = enemy_tile.return_air()
-		if(!excited && air.compare(enemy_air))
-			//testing("Active turf found. Return value of compare(): [is_active]")
-			excited = TRUE
-			SSair.active_turfs |= src
-
-/turf/open/proc/GetHeatCapacity()
-	. = air.heat_capacity()
-
-/turf/open/proc/GetTemperature()
-	. = air.temperature
-
-/turf/open/proc/TakeTemperature(temp)
-	air.temperature += temp
-	air_update_turf()
 
 /turf/open/proc/freon_gas_act()
 	for(var/obj/I in contents)
@@ -154,12 +135,11 @@
 /turf/open/proc/ClearWet()//Nuclear option of immediately removing slipperyness from the tile instead of the natural drying over time
 	qdel(GetComponent(/datum/component/wet_floor))
 
-/turf/open/rad_act(pulse_strength)
+/turf/open/attacked_by(obj/item/I, mob/living/user)
+	if(!(flags_1 & CAN_BE_ATTACKED_1))
+		return FALSE
 	. = ..()
-	if (air.gases[/datum/gas/carbon_dioxide] && air.gases[/datum/gas/oxygen])
-		pulse_strength = min(pulse_strength,air.gases[/datum/gas/carbon_dioxide][MOLES]*1000,air.gases[/datum/gas/oxygen][MOLES]*2000) //Ensures matter is conserved properly
-		air.gases[/datum/gas/carbon_dioxide][MOLES]=max(air.gases[/datum/gas/carbon_dioxide][MOLES]-(pulse_strength/1000),0)
-		air.gases[/datum/gas/oxygen][MOLES]=max(air.gases[/datum/gas/oxygen][MOLES]-(pulse_strength/2000),0)
-		air.assert_gas(/datum/gas/pluoxium)
-		air.gases[/datum/gas/pluoxium][MOLES]+=(pulse_strength/4000)
-		air.garbage_collect()
+
+/turf/open/OnCrafted(dirin, mob/user)
+	. = ..()
+	flags_1 |= CAN_BE_ATTACKED_1

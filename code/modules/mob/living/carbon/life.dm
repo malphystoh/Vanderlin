@@ -8,97 +8,31 @@
 		damageoverlaytemp = 0
 		update_damage_hud()
 
-	if(!IS_IN_STASIS(src))
+	//Reagent processing needs to come before breathing, to prevent edge cases.
+	handle_organs()
 
-		//Reagent processing needs to come before breathing, to prevent edge cases.
-		handle_organs()
+	. = ..()
 
-		. = ..()
+	if (QDELETED(src))
+		return
 
-		if (QDELETED(src))
-			return
-
-		handle_wounds()
-		handle_embedded_objects()
-		handle_blood()
-		handle_roguebreath()
-		update_stress()
-		handle_nausea()
-		if(blood_volume > BLOOD_VOLUME_SURVIVE)
-			if(!heart_attacking)
+	handle_wounds()
+	handle_embedded_objects()
+	handle_blood()
+	handle_roguebreath()
+	update_stress()
+	handle_nausea()
+	if((blood_volume > BLOOD_VOLUME_SURVIVE) || HAS_TRAIT(src, TRAIT_BLOODLOSS_IMMUNE))
+		if(!heart_attacking)
+			if(oxyloss)
 				adjustOxyLoss(-1.6)
-			else
-				if(getOxyLoss() < 20)
-					heart_attacking = FALSE
+		else
+			if(getOxyLoss() < 20)
+				heart_attacking = FALSE
 
-		var/cant_fall_asleep = FALSE
-		var/cause = " I just can't..."
-		for(var/obj/item/clothing/thing in get_equipped_items(FALSE))
-			if(thing.clothing_flags & CANT_SLEEP_IN)
-				cant_fall_asleep = TRUE
-				cause = " \The [thing] bothers me..."
-				break
+	handle_sleep()
 
-		//Healing while sleeping in a bed
-		if(stat >= UNCONSCIOUS)
-			var/sleepy_mod = buckled?.sleepy || 0.5
-			var/bleed_rate = get_bleed_rate()
-			var/yess = HAS_TRAIT(src, TRAIT_NOHUNGER)
-			if(nutrition > 0 || yess)
-				adjust_energy(sleepy_mod * 20)
-			if(hydration > 0 || yess)
-				if(!bleed_rate)
-					blood_volume = min(blood_volume + (4 * sleepy_mod), BLOOD_VOLUME_NORMAL)
-				for(var/obj/item/bodypart/affecting as anything in bodyparts)
-					//for context, it takes 5 small cuts (0.4 x 5) or 3 normal cuts (0.8 x 3) for a bodypart to not be able to heal itself
-					if(affecting.get_bleed_rate() >= 2)
-						continue
-					if(affecting.heal_damage(sleepy_mod, sleepy_mod, required_status = BODYPART_ORGANIC))
-						src.update_damage_overlays()
-					for(var/datum/wound/wound as anything in affecting.wounds)
-						if(!wound.sleep_healing)
-							continue
-						wound.heal_wound(wound.sleep_healing * sleepy_mod)
-				adjustToxLoss( - ( sleepy_mod * 0.5) )
-				if(eyesclosed && !HAS_TRAIT(src, TRAIT_NOSLEEP))
-					Sleeping(300)
-		else if(!IsSleeping() && !HAS_TRAIT(src, TRAIT_NOSLEEP))
-			// Resting on a bed or something
-			if(buckled?.sleepy)
-				if(eyesclosed && !cant_fall_asleep || (eyesclosed && !(fallingas >= 10 && cant_fall_asleep)))
-					if(!fallingas)
-						to_chat(src, span_warning("I'll fall asleep soon..."))
-					fallingas++
-					if(fallingas > 15)
-						Sleeping(300)
-				else if(eyesclosed && fallingas >= 10 && cant_fall_asleep)
-					if(fallingas != 13)
-						to_chat(src, span_boldwarning("I can't sleep...[cause]"))
-					fallingas = 13
-				else
-					adjust_energy(buckled.sleepy * 10)
-			// Resting on the ground (not sleeping or with eyes closed and about to fall asleep)
-			else if(!(mobility_flags & MOBILITY_STAND))
-				if(eyesclosed && !cant_fall_asleep || (eyesclosed && !(fallingas >= 10 && cant_fall_asleep)))
-					if(!fallingas)
-						to_chat(src, span_warning("I'll fall asleep soon, although a bed would be more comfortable..."))
-					fallingas++
-					if(fallingas > 25)
-						Sleeping(300)
-				else if(eyesclosed && fallingas >= 10 && cant_fall_asleep)
-					if(fallingas != 13)
-						to_chat(src, span_boldwarning("I can't sleep...[cause]"))
-					fallingas = 13
-				else
-					adjust_energy(10)
-			else if(fallingas)
-				fallingas = 0
-			tiredness = min(tiredness + 1, 100)
-
-		handle_brain_damage()
-
-	else
-		. = ..()
+	handle_brain_damage()
 
 
 	check_cremation()
@@ -112,13 +46,12 @@
 	if(notransform)
 		return
 
-	if(!IS_IN_STASIS(src))
-		. = ..()
-		if (QDELETED(src))
-			return
-		handle_wounds()
-		handle_embedded_objects()
-		handle_blood()
+	. = ..()
+	if (QDELETED(src))
+		return
+	handle_wounds()
+	handle_embedded_objects()
+	handle_blood()
 
 	check_cremation()
 
@@ -129,22 +62,22 @@
 		var/painpercent = get_complex_pain() / (STAEND * 10)
 		painpercent = painpercent * 100
 
-		if(world.time > mob_timers["painstun"])
-			mob_timers["painstun"] = world.time + 100
+		if(world.time > mob_timers[MT_PAINSTUN])
+			mob_timers[MT_PAINSTUN] = world.time + 10 SECONDS
 			var/probby = 40 - (STAEND * 2)
 			probby = max(probby, 10)
-			if(lying || IsKnockdown())
+			if(lying || HAS_TRAIT(src, TRAIT_FLOORED))
 				if(prob(3) && (painpercent >= 80) )
 					emote("painmoan")
 			else
 				if(painpercent >= 100)
-					if(prob(probby))
+					if(prob(probby) && !HAS_TRAIT(src, TRAIT_NOPAINSTUN))
 						Immobilize(10)
 						emote("painscream")
 						stuttering += 5
 						addtimer(CALLBACK(src, PROC_REF(Stun), 110), 10)
 						addtimer(CALLBACK(src, PROC_REF(Knockdown), 110), 10)
-						mob_timers["painstun"] = world.time + 160
+						mob_timers[MT_PAINSTUN] = world.time + 16 SECONDS
 					else
 						emote("painmoan")
 						stuttering += 5
@@ -178,7 +111,11 @@
 				T.pollution.smell_act(src)
 
 /mob/living/proc/handle_inwater(turf/open/water/W)
-	ExtinguishMob()
+	if(lying || W.water_level == 3)
+		SoakMob(FULL_BODY)
+	else
+		if(W.water_level == 2)
+			SoakMob(BELOW_CHEST)
 
 /mob/living/carbon/handle_inwater(turf/open/water/W)
 	..()
@@ -191,8 +128,11 @@
 		reagentstouch.add_reagent(W.water_reagent, 2)
 		reagentstouch.trans_to(src, reagents.total_volume, transfered_by = src, method = TOUCH)	*/
 	if(lying)
-		adjustOxyLoss(5)
+		var/drown_damage = has_world_trait(/datum/world_trait/abyssor_rage) ? 10 : 5
+		adjustOxyLoss(drown_damage)
 		emote("drown")
+		if(stat == DEAD && client)
+			GLOB.vanderlin_round_stats[STATS_PEOPLE_DROWNED]++
 		var/datum/reagents/reagents = new()
 		reagents.add_reagent(W.water_reagent, 2)
 		reagents.trans_to(src, reagents.total_volume, transfered_by = src, method = INGEST)
@@ -224,7 +164,9 @@
 		amt += ((BPinteg) * dna?.species?.pain_mod)
 	return amt
 
-
+/mob/living/carbon/human/get_complex_pain()
+	. = ..()
+	. *= physiology.pain_mod
 
 ///////////////
 // BREATHING //
@@ -232,7 +174,67 @@
 
 //Start of a breath chain, calls breathe()
 /mob/living/carbon/handle_breathing(times_fired)
+	var/breath_effect_prob = 0
+	var/turf/turf = get_turf(src)
+	var/turf_temp = turf.temperature
+
+	if(turf_temp <= T0C - 50)
+		breath_effect_prob = 100
+	else if(turf_temp <= T0C - 25)
+		breath_effect_prob = 50
+	else if(turf_temp <= T0C - 10)
+		breath_effect_prob = 25
+	else if(turf_temp <= T0C)
+		breath_effect_prob = 15
+
+	var/turf/snow_turf = get_turf(src)
+	if(snow_shiver > world.time)
+		breath_effect_prob += 50
+	else if(snow_turf.snow)
+		breath_effect_prob += 50
+
+	if(prob(breath_effect_prob))
+		// Breathing into your mask, no particle. We can add fogged up glasses later
+		if(is_mouth_covered())
+			return
+		emit_breath_particle(/particles/fog/breath)
+
 	return
+
+/mob/living/proc/emit_breath_particle(particle_type)
+	ASSERT(ispath(particle_type, /particles))
+
+	var/obj/effect/abstract/particle_holder/holder = new(src, particle_type)
+	var/particles/breath_particle = holder.particles
+	var/breath_dir = dir
+
+	var/list/particle_grav = list(0, 0.1, 0)
+	var/list/particle_pos = list(0, 6, 0)
+	if(breath_dir & NORTH)
+		particle_grav[2] = 0.2
+		breath_particle.rotation = pick(-45, 45)
+		// Layer it behind the mob since we're facing away from the camera
+		holder.pixel_w -= 4
+		holder.pixel_y += 4
+	if(breath_dir & WEST)
+		particle_grav[1] = -0.2
+		particle_pos[1] = -5
+		breath_particle.rotation = -45
+	if(breath_dir & EAST)
+		particle_grav[1] = 0.2
+		particle_pos[1] = 5
+		breath_particle.rotation = 45
+	if(breath_dir & SOUTH)
+		particle_grav[2] = 0.2
+		breath_particle.rotation = pick(-45, 45)
+		// Shouldn't be necessary but just for parity
+		holder.pixel_w += 4
+		holder.pixel_y -= 4
+
+	breath_particle.gravity = particle_grav
+	breath_particle.position = particle_pos
+
+	QDEL_IN(holder, breath_particle.lifespan)
 
 /mob/living/carbon/proc/has_smoke_protection()
 	if(HAS_TRAIT(src, TRAIT_NOBREATH))
@@ -366,16 +368,12 @@ GLOBAL_LIST_INIT(ballmer_windows_me_msg, list("Yo man, what if, we like, uh, put
 	if(druggy)
 		adjust_drugginess(-1)
 
-	if(hallucination)
-		handle_hallucinations()
-
 	if(drunkenness)
 		drunkenness = max(drunkenness - (drunkenness * 0.04) - 0.01, 0)
 		if(drunkenness >= 1)
 			if(has_flaw(/datum/charflaw/addiction/alcoholic))
 				sate_addiction()
 		if(drunkenness >= 3)
-//			SEND_SIGNAL(src, COMSIG_ADD_MOOD_EVENT, "drunk", /datum/mood_event/drunk)
 			if(prob(3))
 				slurring += 2
 			jitteriness = max(jitteriness - 3, 0)
@@ -384,24 +382,6 @@ GLOBAL_LIST_INIT(ballmer_windows_me_msg, list("Yo man, what if, we like, uh, put
 			remove_stress(/datum/stressevent/drunk)
 		if(drunkenness >= 11 && slurring < 5)
 			slurring += 1.2
-/*
-		if(mind && (mind.assigned_role == "Scientist" || mind.assigned_role == "Research Director"))
-			if(SSresearch.science_tech)
-				if(drunkenness >= 12.9 && drunkenness <= 13.8)
-					drunkenness = round(drunkenness, 0.01)
-					var/ballmer_percent = 0
-					if(drunkenness == 13.35) // why run math if I dont have to
-						ballmer_percent = 1
-					else
-						ballmer_percent = (-abs(drunkenness - 13.35) / 0.9) + 1
-					if(prob(5))
-						say(pick(GLOB.ballmer_good_msg), forced = "ballmer")
-					SSresearch.science_tech.add_point_list(list(TECHWEB_POINT_TYPE_GENERIC = BALLMER_POINTS * ballmer_percent))
-				if(drunkenness > 26) // by this point you're into windows ME territory
-					if(prob(5))
-						SSresearch.science_tech.remove_point_list(list(TECHWEB_POINT_TYPE_GENERIC = BALLMER_POINTS))
-						say(pick(GLOB.ballmer_windows_me_msg), forced = "ballmer")
-*/
 		if(drunkenness >= 41)
 			if(prob(25))
 				confused += 2
@@ -431,7 +411,6 @@ GLOBAL_LIST_INIT(ballmer_windows_me_msg, list("Yo man, what if, we like, uh, put
 
 		if(drunkenness >= 91)
 			adjustToxLoss(5)
-//			adjustOrganLoss(ORGAN_SLOT_BRAIN, 0.4)
 			if(prob(20) && !stat)
 				to_chat(src, "<span class='warning'>Just a quick nap...</span>")
 				Sleeping(900)
@@ -523,7 +502,7 @@ GLOBAL_LIST_INIT(ballmer_windows_me_msg, list("Yo man, what if, we like, uh, put
 			head.cremation_progress += rand(1,4)
 			if(head.cremation_progress >= 50)
 				if(head.status == BODYPART_ORGANIC) //Non-organic limbs don't burn
-					limb.skeletonize()
+					head.skeletonize()
 					should_update_body = TRUE
 					head.drop_limb()
 					head.visible_message("<span class='warning'>[src]'s head crumbles into ash!</span>")
@@ -595,7 +574,10 @@ GLOBAL_LIST_INIT(ballmer_windows_me_msg, list("Yo man, what if, we like, uh, put
 		return FALSE
 	return TRUE
 
-/mob/living/carbon/proc/set_heartattack(status)
+/mob/living/proc/set_heartattack(status)
+	return
+
+/mob/living/carbon/set_heartattack(status)
 	if(!can_heartattack())
 		return FALSE
 
@@ -604,3 +586,85 @@ GLOBAL_LIST_INIT(ballmer_windows_me_msg, list("Yo man, what if, we like, uh, put
 		return
 
 	heart.beating = !status
+
+/// Handles sleep. Mobs with no_sleep trait cannot sleep.
+/*
+*	The mob tries to go to sleep or IS sleeping
+*
+*	Accounts for...
+*	TRAIT_NOSLEEP
+*	CANT_SLEEP_IN
+*	Hunger and Hydration.
+*/
+
+/mob/living/carbon/proc/handle_sleep()
+	if(HAS_TRAIT(src, TRAIT_NOSLEEP))
+		return
+	var/cant_fall_asleep = FALSE
+	var/cause = " I just can't..."
+	for(var/obj/item/clothing/thing in get_equipped_items(FALSE))
+		if(thing.clothing_flags & CANT_SLEEP_IN)
+			cant_fall_asleep = TRUE
+			cause = " \The [thing] bothers me..."
+			break
+
+	//Healing while sleeping in a bed
+	if(stat >= UNCONSCIOUS)
+		var/sleepy_mod = buckled?.sleepy || 0.5
+		var/bleed_rate = get_bleed_rate()
+		var/yess = HAS_TRAIT(src, TRAIT_NOHUNGER)
+		if(nutrition > 0 || yess)
+			adjust_energy(sleepy_mod * (max_energy * 0.02))
+		if(HAS_TRAIT(src, TRAIT_BETTER_SLEEP))
+			adjust_energy(sleepy_mod * (max_energy * 0.004))
+		if(locate(/obj/item/bedsheet) in get_turf(src))
+			adjust_energy(sleepy_mod * (max_energy * 0.004))
+		if(hydration > 0 || yess)
+			if(!bleed_rate)
+				blood_volume = min(blood_volume + (4 * sleepy_mod), BLOOD_VOLUME_NORMAL)
+			for(var/obj/item/bodypart/affecting as anything in bodyparts)
+				//for context, it takes 5 small cuts (0.4 x 5) or 3 normal cuts (0.8 x 3) for a bodypart to not be able to heal itself
+				if(affecting.get_bleed_rate() >= 2)
+					continue
+				if(affecting.heal_damage(sleepy_mod * 1.5, sleepy_mod * 1.5, required_status = BODYPART_ORGANIC)) // multiplier due to removing healing from sleep effect
+					src.update_damage_overlays()
+				for(var/datum/wound/wound as anything in affecting.wounds)
+					if(!wound.sleep_healing)
+						continue
+					wound.heal_wound(wound.sleep_healing * sleepy_mod)
+			adjustToxLoss( - ( sleepy_mod * 0.5) )
+			if(eyesclosed && !HAS_TRAIT(src, TRAIT_NOSLEEP))
+				Sleeping(300)
+		tiredness = 0
+	else if(!IsSleeping() && !HAS_TRAIT(src, TRAIT_NOSLEEP))
+		// Resting on a bed or something
+		if(buckled?.sleepy)
+			if(eyesclosed && !cant_fall_asleep || (eyesclosed && !(fallingas >= 10 && cant_fall_asleep)))
+				if(!fallingas)
+					to_chat(src, span_warning("I'll fall asleep soon..."))
+				fallingas++
+				if(fallingas > 15)
+					Sleeping(300)
+			else if(eyesclosed && fallingas >= 10 && cant_fall_asleep)
+				if(fallingas != 13)
+					to_chat(src, span_boldwarning("I can't sleep...[cause]"))
+				fallingas -= 5
+			else
+				adjust_energy(buckled.sleepy * (max_energy * 0.01))
+		// Resting on the ground (not sleeping or with eyes closed and about to fall asleep)
+		else if(!(mobility_flags & MOBILITY_STAND))
+			if(eyesclosed && !cant_fall_asleep || (eyesclosed && !(fallingas >= 10 && cant_fall_asleep)))
+				if(!fallingas)
+					to_chat(src, span_warning("I'll fall asleep soon, although a bed would be more comfortable..."))
+				fallingas++
+				if(fallingas > 25)
+					Sleeping(300)
+			else if(eyesclosed && fallingas >= 10 && cant_fall_asleep)
+				if(fallingas != 13)
+					to_chat(src, span_boldwarning("I can't sleep...[cause]"))
+				fallingas -= 5
+			else
+				adjust_energy((max_energy * 0.01))
+		else if(fallingas)
+			fallingas = 0
+		tiredness = min(tiredness + 1, 100)

@@ -20,6 +20,7 @@ Sunlight System
 
 */
 /obj
+	var/object_slowdown = 0
 	var/weatherproof = FALSE
 	var/weather = FALSE
 
@@ -106,7 +107,7 @@ Sunlight System
 		if(T.opacity) /* get_corners used to do opacity checks for arse */
 			continue
 		if (!T.lighting_corners_initialised)
-			T.generate_missing_corners()
+			T.lighting_build_overlay()
 		corners |= T.corners
 		turfs += T
 
@@ -205,6 +206,12 @@ Sunlight System
 	if(outdoor_effect)
 		outdoor_effect.state = TempState
 		outdoor_effect.weatherproof = roofStat["WEATHERPROOF"]
+		if(outdoor_effect.weatherproof)
+			SSParticleWeather.weathered_turfs -= src
+		else
+			if(((turf_flags & TURF_EFFECT_AFFECTABLE) && (z in SSoutdoor_effects.turf_weather_affectable_z_levels)))
+				SSParticleWeather.weathered_turfs |= src
+
 
 /* runs up the Z stack for this turf, returns a assoc (SKYVISIBLE, WEATHERPROOF)*/
 /* pass recursionStarted=TRUE when we are checking our ceiling's stats */

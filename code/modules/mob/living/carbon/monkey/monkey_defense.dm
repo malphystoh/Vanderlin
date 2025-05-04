@@ -54,7 +54,7 @@
 								"<span class='danger'>I avoid [M]'s punch!</span>", "<span class='hear'>I hear a swoosh!</span>", COMBAT_MESSAGE_RANGE, M)
 				to_chat(M, "<span class='warning'>My punch misses [name]!</span>")
 		if(INTENT_DISARM)
-			if(!IsUnconscious())
+			if(stat < UNCONSCIOUS)
 				M.do_attack_animation(src, ATTACK_EFFECT_DISARM)
 				if (prob(25))
 					Paralyze(40)
@@ -101,7 +101,7 @@
 
 
 /mob/living/carbon/monkey/ex_act(severity, target, origin)
-	if(origin && istype(origin, /datum/spacevine_mutation) && isvineimmune(src))
+	if(origin && istype(origin, /datum/vine_mutation) && isvineimmune(src))
 		return
 	..()
 

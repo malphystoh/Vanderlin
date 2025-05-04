@@ -9,7 +9,7 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 	maxHealth = 20
 	gender = PLURAL //placeholder
 
-	status_flags = CANPUSH
+	status_flags = CANPUSH|CANSLOWDOWN|CANSTUN
 
 	simpmob_attack = 45
 	simpmob_defend = 45
@@ -165,6 +165,7 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 	var/footstep_type
 
 	var/food = 0	//increase to make poop
+	var/food_max = 50
 	var/production = 0
 	var/pooptype = /obj/item/natural/poo/horse
 	var/pooprog = 0
@@ -175,16 +176,21 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 	cmode = 1
 
 	var/remains_type
+	var/binded = FALSE
 
 	var/botched_butcher_results
 	var/perfect_butcher_results
 
 	var/obj/item/udder/udder = null
-	var/obj/item/gudder/gudder = null
+	var/datum/reagent/milk_reagent = null
 
 /mob/living/simple_animal/Initialize()
 	. = ..()
-	GLOB.simple_animals[AIStatus] += src
+	if(!(AIStatus in GLOB.simple_animals))
+		GLOB.simple_animals |= "[AIStatus]"
+		GLOB.simple_animals["[AIStatus]"] = list()
+
+	GLOB.simple_animals["[AIStatus]"] += src
 	if(gender == PLURAL)
 		gender = pick(MALE,FEMALE)
 	if(!real_name)
@@ -192,11 +198,13 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 	if(!loc)
 		stack_trace("Simple animal being instantiated in nullspace")
 	update_simplemob_varspeed()
+	if(milk_reagent)
+		udder = new(src, milk_reagent)
 //	if(dextrous)
 //		AddComponent(/datum/component/personal_crafting)
 
 /mob/living/simple_animal/Destroy()
-	GLOB.simple_animals[AIStatus] -= src
+	GLOB.simple_animals["[AIStatus]"] -= src
 	if (SSnpcpool.state == SS_PAUSED && LAZYLEN(SSnpcpool.currentrun))
 		SSnpcpool.currentrun -= src
 
@@ -212,33 +220,68 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 	if (T && AIStatus == AI_Z_OFF)
 		SSidlenpcpool.idle_mobs_by_zlevel[T.z] -= src
 
+	qdel(udder)
+	udder = null
+
 	return ..()
 
 /mob/living/simple_animal/attackby(obj/item/O, mob/user, params)
+	if(!stat && istype(O, /obj/item/reagent_containers/glass))
+		if(udder && user.used_intent.type == INTENT_FILL)
+			changeNext_move(20) // milking sound length
+			udder.milkAnimal(O, user)
+			return TRUE
 	if(!is_type_in_list(O, food_type))
-		..()
-		return
+		return ..()
 	else
-		if(!stat)
-			user.visible_message("<span class='info'>[user] hand-feeds [O] to [src].</span>", "<span class='notice'>I hand-feed [O] to [src].</span>")
-			playsound(loc,'sound/misc/eat.ogg', rand(30,60), TRUE)
-			qdel(O)
-			food = min(food + 30, 100)
-			if(tame && owner == user)
-				return
-			var/realchance = tame_chance
-			if(realchance)
-				if(user.mind)
-					realchance += (user.mind.get_skill_level(/datum/skill/labor/taming) * 20)
-				if(prob(realchance))
-					tamed(user)
-				else
-					tame_chance += bonus_tame_chance
+		if(try_tame(O, user))
+			return TRUE
+	. = ..()
+
+/mob/living/simple_animal/proc/try_tame(obj/item/O, mob/user)
+	if(!stat)
+		user.visible_message("<span class='info'>[user] hand-feeds [O] to [src].</span>", "<span class='notice'>I hand-feed [O] to [src].</span>")
+		playsound(loc,'sound/misc/eat.ogg', rand(30,60), TRUE)
+		qdel(O)
+		food = min(food + 30, 100)
+		if(tame && owner == user)
+			return TRUE
+		var/realchance = tame_chance
+		if(realchance)
+			if(user.mind)
+				realchance += (user.mind.get_skill_level(/datum/skill/labor/taming) * 20)
+			if(prob(realchance))
+				tamed(user)
+			else
+				tame_chance += bonus_tame_chance
+		return TRUE
 
 ///Extra effects to add when the mob is tamed, such as adding a riding component
 /mob/living/simple_animal/proc/tamed(mob/user)
 	INVOKE_ASYNC(src, PROC_REF(emote), "lower_head", null, null, null, TRUE)
 	tame = TRUE
+	if(user)
+		befriend(user)
+	pet_passive = TRUE
+
+	if(ai_controller)
+		ai_controller.can_idle = FALSE
+		var/static/list/pet_commands = list(
+			/datum/pet_command/idle,
+			/datum/pet_command/free,
+			/datum/pet_command/good_boy,
+			/datum/pet_command/follow,
+			/datum/pet_command/attack,
+			/datum/pet_command/fetch,
+			/datum/pet_command/play_dead,
+			/datum/pet_command/protect_owner,
+			/datum/pet_command/aggressive,
+			/datum/pet_command/calm,
+		)
+		var/datum/component/obeys_commands/commands = GetComponent(/datum/component/obeys_commands)
+		if(!commands)
+			AddComponent(/datum/component/obeys_commands, pet_commands)
+
 	stop_automated_movement_when_pulled = TRUE
 	if(user)
 		owner = user
@@ -311,7 +354,11 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 
 /mob/living/simple_animal/proc/handle_automated_movement()
 	set waitfor = FALSE
-	if(!stop_automated_movement && wander && !doing)
+	if(binded)
+		return
+	if(ai_controller)
+		return
+	if(!stop_automated_movement && wander && !doing())
 		if(ssaddle && has_buckled_mobs())
 			return 0
 		if((isturf(loc) || allow_movement_on_non_turfs) && (mobility_flags & MOBILITY_MOVE))		//This is so it only moves if it's not inside a closet, gentics machine, etc.
@@ -359,63 +406,14 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 					else
 						emote("me", 2, pick(emote_hear))
 
-
-/mob/living/simple_animal/proc/environment_is_safe(datum/gas_mixture/environment, check_temp = FALSE)
-	. = TRUE
-
-	if(pulledby && pulledby.grab_state >= GRAB_KILL && atmos_requirements["min_oxy"])
-		. = FALSE //getting choked
-
-	if(isturf(src.loc) && isopenturf(src.loc))
-		var/turf/open/ST = src.loc
-		if(ST.air)
-			var/ST_gases = ST.air.gases
-			ST.air.assert_gases(arglist(GLOB.hardcoded_gases))
-
-			var/tox = ST_gases[/datum/gas/plasma][MOLES]
-			var/oxy = ST_gases[/datum/gas/oxygen][MOLES]
-			var/n2  = ST_gases[/datum/gas/nitrogen][MOLES]
-			var/co2 = ST_gases[/datum/gas/carbon_dioxide][MOLES]
-
-			ST.air.garbage_collect()
-
-			if(atmos_requirements["min_oxy"] && oxy < atmos_requirements["min_oxy"])
-				. = FALSE
-			else if(atmos_requirements["max_oxy"] && oxy > atmos_requirements["max_oxy"])
-				. = FALSE
-			else if(atmos_requirements["min_tox"] && tox < atmos_requirements["min_tox"])
-				. = FALSE
-			else if(atmos_requirements["max_tox"] && tox > atmos_requirements["max_tox"])
-				. = FALSE
-			else if(atmos_requirements["min_n2"] && n2 < atmos_requirements["min_n2"])
-				. = FALSE
-			else if(atmos_requirements["max_n2"] && n2 > atmos_requirements["max_n2"])
-				. = FALSE
-			else if(atmos_requirements["min_co2"] && co2 < atmos_requirements["min_co2"])
-				. = FALSE
-			else if(atmos_requirements["max_co2"] && co2 > atmos_requirements["max_co2"])
-				. = FALSE
-		else
-			if(atmos_requirements["min_oxy"] || atmos_requirements["min_tox"] || atmos_requirements["min_n2"] || atmos_requirements["min_co2"])
-				. = FALSE
-
-	if(check_temp)
-		var/areatemp = get_temperature(environment)
-		if((areatemp < minbodytemp) || (areatemp > maxbodytemp))
-			. = FALSE
-
-
-/mob/living/simple_animal/handle_environment(datum/gas_mixture/environment)
+/mob/living/simple_animal/handle_environment()
 	var/atom/A = src.loc
 	if(isturf(A))
-		var/areatemp = get_temperature(environment)
+		var/areatemp = BODYTEMP_NORMAL
 		if( abs(areatemp - bodytemperature) > 5)
 			var/diff = areatemp - bodytemperature
 			diff = diff / 5
 			adjust_bodytemperature(diff)
-
-	if(!environment_is_safe(environment))
-		adjustHealth(unsuitable_atmos_damage)
 
 	handle_temperature_damage()
 
@@ -429,14 +427,18 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 		var/boon = user.mind.get_learning_boon(/datum/skill/labor/butchering)
 		if(held_item)
 			if((butcher_results || guaranteed_butcher_results) && held_item.get_sharpness() && held_item.wlength == WLENGTH_SHORT)
-				var/used_time = 210
+				if(src.buckled && istype(src.buckled, /obj/structure/meathook))
+					var/obj/structure/meathook/hook = buckled
+					hook.butchery(user, src)
+					return
+				var/used_time = 21 SECONDS
 				if(user.mind)
-					used_time -= (user.mind.get_skill_level(/datum/skill/labor/butchering) * 30)
+					used_time -= (user.mind.get_skill_level(/datum/skill/labor/butchering) * 3 SECONDS)
 				visible_message("[user] begins to butcher [src].")
 				playsound(src, 'sound/foley/gross.ogg', 100, FALSE)
 				var/amt2raise = user.STAINT // this is due to the fact that butchering is not as spammable as training a sword because you cant just spam click
-				if(do_after(user, used_time, target = src))
-					user.mind.adjust_experience(/datum/skill/labor/butchering, amt2raise * boon, FALSE)
+				if(do_after(user, used_time, src))
+					user.mind.add_sleep_experience(/datum/skill/labor/butchering, amt2raise * boon, FALSE)
 					butcher(user)
 	..()
 
@@ -545,6 +547,7 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 			transform = transform.Turn(180)
 		density = FALSE
 		..()
+		SEND_SIGNAL(src, COMSIG_MOB_STATCHANGE, DEAD)
 
 /mob/living/simple_animal/proc/CanAttack(atom/the_target)
 	if(see_invisible < the_target.invisibility)
@@ -561,9 +564,11 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 
 /mob/living/simple_animal/handle_fire()
 	. = ..()
-	if(fire_stacks > 0)
+	if(!on_fire)
+		return TRUE
+	if(fire_stacks + divine_fire_stacks > 0)
 		apply_damage(5, BURN)
-		if(fire_stacks > 5)
+		if(fire_stacks + divine_fire_stacks > 5)
 			apply_damage(10, BURN)
 
 //mob/living/simple_animal/IgniteMob()
@@ -619,6 +624,7 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 		var/childspawn = pickweight(childtype)
 		var/turf/target = get_turf(loc)
 		if(target)
+			GLOB.vanderlin_round_stats[STATS_ANIMALS_BRED]++
 			return new childspawn(target)
 //			visible_message("<span class='warning'>[src] finally gives birth.</span>")
 //			playsound(src, 'sound/foley/gross.ogg', 100, FALSE)
@@ -648,8 +654,15 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 	else
 		..()
 
+/mob/living/simple_animal/update_resting()
+	if(resting)
+		ADD_TRAIT(src, TRAIT_IMMOBILIZED, RESTING_TRAIT)
+	else
+		REMOVE_TRAIT(src, TRAIT_IMMOBILIZED, RESTING_TRAIT)
+	return ..()
+
 /mob/living/simple_animal/update_mobility(value_otherwise = TRUE)
-	if(IsUnconscious() || IsParalyzed() || IsStun() || IsKnockdown() || IsParalyzed() || stat || resting)
+	if(HAS_TRAIT_NOT_FROM(src, TRAIT_IMMOBILIZED, BUCKLED_TRAIT))
 		drop_all_held_items()
 		mobility_flags = NONE
 	else if(buckled)
@@ -775,7 +788,7 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 			time2mount = 40
 	if(ssaddle)
 		playsound(src, 'sound/foley/saddledismount.ogg', 100, TRUE)
-	if(!move_after(M,time2mount, target = src))
+	if(!do_after(M, time2mount, src, (IGNORE_USER_LOC_CHANGE | IGNORE_TARGET_LOC_CHANGE)))
 		if(amt < 3) // Skilled prevents you from fumbling
 			M.Paralyze(50)
 			M.Stun(50)
@@ -804,7 +817,7 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 			else
 				time2mount = 50
 
-		if(!move_after(M,time2mount, target = src))
+		if(!do_after(M, time2mount, src))
 			return
 		if(user.incapacitated())
 			return
@@ -850,8 +863,8 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 				var/amt = user.mind.get_skill_level(/datum/skill/misc/riding)
 				if(amt)
 					amt = clamp(amt, 0, 4) //higher speed amounts are a little wild. Max amount achieved at expert riding.
-					riding_datum.vehicle_move_delay -= (amt/5 + 2)
-				riding_datum.vehicle_move_delay -= 3
+					riding_datum.vehicle_move_delay -= (amt/5 + 1.5)
+					riding_datum.vehicle_move_delay -= 3
 			if(loc != oldloc)
 				var/obj/structure/mineral_door/MD = locate() in loc
 				if(MD && !MD.ridethrough)
@@ -880,8 +893,10 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 					SSidlenpcpool.idle_mobs_by_zlevel[T.z] -= src
 				else
 					SSidlenpcpool.idle_mobs_by_zlevel[T.z] += src
-			GLOB.simple_animals[AIStatus] -= src
-			GLOB.simple_animals[togglestatus] += src
+			GLOB.simple_animals["[AIStatus]"] -= src
+			if(!(togglestatus in GLOB.simple_animals))
+				GLOB.simple_animals["[togglestatus]"] = list()
+			GLOB.simple_animals["[togglestatus]"] += src
 			AIStatus = togglestatus
 		else
 			stack_trace("Something attempted to set simple animals AI to an invalid state: [togglestatus]")
@@ -903,21 +918,7 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 		SSidlenpcpool.idle_mobs_by_zlevel[old_z] -= src
 		toggle_ai(initial(AIStatus))
 
-/mob/living/simple_animal/Move()
-	. = ..()
-//	if(!stat)
-//		eat_plants()
-
 /mob/living/simple_animal/proc/eat_plants()
-//	if(food >= 10 MINUTES)
-//		return
-
-//	var/obj/structure/spacevine/SV = locate(/obj/structure/spacevine) in loc
-//	if(SV)
-//		SV.eat(src)
-//		eaten = TRUE
-//		food = min(food + 5 MINUTES, 10 MINUTES)
-
 	var/obj/item/reagent_containers/food/I = locate(/obj/item/reagent_containers/food) in loc
 	if(is_type_in_list(I, food_type))
 		qdel(I)
@@ -935,10 +936,6 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 				if(production > 0)
 					production--
 					udder.generateMilk()
-			if(gudder)						// for goat milk
-				if(production > 0)
-					production--
-					gudder.generateMilk()
 			if(pooprog >= 100)
 				pooprog = 0
 				poop()
@@ -949,31 +946,39 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 			playsound(src, "fart", 50, TRUE)
 			new pooptype(loc)
 
-//................. UDDER (MOO-BEAST) .......................//
+//................. UDDER .......................//
 /obj/item/udder
 	name = "udder"
+	var/datum/reagent/milk_reagent = /datum/reagent/consumable/milk
 
-/obj/item/udder/Initialize()
+/obj/item/udder/Initialize(mapload, datum/reagent/reagent)
 	create_reagents(100)
-	reagents.add_reagent(/datum/reagent/consumable/milk, rand(0,20))
+	if(reagent)
+		milk_reagent = reagent
+	reagents.add_reagent(milk_reagent, rand(0,20))
 	. = ..()
 
 /obj/item/udder/proc/generateMilk()
-	reagents.add_reagent(/datum/reagent/consumable/milk, 1)
+	reagents.add_reagent(milk_reagent, 1)
 
 /obj/item/udder/proc/milkAnimal(obj/O, mob/living/user = usr)
 	var/obj/item/reagent_containers/glass/G = O
 	if(G.reagents.total_volume >= G.volume)
 		to_chat(user, span_warning("[O] is full."))
 		return
-	if(!reagents.has_reagent(/datum/reagent/consumable/milk, 5))
-		to_chat(user, span_warning("The udder is dry. Wait a bit longer..."))
+	if(!reagents.has_reagent(milk_reagent, 5))
+		to_chat(user, span_warning("[src] is dry. Wait a bit longer..."))
 		user.changeNext_move(10)
 		return
-	if(do_after(user, 1 SECONDS, target = src))
+	if(do_after(user, 1 SECONDS, src))
 		reagents.trans_to(O, rand(5,10))
 		user.visible_message(span_notice("[user] milks [src] using \the [O]"))
 		playsound(O, pick('sound/vo/mobs/cow/milking (1).ogg', 'sound/vo/mobs/cow/milking (2).ogg'), 100, TRUE, -1)
 		user.Immobilize(1 SECONDS)
-		user.changeNext_move(10)
+		user.changeNext_move(1 SECONDS)
 
+
+/mob/living/simple_animal/proc/handle_habitation(obj/structure/home)
+	SHOULD_CALL_PARENT(TRUE)
+	var/drop_location = (src in home.contents) ? get_turf(home) : home
+	forceMove(drop_location)

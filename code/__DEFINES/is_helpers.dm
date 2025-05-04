@@ -20,21 +20,15 @@ GLOBAL_LIST_INIT(turfs_without_ground, typecacheof(list(
 	/turf/open/transparent/openspace
 	)))
 
-GLOBAL_LIST_INIT(our_forest_sex, typecacheof(list(
-	/area/rogue/outdoors/woods,
-	/area/rogue/indoors/shelter/woods,
-	/area/rogue/outdoors/river,
-	/area/rogue/outdoors/bog,
-	/area/rogue/indoors/shelter/bog,
-	/area/rogue/outdoors/rtfield,
-	/area/rogue/indoors/shelter/rtfield
-	)))
+#define isclient(A) istype(A, /client)
 
-#define isforestsex(A) (is_type_in_typecache(A, GLOB.our_forest_sex))
+#define ismind(A) istype(A, /datum/mind)
 
 #define isgroundlessturf(A) (is_type_in_typecache(A, GLOB.turfs_without_ground))
 
 #define isopenturf(A) (istype(A, /turf/open))
+
+#define isopenspace(A) (istype(A, /turf/open/transparent/openspace))
 
 #define isindestructiblefloor(A) (istype(A, /turf/open/indestructible))
 
@@ -50,8 +44,6 @@ GLOBAL_LIST_INIT(our_forest_sex, typecacheof(list(
 
 #define islava(A) (istype(A, /turf/open/lava))
 
-#define ischasm(A) (istype(A, /turf/open/chasm))
-
 #define isplatingturf(A) (istype(A, /turf/open/floor/plating))
 
 #define istransparentturf(A) (istype(A, /turf/open/transparent) || istype(A, /turf/closed/transparent))
@@ -63,7 +55,7 @@ GLOBAL_LIST_INIT(our_forest_sex, typecacheof(list(
 
 //Carbon mobs
 #define iscarbon(A) (istype(A, /mob/living/carbon))
-
+#define isroguespirit(A) (istype(A, /mob/living/carbon/spirit)) //underworld spirit
 #define ishuman(A) (istype(A, /mob/living/carbon/human))
 
 //Human sub-species
@@ -97,10 +89,6 @@ GLOBAL_LIST_INIT(our_forest_sex, typecacheof(list(
 
 #define iscat(A) (istype(A, /mob/living/simple_animal/pet/cat))
 
-#define isdog(A) (istype(A, /mob/living/simple_animal/pet/dog))
-
-#define iscorgi(A) (istype(A, /mob/living/simple_animal/pet/dog/corgi))
-
 #define ishostile(A) (istype(A, /mob/living/simple_animal/hostile))
 
 #define isclown(A) (istype(A, /mob/living/simple_animal/hostile/retaliate/clown))
@@ -110,7 +98,6 @@ GLOBAL_LIST_INIT(our_forest_sex, typecacheof(list(
 #define isobserver(A) (istype(A, /mob/dead/observer))
 
 #define isrogueobserver(A) (istype(A, /mob/dead/observer/rogue))
-#define isroguespirit(A) (istype(A, /mob/living/carbon/spirit)) //underworld spirit
 
 #define isdead(A) (istype(A, /mob/dead))
 
@@ -157,10 +144,41 @@ GLOBAL_LIST_INIT(pointed_types, typecacheof(list(
 
 #define isblobmonster(O) (istype(O, /mob/living/simple_animal/hostile/blob))
 
-#define isshuttleturf(T) (length(T.baseturfs) && (/turf/baseturf_skipover/shuttle in T.baseturfs))
-
 GLOBAL_LIST_INIT(RATS_DONT_EAT, typecacheof(list(
 	/obj/item/reagent_containers/food/snacks/smallrat,
 	/obj/item/reagent_containers/food/snacks/produce/onion,
 	/obj/item/reagent_containers/food/snacks/produce/jacksberry/poison
 	)))
+
+// Jobs
+// Meta\Unsorted
+	//#define is__job(job_type) (istype(job_type, /datum/job/)) //template for easy filling in
+	#define is_unassigned_job(job_type) (istype(job_type, /datum/job/unassigned))
+// Nobility
+	#define is_lord_job(job_type) (istype(job_type, /datum/job/lord))
+	#define is_consort_job(job_type) (istype(job_type, /datum/job/consort))
+	#define is_merchant_job(job_type) (istype(job_type, /datum/job/merchant))
+	#define is_steward_job(job_type) (istype(job_type, /datum/job/steward))
+// Garrison
+// Church
+	#define is_priest_job(job_type) (istype(job_type, /datum/job/priest))
+	#define is_monk_job(job_type) (istype(job_type, /datum/job/monk))
+	#define is_inquisitor_job(job_type) (istype(job_type, /datum/job/inquisitor))
+	#define is_adept_job(job_type) (istype(job_type, /datum/job/adept))
+// Serfs
+	#define is_gaffer_job(job_type) (istype(job_type, /datum/job/gaffer))
+// Peasantry
+	#define is_adventurer_job(job_type) (istype(job_type, /datum/job/adventurer))
+	#define is_mercenary_job(job_type) (istype(job_type, /datum/job/mercenary))
+	#define is_pilgrim_job(job_type) (istype(job_type, /datum/job/pilgrim))
+	#define is_vagrant_job(job_type) (istype(job_type, /datum/job/vagrant))
+//  Apprentices
+	#define is_gaffer_assistant_job(job_type) (istype(job_type, /datum/job/gaffer_assistant))
+// Villains
+	#define is_skeleton_job(job_type) (istype(job_type, /datum/job/skeleton))
+		#define is_skeleton_knight_job(job_type) (istype(job_type, /datum/job/skeleton/knight))
+	#define is_rousman_job(job_type) (istype(job_type, /datum/job/rousman))
+	#define is_goblin_job(job_type) (istype(job_type, /datum/job/goblin))
+
+// seemingly deprecated:
+//"Preacher" //as a job, there is an equivalent class

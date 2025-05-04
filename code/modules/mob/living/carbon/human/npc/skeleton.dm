@@ -1,12 +1,14 @@
 /mob/living/carbon/human/species/skeleton
 	name = "skeleton"
 
+	icon = 'icons/roguetown/mob/monster/skeletons.dmi'
+	icon_state = "skeleton"
 	race = /datum/species/human/northern
 	gender = MALE
 	bodyparts = list(/obj/item/bodypart/chest, /obj/item/bodypart/head, /obj/item/bodypart/l_arm,
 					/obj/item/bodypart/r_arm, /obj/item/bodypart/r_leg, /obj/item/bodypart/l_leg)
-	faction = list("undead")
-	var/skel_outfit = /datum/outfit/job/roguetown/npc/skeleton
+	faction = list(FACTION_UNDEAD)
+	var/skel_outfit = /datum/outfit/job/npc/skeleton
 	ambushable = FALSE
 	rot_type = null
 	base_intents = list(INTENT_HELP, INTENT_DISARM, INTENT_GRAB, /datum/intent/unarmed/claw)
@@ -14,7 +16,11 @@
 	possible_mmb_intents = list(INTENT_STEAL, INTENT_JUMP, INTENT_KICK, INTENT_BITE)
 	possible_rmb_intents = list(/datum/rmb_intent/feint, /datum/rmb_intent/aimed, /datum/rmb_intent/strong, /datum/rmb_intent/weak)
 	stand_attempts = 4
-	cmode_music = 'sound/music/antag/combatskeleton.ogg'
+	cmode_music = 'sound/music/cmode/antag/combatskeleton.ogg'
+
+/mob/living/carbon/species/skeleton/Initialize()
+	. = ..()
+	ADD_TRAIT(src, TRAIT_NOSLEEP, TRAIT_GENERIC)
 
 /mob/living/carbon/human/species/skeleton/npc/no_equipment
 	skel_outfit = null
@@ -23,9 +29,7 @@
 	skel_outfit = null
 
 /mob/living/carbon/human/species/skeleton/npc
-	aggressive = 1
-	mode = AI_IDLE
-	wander = TRUE
+	ai_controller = /datum/ai_controller/human_npc
 	simpmob_attack = 40
 	simpmob_defend = 0
 	wander = TRUE
@@ -41,38 +45,37 @@
 
 /mob/living/carbon/human/species/skeleton/after_creation()
 	..()
-	if(src.dna && src.dna.species)
-		src.dna.species.species_traits |= NOBLOOD
-		src.dna.species.soundpack_m = new /datum/voicepack/skeleton()
-		src.dna.species.soundpack_f = new /datum/voicepack/skeleton()
-	var/obj/item/bodypart/O = src.get_bodypart(BODY_ZONE_R_ARM)
+	if(dna && dna.species)
+		dna.species.species_traits |= NOBLOOD
+		dna.species.soundpack_m = new /datum/voicepack/skeleton()
+		dna.species.soundpack_f = new /datum/voicepack/skeleton()
+		var/obj/item/bodypart/head/headdy = get_bodypart("head")
+		if(headdy)
+			headdy.icon = 'icons/roguetown/mob/monster/skeletons.dmi'
+			headdy.icon_state = "skull"
+			headdy.headprice = rand(5,15)
+	var/obj/item/bodypart/O = get_bodypart(BODY_ZONE_R_ARM)
 	if(O)
 		O.drop_limb()
 		qdel(O)
-	O = src.get_bodypart(BODY_ZONE_L_ARM)
+	O = get_bodypart(BODY_ZONE_L_ARM)
 	if(O)
 		O.drop_limb()
 		qdel(O)
-	src.regenerate_limb(BODY_ZONE_R_ARM)
-	src.regenerate_limb(BODY_ZONE_L_ARM)
+	regenerate_limb(BODY_ZONE_R_ARM)
+	regenerate_limb(BODY_ZONE_L_ARM)
 	for(var/obj/item/bodypart/B in src.bodyparts)
-		B.skeletonize()
-	var/obj/item/organ/eyes/eyes = src.getorganslot(ORGAN_SLOT_EYES)
-	if(eyes)
-		eyes.Remove(src,1)
-		QDEL_NULL(eyes)
-	eyes = new /obj/item/organ/eyes/night_vision/zombie
-	eyes.Insert(src)
-	src.underwear = "Nude"
-	if(src.charflaw)
-		QDEL_NULL(src.charflaw)
+		B.skeletonize(FALSE)
+	grant_undead_eyes()
+	underwear = "Nude"
+	if(charflaw)
+		QDEL_NULL(charflaw)
 	update_body()
 	mob_biotypes = MOB_UNDEAD
-	faction = list("undead")
+	faction = list(FACTION_UNDEAD)
 	name = "skeleton"
 	real_name = "skeleton"
 	ADD_TRAIT(src, TRAIT_NOMOOD, TRAIT_GENERIC)
-	ADD_TRAIT(src, TRAIT_NOSTAMINA, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOHUNGER, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_EASYDISMEMBER, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOBREATH, TRAIT_GENERIC)
@@ -86,33 +89,32 @@
 			equipOutfit(OU)
 
 
-/datum/outfit/job/roguetown/npc/skeleton/random/pre_equip(mob/living/carbon/human/H)
+/datum/outfit/job/npc/skeleton/random/pre_equip(mob/living/carbon/human/H)
 	..()
 
-	H.TOTALSTR = 6
-	H.TOTALSPD = 10
-	H.TOTALCON = 8
-	H.TOTALEND = 8
-	H.TOTALINT = 1
+	H.base_strength = 6
+	H.base_speed = 10
+	H.base_constitution = 8
+	H.base_endurance = 8
+	H.base_intelligence = 1
 
-
-/datum/outfit/job/roguetown/greater_skeleton/pre_equip(mob/living/carbon/human/H) //equipped onto Summon Greater Undead player skeletons only after the mind is added
+/datum/outfit/job/greater_skeleton/pre_equip(mob/living/carbon/human/H) //equipped onto Summon Greater Undead player skeletons only after the mind is added
 	..()
-	wrists = /obj/item/clothing/wrists/roguetown/bracers/leather
-	armor = /obj/item/clothing/suit/roguetown/armor/chainmail/iron
+	wrists = /obj/item/clothing/wrists/bracers/leather
+	armor = /obj/item/clothing/armor/chainmail/iron
 	if(prob(50))
-		shirt = /obj/item/clothing/suit/roguetown/shirt/undershirt/vagrant
+		shirt = /obj/item/clothing/shirt/undershirt/vagrant
 	else
-		shirt = /obj/item/clothing/suit/roguetown/shirt/undershirt/vagrant/l
-	pants = /obj/item/clothing/under/roguetown/chainlegs/iron
-	head = /obj/item/clothing/head/roguetown/helmet/leather
-	shoes = /obj/item/clothing/shoes/roguetown/boots
+		shirt = /obj/item/clothing/shirt/undershirt/vagrant/l
+	pants = /obj/item/clothing/pants/chainlegs/iron
+	head = /obj/item/clothing/head/helmet/leather
+	shoes = /obj/item/clothing/shoes/boots
 
-	H.TOTALSTR = rand(14,16)
-	H.TOTALSPD = 8
-	H.TOTALCON = 9
-	H.TOTALEND = 15
-	H.TOTALINT = 1
+	H.base_strength = rand(14,16)
+	H.base_speed = 8
+	H.base_constitution = 9
+	H.base_endurance = 15
+	H.base_intelligence = 1
 
 	//light labor skills for skeleton manual labor and some warrior-adventurer skills, equipment is still bad probably
 	H.mind?.adjust_skillrank(/datum/skill/craft/carpentry, 1, TRUE)
@@ -142,9 +144,9 @@
 	H.swap_rmb_intent(num=1) //dont want to mess with base NPCs too much out of fear of breaking them so I assigned the intents in the outfit
 
 	if(prob(50))
-		r_hand = /obj/item/rogueweapon/sword
+		r_hand = /obj/item/weapon/sword
 	else
-		r_hand = /obj/item/rogueweapon/polearm/halberd/bardiche/woodcutter
+		r_hand = /obj/item/weapon/polearm/halberd/bardiche/woodcutter
 
 ///////////////////////////////////////////////////////////// EVENTMIN SKELETONGS
 
@@ -152,49 +154,46 @@
 	..()
 	ADD_TRAIT(src, TRAIT_NOMOOD, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOHUNGER, TRAIT_GENERIC)
-	ADD_TRAIT(src, TRAIT_NOSTAMINA, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_EASYDISMEMBER, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_CRITICAL_WEAKNESS, TRAIT_GENERIC)
-	equipOutfit(new /datum/outfit/job/roguetown/species/skeleton/npc/peasant)
-	aggressive=1
-	mode = AI_IDLE
+	equipOutfit(new /datum/outfit/job/species/skeleton/npc/peasant)
 	dodgetime = 15
 	canparry = TRUE
 	flee_in_pain = FALSE
 	wander = TRUE
 
-/datum/outfit/job/roguetown/species/skeleton/npc/peasant/pre_equip(mob/living/carbon/human/H)
+/datum/outfit/job/species/skeleton/npc/peasant/pre_equip(mob/living/carbon/human/H)
 	..()
-	H.TOTALSTR = 6
-	H.TOTALSPD = 8
-	H.TOTALCON = 8
-	H.TOTALEND = 8
+	H.base_strength = 6
+	H.base_speed = 8
+	H.base_constitution = 8
+	H.base_endurance = 8
 	var/loadout = rand(1,7)
-	head = /obj/item/clothing/head/roguetown/roguehood/random
-	pants = /obj/item/clothing/under/roguetown/tights/vagrant
-	shirt = /obj/item/clothing/suit/roguetown/shirt/undershirt/vagrant
+	head = /obj/item/clothing/head/roguehood/random
+	pants = /obj/item/clothing/pants/tights/vagrant
+	shirt = /obj/item/clothing/shirt/undershirt/vagrant
 	switch(loadout)
 		if(1) //Axe Warrior
-			r_hand = /obj/item/rogueweapon/axe/iron
-			wrists = /obj/item/clothing/wrists/roguetown/bracers/leather
-			head = /obj/item/clothing/head/roguetown/knitcap
+			r_hand = /obj/item/weapon/axe/iron
+			wrists = /obj/item/clothing/wrists/bracers/leather
+			head = /obj/item/clothing/head/knitcap
 		if(2) //Long Stick Fighter
-			r_hand = /obj/item/rogueweapon/polearm/woodstaff
+			r_hand = /obj/item/weapon/polearm/woodstaff
 		if(3) //Club Caveman
-			r_hand = /obj/item/rogueweapon/mace/woodclub
+			r_hand = /obj/item/weapon/mace/woodclub
 		if(4) //Stabbity Stabbity your Knight is now horizontality
-			r_hand =/obj/item/rogueweapon/pitchfork
-			head = /obj/item/clothing/head/roguetown/strawhat
+			r_hand =/obj/item/weapon/pitchfork
+			head = /obj/item/clothing/head/strawhat
 		if(5) //Bonk Build
-			r_hand = /obj/item/rogueweapon/thresher
-			wrists = /obj/item/clothing/wrists/roguetown/bracers/leather
+			r_hand = /obj/item/weapon/thresher
+			wrists = /obj/item/clothing/wrists/bracers/leather
 		if(6) //Bonk Build
-			r_hand = /obj/item/rogueweapon/hoe
-			head = /obj/item/clothing/head/roguetown/fisherhat
+			r_hand = /obj/item/weapon/hoe
+			head = /obj/item/clothing/head/fisherhat
 		if(7) //Ex Wife
 			r_hand = /obj/item/cooking/pan
-			head = /obj/item/clothing/head/roguetown/armingcap
-			shirt = /obj/item/clothing/suit/roguetown/shirt/dress/gen/brown
+			head = /obj/item/clothing/head/armingcap
+			shirt = /obj/item/clothing/shirt/dress/gen/brown
 
 
 ///////////////////////////////////////////////////////////// EVENTMIN SKELETONGS
@@ -202,40 +201,37 @@
 	..()
 	ADD_TRAIT(src, TRAIT_NOMOOD, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOHUNGER, TRAIT_GENERIC)
-	ADD_TRAIT(src, TRAIT_NOSTAMINA, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_HEAVYARMOR, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_EASYDISMEMBER, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_CRITICAL_WEAKNESS, TRAIT_GENERIC)
-	equipOutfit(new /datum/outfit/job/roguetown/species/skeleton/npc/random)
-	aggressive=1
-	mode = AI_IDLE
+	equipOutfit(new /datum/outfit/job/species/skeleton/npc/random)
 	dodgetime = 15
 	canparry = TRUE
 	flee_in_pain = FALSE
 	wander = TRUE
 
-/datum/outfit/job/roguetown/species/skeleton/npc/random/pre_equip(mob/living/carbon/human/H)
+/datum/outfit/job/species/skeleton/npc/random/pre_equip(mob/living/carbon/human/H)
 	..()
 	if(prob(50))
-		wrists = /obj/item/clothing/wrists/roguetown/bracers/leather
+		wrists = /obj/item/clothing/wrists/bracers/leather
 	if(prob(50))
-		armor = /obj/item/clothing/suit/roguetown/armor/chainmail/iron
+		armor = /obj/item/clothing/armor/chainmail/iron
 	if(prob(30))
-		shirt = /obj/item/clothing/suit/roguetown/shirt/undershirt/vagrant
+		shirt = /obj/item/clothing/shirt/undershirt/vagrant
 		if(prob(50))
-			shirt = /obj/item/clothing/suit/roguetown/shirt/undershirt/vagrant/l
+			shirt = /obj/item/clothing/shirt/undershirt/vagrant/l
 	if(prob(50))
-		pants = /obj/item/clothing/under/roguetown/tights/vagrant
+		pants = /obj/item/clothing/pants/tights/vagrant
 		if(prob(50))
-			pants = /obj/item/clothing/under/roguetown/tights/vagrant/l
+			pants = /obj/item/clothing/pants/tights/vagrant/l
 	if(prob(50))
-		head = /obj/item/clothing/head/roguetown/helmet/leather
+		head = /obj/item/clothing/head/helmet/leather
 	if(prob(50))
-		head = /obj/item/clothing/head/roguetown/roguehood/random
+		head = /obj/item/clothing/head/roguehood/random
 	if(prob(50))
-		r_hand = /obj/item/rogueweapon/sword/iron
+		r_hand = /obj/item/weapon/sword/iron
 	else
-		r_hand = /obj/item/rogueweapon/mace/woodclub
+		r_hand = /obj/item/weapon/mace/woodclub
 
 ///////////////////////////////////////////////////////////// EVENTMIN SKELETONGS
 
@@ -243,93 +239,87 @@
 	..()
 	ADD_TRAIT(src, TRAIT_NOMOOD, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOHUNGER, TRAIT_GENERIC)
-	ADD_TRAIT(src, TRAIT_NOSTAMINA, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_HEAVYARMOR, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_EASYDISMEMBER, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_CRITICAL_WEAKNESS, TRAIT_GENERIC)
-	equipOutfit(new /datum/outfit/job/roguetown/species/skeleton/npc/warrior)
-	aggressive=1
-	mode = AI_IDLE
+	equipOutfit(new /datum/outfit/job/species/skeleton/npc/warrior)
 	dodgetime = 15
 	canparry = TRUE
 	flee_in_pain = FALSE
 	wander = TRUE
 
-/datum/outfit/job/roguetown/species/skeleton/npc/warrior/pre_equip(mob/living/carbon/human/H)
+/datum/outfit/job/species/skeleton/npc/warrior/pre_equip(mob/living/carbon/human/H)
 	..()
-	H.TOTALSTR = 10
-	H.TOTALSPD = 7
-	H.TOTALCON = 10
-	H.TOTALEND = 10
+	H.base_strength = 10
+	H.base_speed = 7
+	H.base_constitution = 10
+	H.base_endurance = 10
 	var/loadout = rand(1,6)
 	switch(loadout)
 		if(1) //Skeleton Warrior
-			r_hand = /obj/item/rogueweapon/sword/iron
-			l_hand = /obj/item/rogueweapon/shield/wood
-			belt = /obj/item/storage/belt/rogue/leather
-			armor = /obj/item/clothing/suit/roguetown/armor/chainmail/iron
-			shirt = /obj/item/clothing/suit/roguetown/shirt/undershirt/vagrant
-			pants = /obj/item/clothing/under/roguetown/tights/vagrant
-			wrists = /obj/item/clothing/wrists/roguetown/bracers/leather
-			neck = /obj/item/clothing/neck/roguetown/chaincoif
-			head = /obj/item/clothing/head/roguetown/helmet/kettle
+			r_hand = /obj/item/weapon/sword/iron
+			l_hand = /obj/item/weapon/shield/wood
+			belt = /obj/item/storage/belt/leather
+			armor = /obj/item/clothing/armor/chainmail/iron
+			shirt = /obj/item/clothing/shirt/undershirt/vagrant
+			pants = /obj/item/clothing/pants/tights/vagrant
+			wrists = /obj/item/clothing/wrists/bracers/leather
+			neck = /obj/item/clothing/neck/chaincoif
+			head = /obj/item/clothing/head/helmet/kettle
 		if(2)//Skeleton Warrior
-			r_hand = /obj/item/rogueweapon/mace
-			l_hand = /obj/item/rogueweapon/shield/wood
-			belt = /obj/item/storage/belt/rogue/leather
-			armor = /obj/item/clothing/suit/roguetown/armor/chainmail/iron
-			shirt = /obj/item/clothing/suit/roguetown/shirt/undershirt/vagrant
-			pants = /obj/item/clothing/under/roguetown/tights/vagrant
-			neck = /obj/item/clothing/neck/roguetown/chaincoif
-			wrists = /obj/item/clothing/wrists/roguetown/bracers/leather
-			head = /obj/item/clothing/head/roguetown/helmet/kettle
+			r_hand = /obj/item/weapon/mace
+			l_hand = /obj/item/weapon/shield/wood
+			belt = /obj/item/storage/belt/leather
+			armor = /obj/item/clothing/armor/chainmail/iron
+			shirt = /obj/item/clothing/shirt/undershirt/vagrant
+			pants = /obj/item/clothing/pants/tights/vagrant
+			neck = /obj/item/clothing/neck/chaincoif
+			wrists = /obj/item/clothing/wrists/bracers/leather
+			head = /obj/item/clothing/head/helmet/kettle
 		if(3) //Skeleton Warrior
-			r_hand = /obj/item/rogueweapon/flail
-			l_hand = /obj/item/rogueweapon/shield/wood
-			belt = /obj/item/storage/belt/rogue/leather
-			armor = /obj/item/clothing/suit/roguetown/armor/chainmail/iron
-			shirt = /obj/item/clothing/suit/roguetown/shirt/undershirt/vagrant
-			pants = /obj/item/clothing/under/roguetown/tights/vagrant
-			neck = /obj/item/clothing/neck/roguetown/chaincoif
-			wrists = /obj/item/clothing/wrists/roguetown/bracers/leather
-			head = /obj/item/clothing/head/roguetown/helmet/skullcap
+			r_hand = /obj/item/weapon/flail
+			l_hand = /obj/item/weapon/shield/wood
+			belt = /obj/item/storage/belt/leather
+			armor = /obj/item/clothing/armor/chainmail/iron
+			shirt = /obj/item/clothing/shirt/undershirt/vagrant
+			pants = /obj/item/clothing/pants/tights/vagrant
+			neck = /obj/item/clothing/neck/chaincoif
+			wrists = /obj/item/clothing/wrists/bracers/leather
+			head = /obj/item/clothing/head/helmet/skullcap
 		if(4) //Skeleton Warrior
-			r_hand =/obj/item/rogueweapon/polearm/spear
-			armor = /obj/item/clothing/suit/roguetown/armor/chainmail/iron
-			shirt = /obj/item/clothing/suit/roguetown/shirt/undershirt/vagrant
-			neck = /obj/item/clothing/neck/roguetown/chaincoif
-			pants = /obj/item/clothing/under/roguetown/tights/vagrant
-			wrists = /obj/item/clothing/wrists/roguetown/bracers/leather
-			head = /obj/item/clothing/head/roguetown/helmet/kettle
+			r_hand =/obj/item/weapon/polearm/spear
+			armor = /obj/item/clothing/armor/chainmail/iron
+			shirt = /obj/item/clothing/shirt/undershirt/vagrant
+			neck = /obj/item/clothing/neck/chaincoif
+			pants = /obj/item/clothing/pants/tights/vagrant
+			wrists = /obj/item/clothing/wrists/bracers/leather
+			head = /obj/item/clothing/head/helmet/kettle
 		if(5) //Skeleton Warrior
-			r_hand = /obj/item/rogueweapon/sword/sabre
-			l_hand = /obj/item/rogueweapon/knife/dagger
-			armor = /obj/item/clothing/suit/roguetown/armor/chainmail/iron
-			shirt = /obj/item/clothing/suit/roguetown/shirt/undershirt/vagrant
-			pants = /obj/item/clothing/under/roguetown/tights/vagrant
-			wrists = /obj/item/clothing/wrists/roguetown/bracers/leather
-			neck = /obj/item/clothing/neck/roguetown/chaincoif
-			head = /obj/item/clothing/head/roguetown/helmet/kettle
+			r_hand = /obj/item/weapon/sword/sabre
+			l_hand = /obj/item/weapon/knife/dagger
+			armor = /obj/item/clothing/armor/chainmail/iron
+			shirt = /obj/item/clothing/shirt/undershirt/vagrant
+			pants = /obj/item/clothing/pants/tights/vagrant
+			wrists = /obj/item/clothing/wrists/bracers/leather
+			neck = /obj/item/clothing/neck/chaincoif
+			head = /obj/item/clothing/head/helmet/kettle
 		if(6) //Skeleton Warrior
-			r_hand = /obj/item/rogueweapon/sword/scimitar/messer
-			l_hand = /obj/item/rogueweapon/knife/dagger
-			shirt = /obj/item/clothing/suit/roguetown/shirt/undershirt/vagrant
-			pants = /obj/item/clothing/under/roguetown/tights/vagrant
-			neck = /obj/item/clothing/neck/roguetown/chaincoif
-			armor = /obj/item/clothing/suit/roguetown/armor/chainmail/iron
-			wrists = /obj/item/clothing/wrists/roguetown/bracers/leather
-			head = /obj/item/clothing/head/roguetown/helmet/skullcap
+			r_hand = /obj/item/weapon/sword/scimitar/messer
+			l_hand = /obj/item/weapon/knife/dagger
+			shirt = /obj/item/clothing/shirt/undershirt/vagrant
+			pants = /obj/item/clothing/pants/tights/vagrant
+			neck = /obj/item/clothing/neck/chaincoif
+			armor = /obj/item/clothing/armor/chainmail/iron
+			wrists = /obj/item/clothing/wrists/bracers/leather
+			head = /obj/item/clothing/head/helmet/skullcap
 
 
 /mob/living/carbon/human/species/skeleton/npc/warrior/skilled/after_creation()
 	..()
 	ADD_TRAIT(src, TRAIT_NOMOOD, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_NOHUNGER, TRAIT_GENERIC)
-	ADD_TRAIT(src, TRAIT_NOSTAMINA, TRAIT_GENERIC)
 	ADD_TRAIT(src, TRAIT_HEAVYARMOR, TRAIT_GENERIC)
-	equipOutfit(new /datum/outfit/job/roguetown/species/skeleton/npc/warrior)
-	aggressive=1
-	mode = AI_IDLE
+	equipOutfit(new /datum/outfit/job/species/skeleton/npc/warrior)
 	d_intent = INTENT_PARRY //these ones will parry instead of dodge, making them much more dangerous
 	canparry = TRUE
 	flee_in_pain = FALSE
@@ -350,5 +340,12 @@
 
 /mob/living/carbon/human/species/skeleton/death_arena/after_creation()
 	..()
-	equipOutfit(new /datum/outfit/job/roguetown/arena_skeleton)
+	equipOutfit(new /datum/outfit/job/arena_skeleton)
 	ADD_TRAIT(src, TRAIT_CRITICAL_WEAKNESS, TRAIT_GENERIC)
+	ADD_TRAIT(src, TRAIT_NOLIMBDISABLE, TRAIT_GENERIC)
+
+	base_strength = 20
+	base_speed = 10
+	base_constitution = 8
+	base_endurance = 8
+	base_intelligence = 1

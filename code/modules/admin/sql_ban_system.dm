@@ -232,44 +232,7 @@
 			while(query_get_banned_roles.NextRow())
 				banned_from += query_get_banned_roles.item[1]
 			qdel(query_get_banned_roles)
-		var/break_counter = 0
-		//note to future developers: RT doesn't have command staff so toggle_head was removed, go back in the git history if you need to readd it
-		//departments/groups that don't have command staff would throw a javascript error since there's no corresponding reference for toggle_head()
-		var/list/headless_job_lists = list("Nobles" = GLOB.noble_positions,
-							"Garrison" = GLOB.garrison_positions,
-							"Church" = GLOB.church_positions,
-							"Abstract" = list("Appearance", "Emote", "Deadchat", "OOC"))
-		for(var/department in headless_job_lists)
-			output += "<div class='column'><label class='rolegroup [ckey(department)]'><input type='checkbox' name='[department]' class='hidden' [usr.client.prefs.tgui_fancy ? " onClick='toggle_checkboxes(this, \"_com\")'" : ""]>[department]</label><div class='content'>"
-			break_counter = 0
-			for(var/job in headless_job_lists[department])
-				if(break_counter > 0 && (break_counter % 3 == 0))
-					output += "<br>"
-				output += {"<label class='inputlabel checkbox'>[job]
-							<input type='checkbox' name='[job]' class='[department]' value='1'>
-							<div class='inputbox[(job in banned_from) ? " banned" : ""]'></div></label>
-				"}
-				break_counter++
-			output += "</div></div>"
-		var/list/long_job_lists = list("Peasants" = GLOB.peasant_positions,
-									"Selfs" = GLOB.serf_positions,
-									"Apprentices" = GLOB.apprentices_positions,
-									"Ghost and Other Roles" = list(ROLE_NECRO_SKELETON),
-									"Antagonist Positions" = list(ROLE_VILLAIN, ROLE_WEREWOLF,
-									ROLE_VAMPIRE, ROLE_NBEAST, ROLE_BANDIT,
-									ROLE_DELF, ROLE_PREBEL, ROLE_ZIZOIDCULTIST, ROLE_LICH))
-		for(var/department in long_job_lists)
-			output += "<div class='column'><label class='rolegroup long [ckey(department)]'><input type='checkbox' name='[department]' class='hidden' [usr.client.prefs.tgui_fancy ? " onClick='toggle_checkboxes(this, \"_com\")'" : ""]>[department]</label><div class='content'>"
-			break_counter = 0
-			for(var/job in long_job_lists[department])
-				if(break_counter > 0 && (break_counter % 10 == 0))
-					output += "<br>"
-				output += {"<label class='inputlabel checkbox'>[job]
-							<input type='checkbox' name='[job]' class='[department]' value='1'>
-							<div class='inputbox[(job in banned_from) ? " banned" : ""]'></div></label>
-				"}
-				break_counter++
-			output += "</div></div>"
+		output += "</div></div>"
 		output += "</div>"
 	output += "</form>"
 	panel.set_content(jointext(output, ""))
@@ -498,6 +461,24 @@
 	var/msg = "has created a [isnull(duration) ? "permanent" : "temporary [time_message]"] [applies_to_admins ? "admin " : ""][roles_to_ban[1] == "Server" ? "server ban" : "role ban from [roles_to_ban.len] roles"] for [target]."
 	log_admin_private("[kn] [msg][roles_to_ban[1] == "Server" ? "" : " Roles: [roles_to_ban.Join(", ")]"] Reason: [reason]")
 	message_admins("[kna] [msg][roles_to_ban[1] == "Server" ? "" : " Roles: [roles_to_ban.Join("\n")]"]\nReason: [reason]")
+	var/datum/client_interface/mock_player = new(player_key)
+	mock_player.prefs = new /datum/preferences(mock_player)
+
+	var/list/plexora_ban = list(
+		"ckey" = player_ckey,
+		"roles" = roles_to_ban,
+		"expiration_time" = duration,
+		"expiration_interval" = interval,
+		"reason" = reason,
+		"admin_ckey" = admin_ckey,
+		"admin_key_name" = key_name(usr),
+		"round_id" = GLOB.round_id,
+		"round_timer" = ROUND_TIME(),
+		"world_time" = world.time,
+	)
+
+	plexora_ban["total_playtime"] = mock_player.get_exp_living()
+	SSplexora.new_ban(plexora_ban)
 	if(applies_to_admins)
 		send2irc("BAN ALERT","[kn] [msg]")
 	if(player_ckey)
@@ -513,7 +494,7 @@
 		if(GLOB.admin_datums[C.ckey] || GLOB.deadmins[C.ckey])
 			is_admin = TRUE
 		if(roles_to_ban[1] == "Server" && (!is_admin || (is_admin && applies_to_admins)))
-			qdel(C)
+			qdel(C, TRUE)
 	if(roles_to_ban[1] == "Server" && AH)
 		AH.Resolve()
 	for(var/client/i in GLOB.clients - C)
@@ -523,7 +504,7 @@
 			if(GLOB.admin_datums[i.ckey] || GLOB.deadmins[i.ckey])
 				is_admin = TRUE
 			if(roles_to_ban[1] == "Server" && (!is_admin || (is_admin && applies_to_admins)))
-				qdel(i)
+				qdel(i, TRUE)
 
 /datum/admins/proc/unban_panel(player_key, admin_key, player_ip, player_cid, page = 0)
 	if(!check_rights(R_BAN))

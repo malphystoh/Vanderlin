@@ -1,11 +1,20 @@
 
+/obj/reflection
+	vis_flags = VIS_INHERIT_ICON|VIS_INHERIT_ICON_STATE|VIS_INHERIT_DIR|VIS_INHERIT_LAYER|VIS_UNDERLAY
+	appearance_flags = PIXEL_SCALE
+	plane = REFLECTION_PLANE
+	mouse_opacity = 0
+	pixel_y = -44
+
+/obj/reflection/New(loc,mob/owner)
+	. = ..()
+	owner.vis_contents += src
 
 /mob/living
 	see_invisible = SEE_INVISIBLE_LIVING
 	sight = 0
 	see_in_dark = 8
 	hud_possible = list(ANTAG_HUD)
-	pressure_resistance = 10
 
 	var/resize = 1 //Badminnery resize
 	var/lastattacker = null
@@ -21,19 +30,24 @@
 	var/toxloss = 0		//Toxic damage caused by being poisoned or radiated
 	var/fireloss = 0	//Burn damage caused by being way too hot, too cold or burnt.
 	var/cloneloss = 0	//Damage caused by being cloned or ejected from the cloner early. slimes also deal cloneloss damage to victims
-	var/crit_threshold = HEALTH_THRESHOLD_CRIT // when the mob goes from "normal" to crit
+	/// when the mob goes from "normal" to crit
+	var/crit_threshold = HEALTH_THRESHOLD_CRIT
+	///When the mob enters hard critical state and is fully incapacitated.
+	var/hardcrit_threshold = HEALTH_THRESHOLD_FULLCRIT
 
 	var/mobility_flags = MOBILITY_FLAGS_DEFAULT
 
 	var/resting = FALSE
 	var/wallpressed = FALSE
 
+	var/pixelshifted = FALSE
+	var/pixelshift_x = 0
+	var/pixelshift_y = 0
+
 	var/lying = 0			//number of degrees. DO NOT USE THIS IN CHECKS. CHECK FOR MOBILITY FLAGS INSTEAD!!
 	var/lying_prev = 0		//last value of lying on update_mobility
 
 	var/confused = 0	//Makes the mob move in random directions.
-
-	var/hallucination = 0 //Directly affects how long a mob will hallucinate for
 
 	var/last_special = 0 //Used by the resist verb, likely used to prevent players from bypassing next_move by logging in/out.
 	var/timeofdeath = 0
@@ -52,6 +66,7 @@
 
 	var/on_fire = 0 //The "Are we on fire?" var
 	var/fire_stacks = 0 //Tracks how many stacks of fire we have on, max is usually 20
+	var/divine_fire_stacks = 0 //Identical to fire stacks but has less properties like spreading. Should never be negative.
 
 	var/bloodcrawl = 0 //0 No blood crawling, BLOODCRAWL for bloodcrawling, BLOODCRAWL_EAT for crawling+mob devour
 	var/holder = null //The holder for blood crawling
@@ -78,8 +93,6 @@
 	var/butcher_difficulty = 0 //effectiveness prob. is modified negatively by this amount; positive numbers make it more difficult, negative ones make it easier
 
 	var/hellbound = 0 //People who've signed infernal contracts are unrevivable.
-
-	var/list/weather_immunities = list()
 
 	var/stun_absorption = null //converted to a list of stun absorption sources this mob has when one is added
 
@@ -108,12 +121,8 @@
 
 	var/can_be_held = FALSE	//whether this can be picked up and held.
 
-	var/ventcrawl_layer = PIPING_LAYER_DEFAULT
+	var/ventcrawl_layer = 2
 	var/losebreath = 0
-
-	//List of active diseases
-	var/list/diseases = list() // list of all diseases in a mob
-	var/list/disease_resistances = list()
 
 	var/slowed_by_drag = TRUE //Whether the mob is slowed down when dragging another prone mob
 
@@ -173,3 +182,13 @@
 	var/voice_pitch = 1
 
 	var/domhand = 0
+
+	///our blood drain for meathook, the less bloody the more we get
+	var/blood_drained = 0
+	///are we skinned?
+	var/skinned = FALSE
+
+	///our reflection child
+	var/has_reflection = TRUE
+
+	var/mutable_appearance/reflective_icon

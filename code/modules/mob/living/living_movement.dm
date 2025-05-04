@@ -61,15 +61,6 @@
 		if(MOVE_INTENT_SNEAK)
 			mod = 6
 	var/spdchange = (10-STASPD)*0.1
-	var/armorWeight = check_armor_weight()
-	if(armorWeight == "Heavy")
-		spdchange = spdchange + 0.2
-		if(!check_armor_skill())
-			spdchange = spdchange + 0.2
-	if(armorWeight == "Medium")
-		spdchange = spdchange + 0.1
-		if(!check_armor_skill())
-			spdchange = spdchange + 0.1
 	spdchange = clamp(spdchange, -0.5, 1)  //if this is not clamped, it can make you go faster than you should be able to.
 	mod = mod+spdchange
 	//maximum speed is achieved at 15 speed.
@@ -78,6 +69,8 @@
 /mob/living/proc/update_turf_movespeed(turf/open/T)
 	if(isopenturf(T))
 		var/usedslow = T.get_slowdown(src)
+		if(HAS_TRAIT(src, TRAIT_LONGSTRIDER))
+			usedslow = max(0, usedslow - 2)
 		if(HAS_TRAIT(src, TRAIT_TRAM_MOVER))
 			usedslow = 0
 		if(usedslow != 0)
@@ -111,7 +104,7 @@
 				return
 			if(isobj(pulling))
 				var/obj/structure/S = pulling
-				if(!slowed_by_drag || !S.drag_slowdown)
+				if(!slowed_by_drag || !S.drag_slowdown || HAS_TRAIT(src, TRAIT_CRATEMOVER))
 					remove_movespeed_modifier(MOVESPEED_ID_BULKY_DRAGGING)
 					return
 				add_movespeed_modifier(MOVESPEED_ID_BULKY_DRAGGING, multiplicative_slowdown = S.drag_slowdown)

@@ -5,8 +5,27 @@
 		user.add_stress(/datum/stressevent/delf)
 	if(!istiefling(user) && istiefling(src))
 		user.add_stress(/datum/stressevent/tieb)
+	if(!ishalforc(user) && ishalforc(src))
+		user.add_stress(/datum/stressevent/horc)
 	if(user.has_flaw(/datum/charflaw/paranoid) && (STASTR - user.STASTR) > 1)
 		user.add_stress(/datum/stressevent/parastr)
+	if(HAS_TRAIT(src, TRAIT_FOREIGNER) && !HAS_TRAIT(user, TRAIT_FOREIGNER))
+		if(user.has_flaw(/datum/charflaw/paranoid))
+			user.add_stress(/datum/stressevent/paraforeigner)
+		else
+			user.add_stress(/datum/stressevent/foreigner)
+	if(HAS_TRAIT(src, TRAIT_BEAUTIFUL))
+		if(user == src)
+			user.add_stress(/datum/stressevent/beautiful_self)
+		else
+			user.add_stress(/datum/stressevent/beautiful)
+	if(HAS_TRAIT(src, TRAIT_UGLY) && user != src)
+		if(user == src)
+			user.add_stress(/datum/stressevent/ugly_self)
+		else
+			user.add_stress(/datum/stressevent/ugly)
+	if(HAS_TRAIT(src, TRAIT_OLDPARTY) && HAS_TRAIT(user, TRAIT_OLDPARTY) && user != src)
+		user.add_stress(/datum/stressevent/saw_old_party)
 
 /mob/living/carbon/human/examine(mob/user)
 //this is very slightly better than it was because you can use it more places. still can't do \his[src] though.
@@ -16,11 +35,13 @@
 	var/t_has = p_have()
 	var/t_is = p_are()
 	var/obscure_name
-	var/race_name = dna.species.name
+	var/race_name = dna?.species.name
+	var/self_inspect = FALSE
 
 	var/m1 = "[t_He] [t_is]"
 	var/m2 = "[t_his]"
 	var/m3 = "[t_He] [t_has]"
+	. = list()
 	if(user == src)
 		m1 = "I am"
 		m2 = "my"
@@ -32,34 +53,46 @@
 	if(isobserver(user))
 		obscure_name = FALSE
 
+	/// header
+	. += span_info("ø ------------ ø")
+	/// name, title, etc. of the person
+	var/statement_of_identity = "This is "
 	if(obscure_name)
-		. = list("<span class='info'>ø ------------ ø\nThis is <EM>Unknown</EM>.")
+		statement_of_identity += ("<EM>Unknown</EM>.")
+		. += statement_of_identity
 	else
 		on_examine_face(user)
 		var/used_name = name
 		if(isobserver(user))
 			used_name = real_name
+		if(user == src)
+			self_inspect = TRUE
 		var/used_title = get_role_title()
-		var/display_as_wanderer = FALSE
 		var/is_returning = FALSE
-		if(migrant_type)
-			var/datum/migrant_role/migrant = MIGRANT_ROLE(migrant_type)
-			if(migrant.show_wanderer_examine)
-				display_as_wanderer = TRUE
-		else if(job)
-			var/datum/job/J = SSjob.GetJob(job)
-			if(J.wanderer_examine)
-				display_as_wanderer = TRUE
-			if(islatejoin)
-				is_returning = TRUE
-		if(display_as_wanderer)
-			. = list("<span class='info'>ø ------------ ø\nThis is <EM>[used_name]</EM>, the wandering [race_name].")
-		else if(used_title)
-			. = list("<span class='info'>ø ------------ ø\nThis is <EM>[used_name]</EM>, the [is_returning ? "returning " : ""][race_name] [used_title].")
-		else
-			. = list("<span class='info'>ø ------------ ø\nThis is the <EM>[used_name]</EM>, the [race_name].")
+		if(islatejoin)
+			is_returning = TRUE
 
-		if(GLOB.lord_titles[real_name])
+		// building the examine identity
+		statement_of_identity += "<EM>[used_name]</EM>"
+
+		var/appendage_to_name
+		if(is_returning && race_name && !HAS_TRAIT(src, TRAIT_FOREIGNER)) // latejoined? Foreigners can never be returning because they never lived here in the first place
+			appendage_to_name += " returning"
+
+		if(race_name) // race name
+			appendage_to_name += " [race_name]"
+
+		if(used_title && !HAS_TRAIT(src, TRAIT_FOREIGNER)) // job name, don't show job of foreigners.
+			appendage_to_name += ", [used_title]"
+
+		if(appendage_to_name) // if we got any of those paramaters add it to their name
+			statement_of_identity += " the [appendage_to_name]"
+
+		statement_of_identity += "." // comma at the end
+		// full name with all paramaters would be: "John Serf the returning Rakshari, Minnie Bonnickers smithy apprentice.""
+		. += statement_of_identity
+
+		if(GLOB.lord_titles[real_name]) //should be tied to known persons but can't do that until there is a way to recognise new people
 			. += span_notice("[m3] been granted the title of \"[GLOB.lord_titles[name]]\".")
 
 		if(dna.species.use_skintones)
@@ -85,31 +118,62 @@
 
 		if(ishuman(user))
 			var/mob/living/carbon/human/stranger = user
+			var/is_male = FALSE
+			if(gender == MALE)
+				is_male = TRUE
 			if(RomanticPartner(stranger))
-				. += "<span class='love'>It's my spouse.</span>"
+				. += span_love(span_bold("[t_He] is my [is_male ? "husband" : "wife"]."))
 			if(family_datum == stranger.family_datum && family_datum)
 				var/family_text = ReturnRelation(user)
 				if(family_text)
 					. += family_text
+			if(HAS_TRAIT(src, TRAIT_BEAUTIFUL))
+				//Handsome only if male, beautiful in all other pronouns.
+				. += span_love(span_bold("[self_inspect ? "I am" : "[t_He] is"] [is_male ? "handsome" : "beautiful"]!"))
+			if(HAS_TRAIT(src, TRAIT_UGLY))
+				. += span_necrosis(span_bold("[self_inspect ? "I am" : "[t_He] is"] hideous."))
+
+		if(HAS_TRAIT(src, TRAIT_FOREIGNER) && !HAS_TRAIT(user, TRAIT_FOREIGNER))
+			. += span_phobia("A foreigner...")
 
 		if(real_name in GLOB.excommunicated_players)
-			. += "<span class='userdanger'>HERETIC! SHAME!</span>"
+			. += span_userdanger("EXCOMMUNICATED!")
+
+		if(real_name in GLOB.heretical_players)
+			. += span_userdanger("HERETIC! SHAME!")
+
+		if(real_name in GLOB.outlawed_players)
+			. += span_userdanger("OUTLAW!")
 
 		if(iszizocultist(user) || iszizolackey(user))
 			if(virginity)
-				. += "<span class='userdanger'>VIRGIN!</span>"
+				. += span_userdanger("VIRGIN!")
 
-		if(real_name in GLOB.outlawed_players)
-			. += "<span class='userdanger'>OUTLAW!</span>"
 		if(mind && mind.special_role)
 			if(mind && mind.special_role == "Bandit" && HAS_TRAIT(user, TRAIT_KNOWBANDITS))
-				. += "<span class='userdanger'>BANDIT!</span>"
-		else
+				. += span_userdanger("BANDIT!")
 			if(mind && mind.special_role == "Vampire Lord")
-				. += "<span class='userdanger'>A MONSTER!</span>"
+				. += span_userdanger("A MONSTER!")
 
-	if(leprosy == 1)
-		. += "<span class='necrosis'>A LEPER...</span>"
+		var/list/known_frumentarii = user.mind?.cached_frumentarii
+		if(name in known_frumentarii)
+			. += span_greentext("<b>[m1] an agent of the court!</b>")
+
+		if(user != src)
+			if(HAS_TRAIT(src, TRAIT_OLDPARTY) && HAS_TRAIT(user, TRAIT_OLDPARTY))
+				. += span_green("Ahh... my old friend!")
+
+			if(HAS_TRAIT(src, TRAIT_THIEVESGUILD) && HAS_TRAIT(user, TRAIT_THIEVESGUILD))
+				. += span_green("A member of the Thieves Guild.")
+
+			if(HAS_TRAIT(src, TRAIT_CABAL) && HAS_TRAIT(user, TRAIT_CABAL))
+				. += span_purple("A fellow seeker of Her ascension.")
+
+	if(HAS_TRAIT(src, TRAIT_MANIAC_AWOKEN))
+		. += span_userdanger("MANIAC!")
+
+	if(HAS_TRAIT(src, TRAIT_LEPROSY))
+		. += span_necrosis("A LEPER...")
 
 	if(user != src)
 		var/datum/mind/Umind = user.mind
@@ -119,8 +183,12 @@
 					var/shit = bD.examine_friendorfoe(aD,user,src)
 					if(shit)
 						. += shit
-		if(user.mind?.has_antag_datum(/datum/antagonist/vampirelord) || user.mind?.has_antag_datum(/datum/antagonist/vampire))
-			. += "<span class='userdanger'>Blood Volume: [blood_volume]</span>"
+		if(user.mind?.has_antag_datum(/datum/antagonist/vampire))
+			. += span_userdanger("Blood Volume: [blood_volume]")
+		if(HAS_TRAIT(user, TRAIT_MATTHIOS_EYES))
+			var/atom/item = get_most_expensive()
+			if(item)
+				. += span_notice("You get the feeling [m2] most valuable possession is \a [item.name].")
 
 	var/list/obscured = check_obscured_slots()
 	var/skipface = (wear_mask && (wear_mask.flags_inv & HIDEFACE)) || (head && (head.flags_inv & HIDEFACE))
@@ -132,8 +200,8 @@
 	if(wear_pants && !(SLOT_PANTS in obscured))
 		//accessory
 		var/accessory_msg
-		if(istype(wear_pants, /obj/item/clothing/under))
-			var/obj/item/clothing/under/U = wear_pants
+		if(istype(wear_pants, /obj/item/clothing/pants))
+			var/obj/item/clothing/pants/U = wear_pants
 			if(U.attached_accessory)
 				accessory_msg += " with [icon2html(U.attached_accessory, user)] \a [U.attached_accessory]"
 
@@ -142,7 +210,7 @@
 	//head
 	if(head && !(SLOT_HEAD in obscured))
 		. += "[m3] [head.get_examine_string(user)] on [m2] head."
-	//suit/armor
+	//suit/armorF
 	if(wear_armor && !(SLOT_ARMOR in obscured))
 		. += "[m3] [wear_armor.get_examine_string(user)]."
 		//suit/armor storage
@@ -199,12 +267,8 @@
 	if(wear_neck && !(SLOT_NECK in obscured))
 		. += "[m3] [wear_neck.get_examine_string(user)] around [m2] neck."
 
-	//eyes
-	if(!(SLOT_GLASSES in obscured))
-		if(glasses)
-			. += "[m3] [glasses.get_examine_string(user)] covering [m2] eyes."
-		else if(eye_color == BLOODCULT_EYE)
-			. += "<span class='warning'><B>[m2] eyes are glowing an unnatural red!</B></span>"
+	if(get_eye_color() == BLOODCULT_EYE)
+		. += "<span class='warning'><B>[capitalize(m2)] eyes are glowing an unnatural red!</B></span>"
 
 	//ears
 	if(ears && !(SLOT_HEAD in obscured))
@@ -219,10 +283,10 @@
 
 	//handcuffed?
 	if(handcuffed)
-		. += "<A href='?src=[REF(src)];item=[SLOT_HANDCUFFED]'><span class='warning'>[m1] tied up with \a [handcuffed]!</span></A>"
+		. += "<A href='byond://?src=[REF(src)];item=[SLOT_HANDCUFFED]'><span class='warning'>[m1] tied up with \a [handcuffed]!</span></A>"
 
 	if(legcuffed)
-		. += "<A href='?src=[REF(src)];item=[SLOT_LEGCUFFED]'><span class='warning'>[m3] \a [legcuffed] around [m2] legs!</span></A>"
+		. += "<A href='byond://?src=[REF(src)];item=[SLOT_LEGCUFFED]'><span class='warning'>[m3] \a [legcuffed] around [m2] legs!</span></A>"
 
 	//Gets encapsulated with a warning span
 	var/list/msg = list()
@@ -243,14 +307,17 @@
 
 	if(!(user == src && src.hal_screwyhud == SCREWYHUD_HEALTHY)) //fake healthy
 		// Damage
-		switch(temp)
-			if(5 to 25)
+		var/max_health = 1 //let's not divide by 0
+		for(var/obj/item/bodypart/bodypart as anything in bodyparts)
+			max_health += bodypart.max_damage
+		switch(temp/max_health)
+			if(0.0625 to 0.125)
 				msg += "[m1] a little wounded."
-			if(25 to 50)
+			if(0.125 to 0.25)
 				msg += "[m1] wounded."
-			if(50 to 100)
+			if(0.25 to 0.5)
 				msg += "<B>[m1] severely wounded.</B>"
-			if(100 to INFINITY)
+			if(0.5 to INFINITY)
 				msg += "<span class='danger'>[m1] gravely wounded.</span>"
 
 	// Blood volume
@@ -322,19 +389,37 @@
 	if(pulledby && pulledby.grab_state)
 		msg += "[m1] being grabbed by [pulledby]."
 
-	//Nutrition
+	//Nutrition and Thirst
+	var/list/msg_list = list()
 	if(nutrition < (NUTRITION_LEVEL_STARVING - 50))
-		msg += "[m1] looking starved."
+		msg_list += "[m1] looking emaciated."
 //	else if(nutrition >= NUTRITION_LEVEL_FAT)
 //		if(user.nutrition < NUTRITION_LEVEL_STARVING - 50)
 //			msg += "[t_He] [t_is] plump and delicious looking - Like a fat little piggy. A tasty piggy."
 //		else
 //			msg += "[t_He] [t_is] quite chubby."
+	if(HAS_TRAIT(user, TRAIT_EXTEROCEPTION))
+		switch(nutrition)
+			if(NUTRITION_LEVEL_HUNGRY to NUTRITION_LEVEL_FED)
+				msg_list += "[m1] looking peckish."
+			if(NUTRITION_LEVEL_STARVING to NUTRITION_LEVEL_HUNGRY)
+				msg_list += "[m1] looking hungry."
+			if(NUTRITION_LEVEL_STARVING-50 to NUTRITION_LEVEL_STARVING)
+				msg_list += "[m1] looking starved."
+		switch(hydration)
+			if(HYDRATION_LEVEL_THIRSTY to HYDRATION_LEVEL_SMALLTHIRST)
+				msg_list += "[m1] looking like [m2] mouth is dry."
+			if(HYDRATION_LEVEL_DEHYDRATED to HYDRATION_LEVEL_THIRSTY)
+				msg_list += "[m1] looking thirsty for a drink."
+			if(0 to HYDRATION_LEVEL_DEHYDRATED)
+				msg_list += "[m1] looking parched."
+	if(length(msg_list))
+		msg += msg_list.Join(" ")
 
 	//Fire/water stacks
-	if(fire_stacks > 0)
+	if(fire_stacks + divine_fire_stacks > 0)
 		msg += "[m1] covered in something flammable."
-	else if(fire_stacks < 0)
+	else if(fire_stacks < 0 && !on_fire)
 		msg += "[m1] soaked."
 
 	//Status effects
@@ -428,7 +513,7 @@
 	if(length(msg))
 		. += "<span class='warning'>[msg.Join("\n")]</span>"
 
-	if(isliving(user))
+	if(isliving(user) && user != src)
 		var/mob/living/L = user
 		var/final_str = STASTR
 		if(HAS_TRAIT(src, TRAIT_DECEIVING_MEEKNESS))
@@ -446,6 +531,23 @@
 			if(-INFINITY to -5)
 				. += "<span class='warning'><B>[t_He] look[p_s()] much weaker than I.</B></span>"
 
+		var/datum/antagonist/maniac/maniac = user.mind?.has_antag_datum(/datum/antagonist/maniac)
+		if(maniac)
+			var/obj/item/organ/heart/heart = getorganslot(ORGAN_SLOT_HEART)
+			if(heart)
+				var/inscryption_key = LAZYACCESS(heart.inscryption_keys, maniac) // SPECIFICALLY the key that WE wrote
+				if(inscryption_key && (inscryption_key in maniac.key_nums))
+					. += span_danger("[t_He] know[p_s()] [inscryption_key], I AM SURE OF IT!")
+
+	if(IsAdminGhost(user))
+		var/obj/item/organ/heart/heart = getorganslot(ORGAN_SLOT_HEART)
+		if(heart && heart.maniacs)
+			for(var/datum/antagonist/maniac/M in heart.maniacs)
+				var/K = LAZYACCESS(heart.inscryptions, M)
+				var/W = LAZYACCESS(heart.maniacs2wonder_ids, M)
+				var/N = M.owner?.name
+				. += span_notice("Inscryption[N ? " by [N]'s " : ""][W ? "Wonder #[W]" : ""]: [K ? K : ""]")
+
 	if(Adjacent(user))
 		if(isobserver(user))
 			var/static/list/check_zones = list(
@@ -460,32 +562,40 @@
 				var/obj/item/bodypart/bodypart = get_bodypart(zone)
 				if(!bodypart)
 					continue
-				. += "<a href='?src=[REF(src)];inspect_limb=[zone]'>Inspect [parse_zone(zone)]</a>"
-			. += "<a href='?src=[REF(src)];check_hb=1'>Check Heartbeat</a>"
+				. += "<a href='byond://?src=[REF(src)];inspect_limb=[zone]'>Inspect [parse_zone(zone)]</a>"
+			. += "<a href='byond://?src=[REF(src)];check_hb=1'>Check Heartbeat</a>"
 		else
 			var/checked_zone = check_zone(user.zone_selected)
-			. += "<a href='?src=[REF(src)];inspect_limb=[checked_zone]'>Inspect [parse_zone(checked_zone)]</a>"
+			. += "<a href='byond://?src=[REF(src)];inspect_limb=[checked_zone]'>Inspect [parse_zone(checked_zone)]</a>"
 			if(!(mobility_flags & MOBILITY_STAND) && user != src && (user.zone_selected == BODY_ZONE_CHEST))
-				. += "<a href='?src=[REF(src)];check_hb=1'>Listen to Heartbeat</a>"
+				. += "<a href='byond://?src=[REF(src)];check_hb=1'>Listen to Heartbeat</a>"
+		. += "<a href='byond://?src=[REF(src)];view_descriptors=1'>Look at Features</a>"
 
 	// Characters with the hunted flaw will freak out if they can't see someone's face.
 	if(!appears_dead)
 		if(skipface && user.has_flaw(/datum/charflaw/hunted))
 			user.add_stress(/datum/stressevent/hunted)
 
-	// The Assassin's profane dagger can sniff out their targets, even masked.
-	if(HAS_TRAIT(user, TRAIT_ASSASSIN) && (has_flaw(/datum/charflaw/hunted) || HAS_TRAIT(src, TRAIT_ZIZOID_HUNTED)))
-		for(var/obj/item/I in user)
-			if(istype(I, /obj/item/rogueweapon/knife/dagger/steel/profane))
-				user.visible_message("profane dagger whispers, <span class='danger'>\"That's [real_name]! Strike their heart!\"</span>")
-
-	var/list/lines = build_cool_description(get_mob_descriptors(obscure_name, user), src)
-	for(var/line in lines)
-		. += span_info(line)
+	if(!obscure_name && (flavortext || (headshot_link && src.client?.patreon?.has_access(ACCESS_ASSISTANT_RANK)))) // only show flavor text if there is a flavor text and we show headshot
+		. += "<a href='?src=[REF(src)];task=view_flavor_text;'>Examine Closer</a>"
 
 	var/trait_exam = common_trait_examine()
 	if(!isnull(trait_exam))
 		. += trait_exam
+
+	// The Assassin's profane dagger can sniff out their targets, even masked.
+	if(HAS_TRAIT(user, TRAIT_ASSASSIN) && ((has_flaw(/datum/charflaw/hunted) || HAS_TRAIT(src, TRAIT_ZIZOID_HUNTED))))
+		//TODO: move this to an examinate signal call
+		if ((src != user) && iscarbon(user))
+			var/mob/living/carbon/assassin = user
+			for(var/obj/item/I in assassin.get_all_gear())
+				if(istype(I, /obj/item/weapon/knife/dagger/steel/profane))
+					. += "profane dagger whispers, [span_danger("\"That's [real_name]! Strike their heart!\"")]"
+					break
+
+	if(HAS_TRAIT(user, TRAIT_SEEPRICES) && sellprice)
+		. += "Is worth around [sellprice] mammons."
+	SEND_SIGNAL(src, COMSIG_PARENT_EXAMINE, user, .)
 
 /mob/living/proc/status_effect_examines(pronoun_replacement) //You can include this in any mob's examine() to show the examine texts of status effects!
 	var/list/dat = list()
@@ -496,6 +606,6 @@
 		if(E.examine_text)
 			var/new_text = replacetext(E.examine_text, "SUBJECTPRONOUN", pronoun_replacement)
 			new_text = replacetext(new_text, "[pronoun_replacement] is", "[pronoun_replacement] [p_are()]") //To make sure something become "They are" or "She is", not "They are" and "She are"
-			dat += "[new_text]\n" //dat.Join("\n") doesn't work here, for some reason
+			dat += "[new_text]" //dat.Join("\n") doesn't work here, for some reason
 	if(dat.len)
-		return dat.Join()
+		return dat.Join("\n")

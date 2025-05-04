@@ -1,18 +1,18 @@
-/obj/machinery/light/rogue
+/obj/machinery/light/fueled
 	icon = 'icons/roguetown/misc/lighting.dmi'
 	brightness = 8
 	nightshift_allowed = FALSE
 	fueluse = 60 MINUTES
 	bulb_colour = "#f9ad80"
 	bulb_power = 1
-	var/datum/looping_sound/soundloop = /datum/looping_sound/fireloop
+	var/datum/looping_sound/soundloop = null // = /datum/looping_sound/fireloop
 	pass_flags = LETPASSTHROW
 	flags_1 = NODECONSTRUCT_1
 	var/cookonme = FALSE
 	var/crossfire = TRUE
 	var/can_damage = FALSE
 
-/obj/machinery/light/rogue/Initialize()
+/obj/machinery/light/fueled/Initialize()
 	if(soundloop)
 		soundloop = new soundloop(src, FALSE)
 		soundloop.start()
@@ -23,16 +23,12 @@
 	seton(TRUE)
 	. = ..()
 
-/obj/machinery/light/rogue/weather_trigger(W)
-	if(W==/datum/weather/rain)
-		START_PROCESSING(SSweather,src)
-
-/obj/machinery/light/rogue/OnCrafted(dirin)
+/obj/machinery/light/fueled/OnCrafted(dirin, mob/user)
 	. = ..()
 	can_damage = TRUE
 	burn_out()
 
-/obj/machinery/light/rogue/examine(mob/user)
+/obj/machinery/light/fueled/examine(mob/user)
 	. = ..()
 	if(Adjacent(user))
 		if(fueluse > 0)
@@ -48,7 +44,7 @@
 				. += "<span class='warning'>The fire is burned out and hungry...</span>"
 
 
-/obj/machinery/light/rogue/extinguish()
+/obj/machinery/light/fueled/extinguish()
 	if(on)
 		burn_out()
 		new /obj/effect/temp_visual/small_smoke(src.loc)
@@ -56,7 +52,7 @@
 
 
 
-/obj/machinery/light/rogue/burn_out()
+/obj/machinery/light/fueled/burn_out()
 	if(soundloop)
 		soundloop.stop()
 	if(on)
@@ -64,25 +60,25 @@
 	..()
 	update_icon()
 
-/obj/machinery/light/rogue/update_icon()
+/obj/machinery/light/fueled/update_icon()
 	if(on)
 		icon_state = "[base_state]1"
 	else
 		icon_state = "[base_state]0"
 
-/obj/machinery/light/rogue/update()
+/obj/machinery/light/fueled/update()
 	. = ..()
 	if(on)
 		GLOB.fires_list |= src
 	else
 		GLOB.fires_list -= src
 
-/obj/machinery/light/rogue/Destroy()
+/obj/machinery/light/fueled/Destroy()
 	QDEL_NULL(soundloop)
 	GLOB.fires_list -= src
 	. = ..()
 
-/obj/machinery/light/rogue/fire_act(added, maxstacks)
+/obj/machinery/light/fueled/fire_act(added, maxstacks)
 	if(!on && ((fueluse > 0) || (initial(fueluse) == 0)))
 		playsound(src.loc, 'sound/items/firelight.ogg', 100)
 		on = TRUE
@@ -90,25 +86,18 @@
 		update_icon()
 		if(soundloop)
 			soundloop.start()
-		addtimer(CALLBACK(src, PROC_REF(trigger_weather)), rand(5,20))
 		return TRUE
 
-/obj/proc/trigger_weather()
-	if(!QDELETED(src))
-		if(isturf(loc))
-			var/turf/T = loc
-			T.trigger_weather(src)
-
-/obj/machinery/light/rogue/Crossed(atom/movable/AM, oldLoc)
+/obj/machinery/light/fueled/Crossed(atom/movable/AM, oldLoc)
 	..()
 	if(crossfire)
 		if(on)
 			AM.fire_act(1,5)
 
-/obj/machinery/light/rogue/spark_act()
+/obj/machinery/light/fueled/spark_act()
 	fire_act()
 
-/obj/machinery/light/rogue/attackby(obj/item/W, mob/living/user, params)
+/obj/machinery/light/fueled/attackby(obj/item/W, mob/living/user, params)
 	if(cookonme)
 		if(istype(W, /obj/item/reagent_containers/food/snacks))
 			if(istype(W, /obj/item/reagent_containers/food/snacks/egg))
@@ -128,7 +117,7 @@
 						prob2spoil = 1
 					user.visible_message("<span class='notice'>[user] starts to cook [W] over [src].</span>")
 					for(var/i in 1 to 6)
-						if(do_after(user, 30, target = src))
+						if(do_after(user, 3 SECONDS, src))
 							var/obj/item/reagent_containers/food/snacks/S = W
 							var/obj/item/C
 							if(prob(prob2spoil))
@@ -155,7 +144,9 @@
 		else
 			if(!on)
 				return
-		if (alert(usr, "Feed [W] to the fire?", "ROGUETOWN", "Yes", "No") != "Yes")
+		if (alert(usr, "Feed [W] to the fire?", "VANDERLIN", "Yes", "No") != "Yes")
+			return
+		if(!(W in user.held_items)|| !user.temporarilyRemoveItemFromInventory(W))
 			return
 		qdel(W)
 		user.visible_message("<span class='warning'>[user] feeds [W] to [src].</span>")
@@ -179,7 +170,7 @@
 				W.spark_act()
 	. = ..()
 
-/obj/machinery/light/rogue/take_damage(damage_amount, damage_type = BRUTE, damage_flag = 0, sound_effect = 1)
+/obj/machinery/light/fueled/take_damage(damage_amount, damage_type = BRUTE, damage_flag = 0, sound_effect = 1)
 	if(!can_damage)
 		return
 	. = ..()

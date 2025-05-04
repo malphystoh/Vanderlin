@@ -7,8 +7,6 @@
 		. += E.flash_protect
 	if(isclothing(head)) //Adds head protection
 		. += head.flash_protect
-	if(isclothing(glasses)) //Glasses
-		. += glasses.flash_protect
 	if(isclothing(wear_mask)) //Mask
 		. += wear_mask.flash_protect
 
@@ -29,8 +27,6 @@
 		return head
 	if(check_mask && wear_mask && (wear_mask.flags_cover & MASKCOVERSEYES))
 		return wear_mask
-	if(check_glasses && glasses && (glasses.flags_cover & GLASSESCOVERSEYES))
-		return glasses
 /mob/living/carbon/is_pepper_proof(check_head = TRUE, check_mask = TRUE)
 	if(check_head &&(head?.flags_cover & PEPPERPROOF))
 		return head
@@ -241,6 +237,9 @@
 
 //ATTACK HAND IGNORING PARENT RETURN VALUE
 /mob/living/carbon/attack_hand(mob/living/carbon/human/user)
+	if(SEND_SIGNAL(src, COMSIG_ATOM_ATTACK_HAND, user) & COMPONENT_NO_ATTACK_HAND)
+		. = TRUE
+
 	if(!lying_attack_check(user))
 		return FALSE
 
@@ -248,7 +247,7 @@
 		to_chat(user, "<span class='warning'>[src] is missing that.</span>")
 		return FALSE
 
-	if(!user.cmode)
+	if(!user.cmode && (istype(user.rmb_intent, /datum/rmb_intent/weak) || istype(user.rmb_intent, /datum/rmb_intent/strong)))
 		var/try_to_fail = !istype(user.rmb_intent, /datum/rmb_intent/weak)
 		var/list/possible_steps = list()
 		for(var/datum/surgery_step/surgery_step as anything in GLOB.surgery_steps)
@@ -307,14 +306,6 @@
 		return affecting.body_zone
 	return dam_zone
 
-/mob/living/carbon/emp_act(severity)
-	. = ..()
-	if(. & EMP_PROTECT_CONTENTS)
-		return
-	for(var/X in internal_organs)
-		var/obj/item/organ/O = X
-		O.emp_act(severity)
-
 ///Adds to the parent by also adding functionality to propagate shocks through pulling and doing some fluff effects.
 /mob/living/carbon/electrocute_act(shock_damage, source, siemens_coeff = 1, flags = NONE)
 	. = ..()
@@ -339,7 +330,7 @@
 	//Stun
 	var/should_stun = (!(flags & SHOCK_TESLA) || siemens_coeff > 0.5) && !(flags & SHOCK_NOSTUN)
 	if(!HAS_TRAIT(src, TRAIT_NOPAIN))
-		if(should_stun)
+		if(should_stun && !HAS_TRAIT(src, TRAIT_NOPAINSTUN))
 			Paralyze(30)
 		//Jitter and other fluff.
 		jitteriness += 1000
@@ -352,12 +343,20 @@
 ///Called slightly after electrocute act to reduce jittering and apply a secondary stun.
 /mob/living/carbon/proc/secondary_shock(should_stun)
 	jitteriness = max(jitteriness - 990, 10)
-	if(should_stun)
+	if(should_stun && !HAS_TRAIT(src, TRAIT_NOPAINSTUN))
 		Paralyze(60)
 
 /mob/living/carbon/proc/help_shake_act(mob/living/carbon/M)
 	if(on_fire)
-		to_chat(M, "<span class='warning'>I can't put [p_them()] out with just my bare hands!</span>")
+		if(M.gloves)
+			M.changeNext_move(CLICK_CD_MELEE)
+			M.visible_message(span_warning("[M] pats out the flames on [src]!"))
+			adjust_divine_fire_stacks(-2)
+			if(fire_stacks > 0)
+				adjust_fire_stacks(-2)
+			M.gloves.take_damage(10, BURN, "fire")
+		else
+			to_chat(M, span_warning("I can't put [p_them()] out with just my bare hands!"))
 		return
 
 //	if(!(mobility_flags & MOBILITY_STAND))
@@ -480,3 +479,23 @@
 	var/obj/item/organ/ears/ears = getorganslot(ORGAN_SLOT_EARS)
 	if((istype(ears) && !ears.deaf) || (src.stat == DEAD)) // 2nd check so you can hear messages when beheaded
 		. = TRUE
+
+/mob/living/carbon/adjustOxyLoss(amount, updating_health = TRUE, forced = FALSE)
+	. = ..()
+	if(isnull(.))
+		return
+	if(. <= 75)
+		if(getOxyLoss() > 75)
+			ADD_TRAIT(src, TRAIT_KNOCKEDOUT, OXYLOSS_TRAIT)
+	else if(getOxyLoss() <= 75)
+		REMOVE_TRAIT(src, TRAIT_KNOCKEDOUT, OXYLOSS_TRAIT)
+
+/mob/living/carbon/setOxyLoss(amount, updating_health = TRUE, forced = FALSE)
+	. = ..()
+	if(isnull(.))
+		return
+	if(. <= 75)
+		if(getOxyLoss() > 75)
+			ADD_TRAIT(src, TRAIT_KNOCKEDOUT, OXYLOSS_TRAIT)
+	else if(getOxyLoss() <= 75)
+		REMOVE_TRAIT(src, TRAIT_KNOCKEDOUT, OXYLOSS_TRAIT)

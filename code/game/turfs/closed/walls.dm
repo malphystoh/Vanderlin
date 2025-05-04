@@ -3,14 +3,11 @@
 /turf/closed/wall
 	name = ""
 	desc = ""
-	icon = 'icons/turf/walls/wall.dmi'
+	icon = 'icons/turf/walls.dmi'
 	icon_state = "wall"
 	explosion_block = 1
 
-	thermal_conductivity = WALL_HEAT_TRANSFER_COEFFICIENT
-	heat_capacity = 312500 //a little over 5 cm thick , 312500 for 1 m by 2.5 m by 0.25 m plasteel wall
-
-	baseturfs = list(/turf/open/floor/rogue/dirt/road)
+	baseturfs = list(/turf/open/floor/dirt/road)
 
 	var/hardness = 40 //lower numbers are harder. Used to determine the probability of a hulk smashing through.
 	var/slicing_duration = 100  //default time taken to slice the wall
@@ -23,8 +20,6 @@
 
 	var/list/dent_decals
 
-/turf/closed/wall/attack_tk()
-	return
 
 /turf/closed/wall/handle_ricochet(obj/projectile/P)			//A huge pile of shitcode!
 	var/turf/p_turf = get_turf(P)
@@ -119,9 +114,8 @@
 		return
 
 	// Are you trying to break your instrument? Go ahead!
-	if(istype(W, /obj/item/rogue/instrument))
-		if(T.attacked_by(src, user))
-			user.do_attack_animation(src)
+	if(istype(W, /obj/item/instrument))
+		user.do_attack_animation(src)
 		visible_message("<span class='warning'>[user] slams \the [W] against \the [src]!</span>",
 						"<span class='warning'>I slam \the [W] against \the [src]!</span>",null ,COMBAT_MESSAGE_RANGE)
 		W.take_damage(10, BRUTE, "blunt")
@@ -205,6 +199,7 @@
 	icon_state = ""
 	layer = FLY_LAYER
 	bullet_bounce_sound = null
+	canSmoo
 
 /turf/closed/splashscreen/New()
 	SStitle.splash_turf = src

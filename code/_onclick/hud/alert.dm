@@ -188,12 +188,12 @@
 	desc = ""
 	icon_state = "gross3"
 
-/atom/movable/screen/alert/hot
+/atom/movable/screen/alert/status_effect/debuff/hot
 	name = "Too Hot"
 	desc = ""
 	icon_state = "hot"
 
-/atom/movable/screen/alert/cold
+/atom/movable/screen/alert/status_effect/debuff/cold
 	name = "Too Cold"
 	desc = ""
 	icon_state = "cold"
@@ -253,7 +253,7 @@
 			for(var/X in H.bodyparts)
 				var/obj/item/bodypart/BP = X
 				for(var/obj/item/I in BP.embedded_objects)
-					msg += "<a href='?src=[REF(H)];embedded_object=[REF(I)];embedded_limb=[REF(BP)]' class='warning'>[I] - [BP.name]</a>\n"
+					msg += "<a href='byond://?src=[REF(H)];embedded_object=[REF(I)];embedded_limb=[REF(BP)]' class='warning'>[I] - [BP.name]</a>\n"
 			msg += "***"
 			to_chat(H, "[msg.Join()]")
 

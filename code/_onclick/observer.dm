@@ -14,16 +14,24 @@
 	// Otherwise jump
 	else if(A.loc)
 		forceMove(get_turf(A))
-		update_parallax_contents()
 
 /mob/dead/observer/profane/DblClickOn(atom/A, params) // Souls trapped by the dagger should not be jumping around.
 	return
 
 /mob/dead/observer/rogue/DblClickOn(atom/A, params)
-	return
+	if(check_click_intercept(params, A))
+		return
+
+	if(can_reenter_corpse && mind && mind.current)
+		if(A == mind.current || (mind.current in A))
+			reenter_corpse()
+			return
 
 /mob/dead/observer/ClickOn(atom/A, params)
 	if(check_click_intercept(params,A))
+		return
+
+	if(SEND_SIGNAL(src, COMSIG_MOB_CLICKON, A, params) & COMSIG_MOB_CANCEL_CLICKON)
 		return
 
 	var/list/modifiers = params2list(params)

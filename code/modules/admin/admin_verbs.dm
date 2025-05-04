@@ -7,14 +7,19 @@ GLOBAL_PROTECT(admin_verbs_default)
 	return list(
 	/client/proc/check_pq,
 	/client/proc/spawn_pollution,
+	/client/proc/adjust_personal_see_leylines,
+	/client/proc/spawn_liquid,
+	/client/proc/remove_liquid,
 	/client/proc/adjust_pq,
 	/client/proc/stop_restart,
 	/client/proc/hearallasghost,
+	/client/proc/toggle_aghost_invis,
 	/client/proc/admin_ghost,
 	/client/proc/ghost_up,
 	/datum/admins/proc/start_vote,
 	/datum/admins/proc/show_player_panel,
 	/datum/admins/proc/admin_heal,
+	/datum/admins/proc/admin_bless,
 	/datum/admins/proc/admin_curse,
 	/datum/admins/proc/admin_sleep,
 	/client/proc/ghost_down,
@@ -22,6 +27,8 @@ GLOBAL_PROTECT(admin_verbs_default)
 	/client/proc/jumptokey,
 	/datum/admins/proc/checkpq,
 	/datum/admins/proc/adjustpq,
+	/datum/admins/proc/checktriumphs,
+	/datum/admins/proc/adjusttriumphs,
 	/client/proc/jumptomob,
 	/client/proc/returntolobby,
 	/datum/verbs/menu/Admin/verb/playerpanel,
@@ -31,13 +38,14 @@ GLOBAL_PROTECT(admin_verbs_default)
 	/client/proc/deadmin,				/*destroys our own admin datum so we can play as a regular player*/
 	/client/proc/toggle_context_menu,
 	/client/proc/delete_player_book,
+	/client/proc/manage_paintings,
 	/client/proc/ShowAllFamilies,
+	/datum/admins/proc/anoint_priest,
 	)
 GLOBAL_LIST_INIT(admin_verbs_admin, world.AVerbsAdmin())
 GLOBAL_PROTECT(admin_verbs_admin)
 /world/proc/AVerbsAdmin()
 	return list(
-	/client/proc/adjusttriumph,
 	/client/proc/end_party,		/*destroys our own admin datum so we can play as a regular player*/
 	/client/proc/cmd_admin_say,			/*admin-only ooc chat*/
 	/client/proc/hide_verbs,			/*hides all our adminverbs*/
@@ -53,7 +61,6 @@ GLOBAL_PROTECT(admin_verbs_admin)
 	/client/proc/cmd_admin_pm_panel,		/*admin-pm list*/
 	/client/proc/stop_sounds,
 	/client/proc/mark_datum_mapview,
-	/client/proc/fix_air,				/*resets air in designated radius to its default atmos composition*/
 
 	/client/proc/invisimin,				/*allows our mob to go invisible/visible*/
 //	/datum/admins/proc/show_traitor_panel,	/*interface which shows a mob's mind*/ -Removed due to rare practical use. Moved to debug verbs ~Errorage
@@ -62,10 +69,14 @@ GLOBAL_PROTECT(admin_verbs_admin)
 	/client/proc/game_panel,			/*game panel, allows to change game-mode etc*/
 	/datum/admins/proc/toggleooc,		/*toggles ooc on/off for everyone*/
 	/datum/admins/proc/toggleoocdead,	/*toggles ooc on/off for everyone who is dead*/
+	/datum/admins/proc/togglelooc,
+	/datum/admins/proc/fix_death_area,
+	/datum/admins/proc/toggle_debug_pathfinding,
 	/datum/admins/proc/toggleenter,		/*toggles whether people can join the current game*/
 	/datum/admins/proc/toggleguests,	/*toggles whether guests can join the current game*/
 	/datum/admins/proc/announce,		/*priority announce something to all clients.*/
 	/datum/admins/proc/set_admin_notice, /*announcement all clients see when joining the server.*/
+	/client/proc/toggle_aghost_invis, /* lets us choose whether our in-game mob goes visible when we aghost (off by default) */
 	/client/proc/admin_ghost,			/*allows us to ghost/reenter body at will*/
 	/client/proc/hearallasghost,
 	/client/proc/ghost_up,
@@ -87,8 +98,7 @@ GLOBAL_PROTECT(admin_verbs_admin)
 	/client/proc/jumptokey,				/*allows us to jump to the location of a mob with a certain ckey*/
 	/client/proc/jumptomob,				/*allows us to jump to a specific mob*/
 	/client/proc/jumptoturf,			/*allows us to jump to a specific turf*/
-	/client/proc/admin_call_shuttle,	/*allows us to call the emergency shuttle*/
-	/client/proc/admin_cancel_shuttle,	/*allows us to cancel the emergency shuttle, sending it back to centcom*/
+	/client/proc/spawn_in_test_area,
 	/client/proc/cmd_admin_direct_narrate,	/*send text directly to a player with no padding. Useful for narratives and fluff-text*/
 	/client/proc/cmd_admin_world_narrate,	/*sends text to all players with no padding*/
 	/client/proc/cmd_admin_local_narrate,	/*sends text to all mobs within view of atom*/
@@ -97,18 +107,20 @@ GLOBAL_PROTECT(admin_verbs_admin)
 	/client/proc/cmd_admin_check_player_exp, /* shows players by playtime */
 	/client/proc/toggle_combo_hud, // toggle display of the combination pizza antag and taco sci/med/eng hud
 	/client/proc/toggle_AI_interact, /*toggle admin ability to interact with machines as an AI*/
-	/datum/admins/proc/open_shuttlepanel, /* Opens shuttle manipulator UI */
 	/client/proc/deadchat,
 	/client/proc/toggleprayers,
 	/client/proc/toggle_prayer_sound,
 	/client/proc/colorasay,
 	/client/proc/resetasaycolor,
+	/client/proc/set_personal_admin_ooc_color,
+	/client/proc/reset_personal_admin_ooc_color,
+	/client/proc/set_ghost_sprite,
 	/client/proc/toggleadminhelpsound,
 	/client/proc/respawn_character,
 	/client/proc/discord_id_manipulation,
 	/client/proc/ShowAllFamilies,
 	)
-GLOBAL_LIST_INIT(admin_verbs_ban, list(/client/proc/unban_panel, /client/proc/ban_panel, /client/proc/stickybanpanel, /client/proc/check_pq, /client/proc/adjust_pq, /client/proc/getcurrentlogs, /client/proc/getserverlogs))
+GLOBAL_LIST_INIT(admin_verbs_ban, list(/client/proc/unban_panel, /client/proc/ban_panel, /client/proc/stickybanpanel, /client/proc/role_ban_panel, /client/proc/check_pq, /client/proc/adjust_pq, /client/proc/getcurrentlogs, /client/proc/getserverlogs))
 GLOBAL_PROTECT(admin_verbs_ban)
 GLOBAL_LIST_INIT(admin_verbs_sounds, list(/client/proc/play_local_sound, /client/proc/play_sound, /client/proc/set_round_end_sound))
 GLOBAL_PROTECT(admin_verbs_sounds)
@@ -118,15 +130,14 @@ GLOBAL_LIST_INIT(admin_verbs_fun, list(
 	/client/proc/drop_bomb,
 	/client/proc/set_dynex_scale,
 	/client/proc/drop_dynex_bomb,
-	/client/proc/cinematic,
 	/client/proc/cmd_admin_add_freeform_ai_law,
 	/client/proc/object_say,
 	/client/proc/toggle_random_events,
 	/client/proc/set_ooc,
 	/client/proc/reset_ooc,
 	/client/proc/forceEvent,
+	/client/proc/forceGamemode,
 	/client/proc/admin_change_sec_level,
-	/client/proc/run_weather,
 	/client/proc/run_particle_weather,
 	/client/proc/show_tip,
 	/client/proc/smite,
@@ -139,7 +150,6 @@ GLOBAL_PROTECT(admin_verbs_server)
 /world/proc/AVerbsServer()
 	return list(
 	/datum/admins/proc/startnow,
-	/datum/admins/proc/forcemode,
 	/datum/admins/proc/restart,
 	/datum/admins/proc/end_round,
 	/datum/admins/proc/delay,
@@ -152,7 +162,8 @@ GLOBAL_PROTECT(admin_verbs_server)
 	/client/proc/forcerandomrotate,
 	/client/proc/adminchangemap,
 	/client/proc/panicbunker,
-	/client/proc/toggle_hub
+	/client/proc/toggle_hub,
+	/client/proc/toggle_cdn
 	)
 GLOBAL_LIST_INIT(admin_verbs_debug, world.AVerbsDebug())
 GLOBAL_PROTECT(admin_verbs_debug)
@@ -181,7 +192,6 @@ GLOBAL_PROTECT(admin_verbs_debug)
 	/client/proc/map_template_load,
 	/client/proc/map_template_upload,
 	/client/proc/jump_to_ruin,
-	/client/proc/clear_dynamic_transit,
 	/client/proc/toggle_medal_disable,
 	/client/proc/view_runtimes,
 	/client/proc/pump_random_event,
@@ -190,6 +200,8 @@ GLOBAL_PROTECT(admin_verbs_debug)
 	/client/proc/reload_configuration,
 	/datum/admins/proc/create_or_modify_area,
 	/client/proc/returntolobby,
+	/client/proc/tracy_next_round,
+	/client/proc/start_tracy,
 	/client/proc/set_tod_override
 	)
 GLOBAL_LIST_INIT(admin_verbs_possess, list(/proc/possess, GLOBAL_PROC_REF(release)))
@@ -209,13 +221,12 @@ GLOBAL_LIST_INIT(admin_verbs_hideable, list(
 	/datum/admins/proc/toggleguests,
 	/datum/admins/proc/announce,
 	/datum/admins/proc/set_admin_notice,
+	/client/proc/toggle_aghost_invis,
 	/client/proc/admin_ghost,
 	/client/proc/toggle_view_range,
 	/client/proc/cmd_admin_subtle_message,
 	/client/proc/cmd_admin_headset_message,
 	/client/proc/cmd_admin_check_contents,
-	/client/proc/admin_call_shuttle,
-	/client/proc/admin_cancel_shuttle,
 	/client/proc/cmd_admin_direct_narrate,
 	/client/proc/cmd_admin_world_narrate,
 	/client/proc/cmd_admin_local_narrate,
@@ -229,7 +240,6 @@ GLOBAL_LIST_INIT(admin_verbs_hideable, list(
 	/client/proc/get_dynex_range,
 	/client/proc/get_dynex_power,
 	/client/proc/set_dynex_scale,
-	/client/proc/cinematic,
 	/client/proc/cmd_admin_add_freeform_ai_law,
 	/client/proc/cmd_admin_create_centcom_report,
 	/client/proc/cmd_change_command_name,
@@ -361,6 +371,14 @@ GLOBAL_PROTECT(admin_verbs_hideable)
 		show_popup_menus = FALSE
 		log_admin("[key_name(usr)] toggled context menu OFF.")
 
+/client/proc/toggle_aghost_invis()
+	set category = "GameMaster"
+	set name = "Aghost (Toggle Invisibility)"
+	if (!holder)
+		return
+	aghost_toggle = !aghost_toggle
+	to_chat(src, aghost_toggle ? "Aghosting will now turn your mob invisible." : "Aghost will no longer turn your mob invisible.")
+
 /client/proc/admin_ghost()
 	set category = "GameMaster"
 	set name = "Aghost"
@@ -375,6 +393,18 @@ GLOBAL_PROTECT(admin_verbs_hideable)
 		if(!ghost.can_reenter_corpse)
 			log_admin("[key_name(usr)] re-entered corpse")
 			message_admins("[key_name_admin(usr)] re-entered corpse")
+		if(istype(ghost.mind.current, /mob/living))
+			var/mob/living/M = ghost.mind.current
+			var/datum/status_effect/incapacitating/sleeping/S = M.IsSleeping()
+			if(S && !HAS_TRAIT(M, TRAIT_FLOORED)) // Wake them up unless they're asleep for another reason
+				M.remove_status_effect(S)
+				M.set_resting(FALSE, TRUE)
+			M.density = initial(M.density)
+			M.invisibility = initial(M.invisibility)
+		else
+			var/mob/M = ghost.mind.current
+			M.invisibility = initial(M.invisibility)
+			M.density = initial(M.density)
 		ghost.can_reenter_corpse = 1 //force re-entering even when otherwise not possible
 		ghost.reenter_corpse()
 		show_popup_menus = FALSE
@@ -389,6 +419,9 @@ GLOBAL_PROTECT(admin_verbs_hideable)
 		log_admin("[key_name(usr)] admin ghosted.")
 		message_admins("[key_name_admin(usr)] admin ghosted.")
 		var/mob/body = mob
+		if (aghost_toggle)
+			body.invisibility = INVISIBILITY_MAXIMUM
+			body.density = 0
 		body.ghostize(1)
 		if(body && !body.key)
 			body.key = "@[key]"	//Haaaaaaaack. But the people have spoken. If it breaks; blame adminbus
@@ -437,6 +470,14 @@ GLOBAL_PROTECT(admin_verbs_hideable)
 		return
 	holder.ban_panel()
 	SSblackbox.record_feedback("tally", "admin_verb", 1, "Banning Panel") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
+
+/client/proc/role_ban_panel()
+	set name = "Role Ban Panel"
+	set category = "Admin"
+	if(!check_rights(R_BAN))
+		return
+	holder.role_ban_panel.show_ui(usr)
+	SSblackbox.record_feedback("tally", "admin_verb", 1, "Role Ban Panel") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
 
 /client/proc/unban_panel()
 	set name = "Unbanning Panel"
@@ -670,11 +711,21 @@ GLOBAL_PROTECT(admin_verbs_hideable)
 	if(!holder)
 		return
 
+	// Handle antag HUD if active
 	if(has_antag_hud())
 		toggle_combo_hud()
 
+	// Deactivate admin holder
 	holder.deactivate()
 
+	// Ensure the admin stops hearing ghosts like a mortal
+	if(prefs)
+		prefs.chat_toggles &= ~CHAT_GHOSTEARS   // Explicitly remove ghost hearing
+		prefs.chat_toggles &= ~CHAT_GHOSTWHISPER // Explicitly remove ghost whispers
+		prefs.save_preferences()
+		to_chat(src, "<span class='info'>I will hear like a mortal.</span>")
+
+	// Messaging
 	to_chat(src, "<span class='interface'>I am now a normal player.</span>")
 	log_admin("[src] deadmined themself.")
 	message_admins("[src] deadmined themself.")
@@ -689,7 +740,7 @@ GLOBAL_PROTECT(admin_verbs_hideable)
 
 	if(!A)
 		A = GLOB.admin_datums[ckey]
-		if (!A)
+		if(!A)
 			var/msg = " is trying to readmin but they have no deadmin entry"
 			message_admins("[key_name_admin(src)][msg]")
 			log_admin_private("[key_name(src)][msg]")
@@ -697,7 +748,7 @@ GLOBAL_PROTECT(admin_verbs_hideable)
 
 	A.associate(src)
 
-	if (!holder)
+	if(!holder)
 		return //This can happen if an admin attempts to vv themself into somebody elses's deadmin datum by getting ref via brute force
 
 	to_chat(src, "<span class='interface'>I am now an admin.</span>")
@@ -735,10 +786,34 @@ GLOBAL_PROTECT(admin_verbs_hideable)
 	set name = "Delete Player Made Book"
 	if(!holder)
 		return
-	if(SSlibrarian.del_player_book(input(src, "What is the book file you want to delete? (spaces and other characters are their url encode versions for the file name, so for example spaces are +)")))
+	var/book = input(src, "What is the book file you want to delete?") in SSlibrarian.books
+	if(SSlibrarian.del_player_book(book))
 		to_chat(src, "<span class='notice'>Book has been successfully deleted</span>")
 	else
 		to_chat(src, "<span class='notice'> Either the book file doesn't exist or you have failed to type it in properly (remember characters have been url encoded for the file name)</span>")
+
+
+/client/proc/manage_paintings()
+	set category = "Admin"
+	set name = "Manage Player Made Paintings"
+	if(!holder)
+		return
+
+	var/list/paintings = list()
+
+	paintings |= SSpaintings.paintings
+	var/dat = "<h3>Paintings:</h3><br>"
+	dat += "<table><tr><th>Picture</th><th>Title</th><th>Author</th><th>Delete</th></tr>"
+	for(var/paint_name in paintings)
+		var/list/painting = paintings[paint_name]
+		var/icon/painting_icon = icon("data/player_generated_paintings/paintings/[painting["painting_title"]].png")
+		src << browse_rsc(painting_icon, "[paint_name].png")
+		dat += "<tr><td><img height=128 src='[painting["painting_title"]].png'/></td><td>[painting["painting_title"]]</td><td>[painting["author_ckey"]]</td><td><a href='byond://?src=[REF(src)];delete_painting=1;id=[painting["painting_title"]]'>Delete</a></td></tr>"
+	if (!length(paintings))
+		dat += "<tr><td colspan='4'>No results found.</td></tr>"
+
+	dat += "</table>"
+	src << browse(dat, "window=painting_deletion")
 
 //Family Tree Subsystem
 /client/proc/ShowAllFamilies()
@@ -752,3 +827,57 @@ GLOBAL_PROTECT(admin_verbs_hideable)
 	popup.set_content(dat)
 	popup.open()
 
+/client/proc/tracy_next_round()
+	set name = "Toggle Tracy Next Round"
+	set desc = "Toggle running the byond-tracy profiler next round"
+	set category = "Debug"
+	if(!check_rights_for(src, R_DEBUG))
+		return
+#ifndef OPENDREAM
+	if(!fexists(TRACY_DLL_PATH))
+		to_chat(src, span_danger("byond-tracy library ([TRACY_DLL_PATH]) not present!"))
+		return
+	if(fexists(TRACY_ENABLE_PATH))
+		fdel(TRACY_ENABLE_PATH)
+	else
+		rustg_file_write("[ckey]", TRACY_ENABLE_PATH)
+	message_admins(span_adminnotice("[key_name_admin(src)] [fexists(TRACY_ENABLE_PATH) ? "enabled" : "disabled"] the byond-tracy profiler for next round."))
+	log_admin("[key_name(src)] [fexists(TRACY_ENABLE_PATH) ? "enabled" : "disabled"] the byond-tracy profiler for next round.")
+#else
+	to_chat(src, span_danger("byond-tracy is not supported on OpenDream, sorry!"))
+#endif
+
+/client/proc/start_tracy()
+	set name = "Run Tracy Now"
+	set desc = "Start running the byond-tracy profiler immediately."
+	set category = "Debug"
+	if(!check_rights_for(src, R_DEBUG))
+		return
+#ifndef OPENDREAM
+	if(GLOB.tracy_initialized)
+		to_chat(src, span_warning("byond-tracy is already running!"))
+		return
+	else if(GLOB.tracy_init_error)
+		to_chat(src, span_danger("byond-tracy failed to initialize during an earlier attempt: [GLOB.tracy_init_error]"))
+		return
+	else if(!fexists(TRACY_DLL_PATH))
+		to_chat(src, span_danger("byond-tracy library ([TRACY_DLL_PATH]) not present!"))
+		return
+	message_admins(span_adminnotice("[key_name_admin(src)] is trying to start the byond-tracy profiler."))
+	log_admin("[key_name(src)] is trying to start the byond-tracy profiler.")
+	GLOB.tracy_initialized = FALSE
+	GLOB.tracy_init_reason = "[ckey]"
+	world.init_byond_tracy()
+	if(GLOB.tracy_init_error)
+		to_chat(src, span_danger("byond-tracy failed to initialize: [GLOB.tracy_init_error]"))
+		message_admins(span_adminnotice("[key_name_admin(src)] tried to start the byond-tracy profiler, but it failed to initialize ([GLOB.tracy_init_error])"))
+		log_admin("[key_name(src)] tried to start the byond-tracy profiler, but it failed to initialize ([GLOB.tracy_init_error])")
+		return
+	to_chat(src, span_notice("byond-tracy successfully started!"))
+	message_admins(span_adminnotice("[key_name_admin(src)] started the byond-tracy profiler."))
+	log_admin("[key_name(src)] started the byond-tracy profiler.")
+	if(GLOB.tracy_log)
+		rustg_file_write("[GLOB.tracy_log]", "[GLOB.log_directory]/tracy.loc")
+#else
+	to_chat(src, span_danger("byond-tracy is not supported on OpenDream, sorry!"))
+#endif

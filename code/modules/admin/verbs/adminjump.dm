@@ -1,4 +1,4 @@
-/client/proc/jumptoarea(area/A in GLOB.sortedAreas)
+/client/proc/jumptoarea(area/A in get_sorted_areas())
 	set name = "Jump to Area"
 	set desc = ""
 	set category = "GameMaster"
@@ -10,10 +10,10 @@
 		return
 
 	var/list/turfs = list()
-	for(var/turf/T in A)
-		if(T.density)
-			continue
-		turfs.Add(T)
+	for (var/list/zlevel_turfs as anything in A.get_zlevel_turf_lists())
+		for (var/turf/area_turf as anything in zlevel_turfs)
+			if(!area_turf.density)
+				turfs.Add(area_turf)
 
 	var/turf/T = safepick(turfs)
 	if(!T)
@@ -144,7 +144,11 @@
 	if(!src.holder)
 		//to_chat(src, "Only administrators may use this command.")
 		return
-	var/area/A = input(usr, "Pick an area.", "Pick an area") in GLOB.sortedAreas|null
+	var/list/sorted_areas = get_sorted_areas()
+	if(!length(sorted_areas))
+		to_chat(src, "No areas found.")
+		return
+	var/area/A = input(usr, "Pick an area.", "Pick an area") in sorted_areas
 	if(A && istype(A))
 		if(M.forceMove(safepick(get_area_turfs(A))))
 
@@ -155,3 +159,23 @@
 		else
 			to_chat(src, "Failed to move mob to a valid location.")
 		SSblackbox.record_feedback("tally", "admin_verb", 1, "Send Mob") //If you are copy-pasting this, ensure the 2nd parameter is unique to the new proc!
+
+/client/proc/spawn_in_test_area()
+	set name = "Spawn in Test Area"
+	set desc = ""
+	set category = "GameMaster"
+	if(!src.holder)
+//		//to_chat(src, "Only administrators may use this command.")
+		return
+
+	var/turf/warp_place = pick(GLOB.admin_warp)
+	if(!warp_place)
+		return
+
+	var/mob/living/carbon/human/new_human = new (warp_place)
+
+	var/datum/outfit/outfit = new /datum/outfit/job/tailor
+	outfit.equip(new_human)
+
+	prefs.safe_transfer_prefs_to(new_human)
+	new_human.ckey = ckey

@@ -1,3 +1,6 @@
+///Whether we should not attempt to clean.
+#define DO_NOT_CLEAN "do_not_clean"
+
 //Cleaning tool strength
 // 1 is also a valid cleaning strength but completely unused so left undefined
 #define CLEAN_WEAK 			2
@@ -14,3 +17,7 @@
 #define CLEAN_STRENGTH_FINGERPRINTS CLEAN_IMPRESSIVE
 #define CLEAN_STRENGTH_BLOOD CLEAN_MEDIUM
 #define CLEAN_STRENGTH_FIBERS CLEAN_IMPRESSIVE
+
+#define CLEAN_EFFECTIVENESS_WATER 0.6
+#define CLEAN_EFFECTIVENESS_DIRTY_WATER 0.4
+#define CLEAN_EFFECTIVENESS_SOAP 7

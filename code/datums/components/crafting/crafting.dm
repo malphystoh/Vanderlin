@@ -3,16 +3,7 @@
 		return COMPONENT_INCOMPATIBLE
 	var/mob/living/L = parent
 	L.craftingthing = src
-//	RegisterSignal(parent, COMSIG_MOB_CLIENT_LOGIN, PROC_REF(create_mob_button))
-/*
-/datum/component/personal_crafting/proc/create_mob_button(mob/user, client/CL)
-	var/datum/hud/H = user.hud_used
-	var/atom/movable/screen/craft/C = new()
-	C.icon = H.ui_style
-	H.static_inventory += C
-	CL.screen += C
-	RegisterSignal(C, COMSIG_CLICK, PROC_REF(roguecraft))
-*/
+
 /datum/component/personal_crafting
 	var/busy
 	var/viewing_category = 1 //typical powergamer starting on the Weapons tab
@@ -99,10 +90,7 @@
 			continue
 		if(I.flags_1 & HOLOGRAM_1)
 			continue
-		if(istype(I, /obj/item/stack))
-			var/obj/item/stack/S = I
-			.["other"][I.type] += S.amount
-		else if(istype(I, /obj/item/natural/bundle))
+		if(istype(I, /obj/item/natural/bundle))
 			var/obj/item/natural/bundle/B = I
 			.["other"][B.stacktype] += B.amount
 		else if(I.tool_behaviour)
@@ -147,30 +135,27 @@
 			return FALSE
 	return TRUE
 
-/atom/proc/OnCrafted(dirin)
+/atom/proc/OnCrafted(dirin, mob/user)
+	SHOULD_CALL_PARENT(TRUE)
+	add_abstract_elastic_data(ELASCAT_CRAFTING, "[name]", 1)
 	return
 
-/obj/structure/OnCrafted(dirin)
+/obj/structure/OnCrafted(dirin, mob/user)
 	obj_flags |= CAN_BE_HIT
 	. = ..()
 
-/turf/open/OnCrafted(dirin)
-	. = ..()
-	START_PROCESSING(SSweather,src)
-	var/turf/belo = get_step_multiz(src, DOWN)
-	for(var/x in 1 to 5)
-		if(belo)
-			START_PROCESSING(SSweather,belo)
-			belo = get_step_multiz(belo, DOWN)
-		else
-			break
-
 /datum/crafting_recipe/proc/TurfCheck(mob/user, turf/T)
+	if(istype(T, /turf/open/water))
+		return FALSE
+	if(istype(T, /turf/open/lava))
+		return FALSE
 	return TRUE
 
 
 /datum/component/personal_crafting/proc/construct_item(mob/user, datum/crafting_recipe/R)
-	if(user.doing)
+	if(user.doing())
+		return
+	if(!R)
 		return
 	var/list/contents = get_surroundings(user)
 //	var/send_feedback = 1
@@ -184,39 +169,36 @@
 		N = R.result
 		result_name = N.name
 	if(isopenturf(T) && R.wallcraft)
-		to_chat(user, "<span class='warning'>Need to craft this on a wall.</span>")
+		to_chat(user, "<span class='warning'>I need to craft this on a wall.</span>")
 		return
 	if(!isopenturf(T) || R.ontile)
 		T = get_turf(user.loc)
 	if(!R.TurfCheck(user, T))
-		to_chat(user, "<span class='warning'>I can't craft here.</span>")
-		return
-	if(istype(T, /turf/open/water))
-		to_chat(user, "<span class='warning'>I can't craft here.</span>")
+		to_chat(user, "<span class='warning'>I can't craft on [T].</span>")
 		return
 	if(isturf(R.result))
 		for(var/obj/structure/fluff/traveltile/TT in range(7, user))
-			to_chat(user, "<span class='warning'>I can't craft here.</span>")
+			to_chat(user, "<span class='warning'>I can't build this near a travel point.</span>")
 			return
 	if(ispath(R.result, /obj/structure) || ispath(R.result, /obj/machinery))
 		for(var/obj/structure/fluff/traveltile/TT in range(7, user))
-			to_chat(user, "<span class='warning'>I can't craft here.</span>")
+			to_chat(user, "<span class='warning'>I can't build this near a travel point.</span>")
 			return
 		for(var/obj/structure/S in T)
 			if(R.buildsame && istype(S, R.result))
 				if(user.dir == S.dir)
-					to_chat(user, "<span class='warning'>Something is in the way.</span>")
+					to_chat(user, "<span class='warning'>[S] is in the way.</span>")
 					return
 				continue
 			if(R.structurecraft && istype(S, R.structurecraft))
 				testing("isstructurecraft")
 				continue
 			if(S.density)
-				to_chat(user, "<span class='warning'>Something is in the way.</span>")
+				to_chat(user, "<span class='warning'>[S] is in the way.</span>")
 				return
 		for(var/obj/machinery/M in T)
 			if(M.density)
-				to_chat(user, "<span class='warning'>Something is in the way.</span>")
+				to_chat(user, "<span class='warning'>[M] is in the way.</span>")
 				return
 	if(R.req_table)
 		if(!(locate(/obj/structure/table) in T))
@@ -224,16 +206,17 @@
 			return
 	if(R.structurecraft)
 		if(!(locate(R.structurecraft) in T))
-			to_chat(user, "<span class='warning'>I'm missing something.</span>")
+			var/atom/A = R.structurecraft
+			to_chat(user, "<span class='warning'>There isn't \a [initial(A.name)] nearby.</span>")
 			return
 	if(check_contents(R, contents))
 		if(check_tools(user, R, contents))
 			if(R.craftsound)
 				playsound(T, R.craftsound, 100, TRUE)
 //			var/time2use = round(R.time / 3)
-			var/time2use = 10
+			var/time2use = 1 SECONDS
 			for(var/i = 1 to 100)
-				if(do_after(user, time2use, target = user))
+				if(do_after(user, time2use, user))
 					contents = get_surroundings(user)
 					if(!check_contents(R, contents))
 						return ", missing component."
@@ -277,16 +260,16 @@
 						for(var/IT in L)
 							var/atom/movable/I = new IT(T)
 							I.CheckParts(parts, R)
-							I.OnCrafted(user.dir)
+							I.OnCrafted(user.dir, user)
 					else
 						if(ispath(R.result, /turf))
 							var/turf/X = T.PlaceOnTop(R.result)
 							if(X)
-								X.OnCrafted(user.dir)
+								X.OnCrafted(user.dir, user)
 						else
 							var/atom/movable/I = new R.result (T)
 							I.CheckParts(parts, R)
-							I.OnCrafted(user.dir)
+							I.OnCrafted(user.dir, user)
 					user.visible_message("<span class='notice'>[user] [R.verbage_tp] \the [result_name]!</span>", \
 										"<span class='notice'>I [R.verbage] \the [result_name]!</span>")
 					if(user.mind && R.skillcraft)
@@ -369,28 +352,6 @@
 						RC.on_reagent_change()
 					else
 						surroundings -= RC
-			else if(ispath(A, /obj/item/stack))
-				var/obj/item/stack/S
-				var/obj/item/stack/SD
-				while(amt > 0)
-					S = locate(A) in surroundings
-					if(S.amount >= amt)
-						if(!locate(S.type) in Deletion)
-							SD = new S.type()
-							Deletion += SD
-						S.use(amt)
-						SD = locate(S.type) in Deletion
-						SD.amount += amt
-						continue main_loop
-					else
-						amt -= S.amount
-						if(!locate(S.type) in Deletion)
-							Deletion += S
-						else
-							data = S.amount
-							S = locate(S.type) in Deletion
-							S.add(data)
-						surroundings -= S
 			else if(ispath(A, /obj/item/natural) || A == /obj/item/grown/log/tree/stick)
 				while(amt > 0)
 					for(var/obj/item/natural/bundle/B in get_environment(user))
@@ -438,13 +399,6 @@
 			. += RG
 			Deletion -= RG
 			continue
-		else if(istype(A, /obj/item/stack))
-			var/obj/item/stack/ST = locate(A) in Deletion
-			if(ST.amount > partlist[A])
-				ST.amount = partlist[A]
-			. += ST
-			Deletion -= ST
-			continue
 		else
 			while(partlist[A] > 0)
 				var/atom/movable/AM = locate(A) in Deletion
@@ -452,8 +406,13 @@
 				Deletion -= AM
 				partlist[A] -= 1
 	while(Deletion.len)
-		var/DL = Deletion[Deletion.len]
+		var/atom/DL = Deletion[Deletion.len]
 		Deletion.Cut(Deletion.len)
+		var/datum/component/storage/STR = DL.GetComponent(/datum/component/storage)
+		if(STR)
+			var/list/things = STR.contents()
+			for(var/obj/item/I in things)
+				STR.remove_from_storage(I, get_turf(src))
 		qdel(DL)
 
 /datum/component/personal_crafting/proc/component_ui_interact(atom/movable/screen/craft/image, location, control, params, user)
@@ -604,7 +563,7 @@
 // new crafting button interaction
 
 /datum/component/personal_crafting/proc/roguecraft(location, control, params, mob/user)
-	if(user.doing)
+	if(user.doing())
 		return
 	var/area/A = get_area(user)
 	if(!A.can_craft_here())

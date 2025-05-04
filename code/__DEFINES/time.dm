@@ -31,12 +31,16 @@ When using time2text(), please use "DDD" to find the weekday. Refrain from using
 */
 
 #define MONDAY		"Mon"
-#define TUESDAY	"Tue"
+#define TUESDAY		"Tue"
 #define WEDNESDAY	"Wed"
 #define THURSDAY	"Thu"
 #define FRIDAY		"Fri"
 #define SATURDAY	"Sat"
 #define SUNDAY		"Sun"
+
+#define MILLISECONDS *0.01
+
+#define DECISECONDS *1 //the base unit all of these defines are scaled by, because byond uses that as a unit of measurement for some fucking reason
 
 #define SECONDS *10
 

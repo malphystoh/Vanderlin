@@ -53,7 +53,6 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 	var/w_class = WEIGHT_CLASS_NORMAL
 	var/slot_flags = 0		//This is used to determine on which slots an item can fit.
 	pass_flags = PASSTABLE
-	pressure_resistance = 4
 	var/obj/item/master = null
 
 	var/heat_protection = 0 //flags which determine which body parts are protected from heat. Use the HEAD, CHEST, GROIN, etc. flags. See setup.dm
@@ -88,8 +87,8 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 	var/equip_delay_self = 1
 	// In deciseconds, how long does it take for us to take off a piece of clothing or equipment. Normally will have same value as equip_delay_self
 	var/unequip_delay_self = 1
-	// Boolean. If true, can be moving while equipping (for helmets etc)
-	var/edelay_type = 1
+	/// Boolean. If true, can be moving while equipping (for helmets etc)
+	var/edelay_type = TRUE
 	// In deciseconds, how long an item takes to be put on another person via the undressing menu.
 	var/equip_delay_other = 20
 	//In deciseconds, how long an item takes to remove from another person via the undressing menu.
@@ -162,7 +161,9 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 	var/list/gripped_intents //intents while gripped, replacing main intents
 	var/force_wielded = 0
 	var/gripsprite = FALSE //use alternate grip sprite for inhand
+	var/gripspriteonmob = FALSE //use alternate sprite for onmob
 
+	/// Item will be scaled by this factor when on the ground.
 	var/dropshrink = 0
 
 	var/wlength = WLENGTH_NORMAL		//each weapon length class has its own inherent dodge properties
@@ -188,7 +189,7 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 	var/bloody_icon_state = "itemblood"
 	var/boobed = FALSE
 
-	// Time in deciseconds this item adds to var/fueluse for a /obj/machinery/light/rogue type when fed to it.
+	// Time in deciseconds this item adds to var/fueluse for a /obj/machinery/light/fueled type when fed to it.
 	var/firefuel = 0 //add this idiot
 
 	var/thrown_bclass = BCLASS_BLUNT
@@ -222,7 +223,8 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 
 	var/list/blocksound //played when an item that is equipped blocks a hit
 
-	var/list/onprop = list()
+	/// A lazylist to store inhands data.
+	var/list/onprop
 	var/damage_type = "blunt"
 	var/force_reupdate_inhand = TRUE
 
@@ -234,8 +236,39 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 	// Can this be used against a training dummy to learn skills? Prevents dumb exploits.
 	var/istrainable = FALSE
 
+	/// This is what we get when we either tear up or salvage a piece of clothing
+	var/obj/item/salvage_result = null
+	/// The amount of salvage we get out of salvaging with scissors
+	var/salvage_amount = 0 //This will be more accurate when sewing recipes get sorted
+	/// Temporary snowflake var to be used in the rare cases clothing doesn't require fibers to sew, to avoid material duping
+	var/fiber_salvage = FALSE
+	/// Number of torn sleves, important for salvaging calculations and examine text
+	var/torn_sleeve_number = 0
+
+	var/blocking_behavior
+	var/wetness = 0
+	var/block2add
+	var/detail_tag
+	var/detail_color
+
+
+	// ~Grid INVENTORY VARIABLES
+	/// Width we occupy on the hud - Keep null to generate based on w_class
+	var/grid_width
+	/// Height we occupy on the hud - Keep null to generate based on w_class
+	var/grid_height
+	///our melting material, basically if exists this is what we melt into in a crucible
+	var/datum/material/melting_material
+	///our metling amount
+	var/melt_amount = 0
+	///our current in progress slapcraft
+	var/datum/orderless_slapcraft/in_progress_slapcraft
+	///these are flags of what tools can interact with this atom useful to stop hard coding interactions
+	var/tool_flags = NONE
+
 /obj/item/Initialize()
 	. = ..()
+
 	if(!pixel_x && !pixel_y && !bigboy)
 		pixel_x = rand(-5,5)
 		pixel_y = rand(-5,5)
@@ -246,8 +279,21 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 	if(!experimental_inhand)
 		inhand_x_dimension = 32
 		inhand_y_dimension = 32
+
+	if(grid_width <= 0)
+		grid_width = (w_class * world.icon_size)
+	if(grid_height <= 0)
+		grid_height = (w_class * world.icon_size)
+
+	if(is_silver)
+		enchant(/datum/enchantment/silver)
 	update_transform()
 
+/obj/item/proc/get_detail_tag() //this is for extra layers on clothes
+	return detail_tag
+
+/obj/item/proc/get_detail_color() //this is for extra layers on clothes
+	return detail_color
 
 /obj/item/proc/update_transform()
 	transform = null
@@ -274,9 +320,23 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 					B.remove()
 					B.generate_appearance()
 					B.apply()
+			if(gripspriteonmob)
+				item_state = "[initial(icon_state)]_wield"
+				var/datum/component/decal/blood/B = GetComponent(/datum/component/decal/blood)
+				if(B)
+					B.remove()
+					B.generate_appearance()
+					B.apply()
 			return
 		if(gripsprite)
 			icon_state = initial(icon_state)
+			var/datum/component/decal/blood/B = GetComponent(/datum/component/decal/blood)
+			if(B)
+				B.remove()
+				B.generate_appearance()
+				B.apply()
+		if(gripspriteonmob)
+			item_state = initial(icon_state)
 			var/datum/component/decal/blood/B = GetComponent(/datum/component/decal/blood)
 			if(B)
 				B.remove()
@@ -343,6 +403,9 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 
 	if(sharpness) //give sharp objects butchering functionality, for consistency
 		AddComponent(/datum/component/butchering, 80 * toolspeed)
+	else
+		max_blade_int = 0
+		blade_int = 0
 
 	if(max_blade_int && !blade_int) //set blade integrity to randomized 60% to 100% if not already set
 		blade_int = max_blade_int + rand(-(max_blade_int * 0.4), 0)
@@ -454,10 +517,14 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 		if(istype(src,/obj/item/clothing))
 			var/obj/item/clothing/C = src
 			if(C.prevent_crits)
-				if(C.prevent_crits.len)
-					inspec += "\n<b>DEFENSE</b>"
+				if(length(C.prevent_crits))
+					inspec += "\n<b>DEFENSE:</b>"
 					for(var/X in C.prevent_crits)
 						inspec += "\n<b>[X] damage</b>"
+			if(C.body_parts_covered)
+				inspec += "\n<b>COVERAGE:</b>"
+				for(var/zone in body_parts_covered2organ_names(C.body_parts_covered))
+					inspec += "\n<b>[parse_zone(zone)]</b>"
 
 //**** General durability
 
@@ -473,7 +540,7 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 
 /obj/item/get_inspect_button()
 	if(has_inspect_verb || (obj_integrity < max_integrity))
-		return " <span class='info'><a href='?src=[REF(src)];inspect=1'>{?}</a></span>"
+		return " <span class='info'><a href='byond://?src=[REF(src)];inspect=1'>{?}</a></span>"
 	return ..()
 
 
@@ -542,11 +609,14 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 	if(grav > STANDARD_GRAVITY)
 		var/grav_power = min(3,grav - STANDARD_GRAVITY)
 		to_chat(user,"<span class='notice'>I start picking up [src]...</span>")
-		if(!do_mob(user,src,30*grav_power))
+		if(!do_after(user, (3 SECONDS * grav_power), src))
 			return
 
+	if(SEND_SIGNAL(loc, COMSIG_STORAGE_BLOCK_USER_TAKE, src, user, TRUE))
+		return
+
 	if(!ontable() && isturf(loc))
-		if(!move_after(user,3,target = src))
+		if(!do_after(user, 3 DECISECONDS, src))
 			return
 
 	//If the item is in a storage item, take it out
@@ -567,6 +637,7 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 	else
 		if(twohands_required)
 			wield(user)
+	afterpickup(user)
 
 /atom/proc/ontable()
 	if(!isturf(src.loc))
@@ -581,12 +652,9 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 		if(!(src in C.held_items) && unequip_delay_self)
 			if(unequip_delay_self >= 10)
 				C.visible_message(span_smallnotice("[C] starts taking off [src]..."), span_smallnotice("I start taking off [src]..."))
-			if(edelay_type)
-				if(move_after(C, minone(unequip_delay_self-C.STASPD), target = C))
-					return TRUE
-			else
-				if(do_after(C, minone(unequip_delay_self-C.STASPD), target = C))
-					return TRUE
+
+			var/doafter_flags = edelay_type ? (IGNORE_USER_LOC_CHANGE) : (NONE)
+			return do_after(C, minone(unequip_delay_self-C.STASPD), timed_action_flags = doafter_flags)
 
 	return TRUE
 
@@ -621,6 +689,9 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 		return 1
 	return 0
 
+/obj/item/proc/hit_response(mob/living/carbon/human/owner, mob/living/carbon/human/attacker)
+	SEND_SIGNAL(src, COMSIG_ITEM_HIT_RESPONSE, owner, attacker)		//sends signal for Magic_items. Used to call enchantments effects for worn items
+
 /obj/item/proc/talk_into(mob/M, input, channel, spans, datum/language/language)
 	return ITALICS | REDUCE_RANGE
 
@@ -646,6 +717,8 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 	if(!silent)
 		playsound(src, drop_sound, DROP_SOUND_VOLUME, TRUE, ignore_walls = FALSE)
 	user.update_equipment_speed_mods()
+	if(isliving(user))
+		user:encumbrance_to_speed()
 	update_transform()
 
 // called just as an item is picked up (loc is not yet changed)
@@ -653,6 +726,14 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 	SHOULD_CALL_PARENT(TRUE)
 	SEND_SIGNAL(src, COMSIG_ITEM_PICKUP, user)
 	item_flags |= IN_INVENTORY
+
+// called just as an item is picked up (loc is not yet changed)
+/obj/item/proc/afterpickup(mob/user)
+	SHOULD_CALL_PARENT(TRUE)
+	if(isliving(user))
+		user:encumbrance_to_speed()
+
+/obj/item/proc/afterdrop(mob/user)
 
 // called when "found" in pockets and storage items. Returns 1 if the search should end.
 /obj/item/proc/on_found(mob/finder)
@@ -666,6 +747,7 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 /obj/item/proc/equipped(mob/user, slot, initial = FALSE)
 	SHOULD_CALL_PARENT(TRUE)
 	SEND_SIGNAL(src, COMSIG_ITEM_EQUIPPED, user, slot)
+	SEND_SIGNAL(user, COMSIG_MOB_EQUIPPED_ITEM, src, slot)
 	for(var/X in actions)
 		var/datum/action/A = X
 		if(item_action_slot_check(slot, user)) //some items only give their actions buttons when in a specific slot.
@@ -704,10 +786,14 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 //If you are making custom procs but would like to retain partial or complete functionality of this one, include a 'return ..()' to where you want this to happen.
 //Set disable_warning to TRUE if you wish it to not give you outputs.
 /obj/item/proc/mob_can_equip(mob/living/M, mob/living/equipper, slot, disable_warning = FALSE, bypass_equip_delay_self = FALSE)
+	// pretty sure this isn't needed, the reason this is disabled is so harpoon guns can be equipped to hips.
+	// if it causes issues - reenable it and seek a different fix.
+	/*
 	if(twohands_required)
 		if(!disable_warning)
 			to_chat(M, "<span class='warning'>[src] is too bulky to carry with anything but my hands!</span>")
 		return 0
+	*/
 
 	if(!M)
 		return FALSE
@@ -924,6 +1010,8 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 ///Returns the sharpness of src. If you want to get the sharpness of an item use this.
 /obj/item/proc/get_sharpness()
 	//Oh no, we are dulled out!
+	if(!max_blade_int) //not even sharp
+		return FALSE
 	if(max_blade_int && (blade_int <= 0))
 		return FALSE
 	var/max_sharp = sharpness
@@ -1033,19 +1121,6 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 	else
 		openToolTip(user,src,params,title = name,content = "[desc]<br><b>Force:</b> [force_string]",theme = "")
 
-/obj/item/MouseEntered(location, control, params)
-	. = ..()
-	if((item_flags & IN_INVENTORY || item_flags & IN_STORAGE) && usr.client.prefs.enable_tips && !QDELETED(src))
-		var/timedelay = usr.client.prefs.tip_delay/100
-		var/user = usr
-		tip_timer = addtimer(CALLBACK(src, PROC_REF(openTip), location, control, params, user), timedelay, TIMER_STOPPABLE)//timer takes delay in deciseconds, but the pref is in milliseconds. dividing by 100 converts it.
-
-/obj/item/MouseExited()
-	. = ..()
-	deltimer(tip_timer)//delete any in-progress timer if the mouse is moved off the item before it finishes
-	closeToolTip(usr)
-
-
 // Called when a mob tries to use the item as a tool.
 // Handles most checks.
 /obj/item/proc/use_tool(atom/target, mob/living/user, delay, amount=0, volume=0, datum/callback/extra_checks)
@@ -1070,11 +1145,11 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 		var/datum/callback/tool_check = CALLBACK(src, PROC_REF(tool_check_callback), user, amount, extra_checks)
 
 		if(ismob(target))
-			if(!do_mob(user, target, delay, extra_checks=tool_check))
+			if(!do_after(user, delay, target, extra_checks=tool_check))
 				return
 
 		else
-			if(!do_after(user, delay, target=target, extra_checks=tool_check))
+			if(!do_after(user, delay, target, extra_checks=tool_check))
 				return
 	else
 		// Invoke the extra checks once, just in case.
@@ -1143,6 +1218,14 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 	if(HAS_TRAIT(src, TRAIT_NODROP))
 		return
 	return ..()
+
+/obj/item/proc/embedded(atom/embedded_target, obj/item/bodypart/part)
+	return
+
+/obj/item/proc/unembedded(mob/living/owner)
+	if(item_flags & DROPDEL && !QDELETED(src))
+		qdel(src)
+		return TRUE
 
 /obj/item/proc/canStrip(mob/stripper, mob/owner)
 	return !HAS_TRAIT(src, TRAIT_NODROP)
@@ -1231,4 +1314,17 @@ GLOBAL_DATUM_INIT(fire_overlay, /mutable_appearance, mutable_appearance('icons/e
 		if(altgripped || wielded)
 			ungrip(M, FALSE)
 
+/obj/item/proc/on_consume(mob/living/eater)
+	return
 
+/obj/item/proc/get_displayed_price(mob/user)
+	if(get_real_price() > 0 && (HAS_TRAIT(user, TRAIT_SEEPRICES) || simpleton_price))
+		return span_info("Value: [get_real_price()] mammon")
+	return FALSE
+
+/obj/item/proc/get_stored_weight()
+	var/held_weight = 0
+	for(var/obj/item/stored_item in contents)
+		held_weight += stored_item.item_weight * carry_multiplier
+
+	return held_weight

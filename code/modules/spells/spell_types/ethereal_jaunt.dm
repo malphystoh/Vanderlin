@@ -3,8 +3,7 @@
 	desc = ""
 	overlay_state = "jaunt"
 	school = "transmutation"
-	charge_max = 300
-	clothes_req = FALSE
+	recharge_time = 300
 	invocation = "VANISHIKA"
 	invocation_type = "shout"
 	range = -1
@@ -16,8 +15,12 @@
 	var/jaunt_in_type = /obj/effect/temp_visual/wizard
 	var/jaunt_out_type = /obj/effect/temp_visual/wizard/out
 	associated_skill = /datum/skill/magic/arcane
+	attunements = list(
+		/datum/attunement/arcyne = 0.4,
+	)
 
 /obj/effect/proc_holder/spell/targeted/ethereal_jaunt/cast(list/targets,mob/user = usr) //magnets, so mostly hardcoded
+	. = ..()
 	playsound(get_turf(user), 'sound/swap.ogg', 50, TRUE, -1)
 	for(var/mob/living/target in targets)
 		INVOKE_ASYNC(src, PROC_REF(do_jaunt), target)
@@ -32,6 +35,7 @@
 	target.reset_perspective(holder)
 	target.notransform=0 //mob is safely inside holder now, no need for protection.
 	jaunt_steam(mobloc)
+	ADD_TRAIT(target, TRAIT_IMPERCEPTIBLE, MAGIC_TRAIT)
 
 	sleep(jaunt_duration)
 
@@ -47,6 +51,7 @@
 	new jaunt_in_type(mobloc, holder.dir)
 	target.setDir(holder.dir)
 	sleep(jaunt_in_time)
+	REMOVE_TRAIT(target, TRAIT_IMPERCEPTIBLE, MAGIC_TRAIT)
 	qdel(holder)
 	if(!QDELETED(target))
 		if(mobloc.density)
@@ -73,6 +78,7 @@
 	anchored = TRUE
 	invisibility = 60
 	resistance_flags = LAVA_PROOF | FIRE_PROOF | UNACIDABLE | ACID_PROOF
+	flags_1 = PREVENT_CONTENTS_EXPLOSION_1
 
 /obj/effect/dummy/phased_mob/spell_jaunt/Destroy()
 	// Eject contents if deleted somehow

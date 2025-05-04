@@ -34,7 +34,11 @@
 	. = ..()
 
 /datum/component/rot/corpse/process()
+	var/time_elapsed = last_process ? (world.time - last_process)/10 : 1
 	..()
+	if(has_world_trait(/datum/world_trait/pestra_mercy))
+		amount -= 5 * time_elapsed
+
 	var/mob/living/carbon/C = parent
 	var/is_zombie
 	if(C.mind)
@@ -44,8 +48,6 @@
 		if(C.stat != DEAD)
 			qdel(src)
 			return
-
-
 	if(!(C.mob_biotypes & (MOB_ORGANIC|MOB_UNDEAD)))
 		qdel(src)
 		return
@@ -53,7 +55,11 @@
 		if(is_zombie)
 			var/datum/antagonist/zombie/Z = C.mind.has_antag_datum(/datum/antagonist/zombie)
 			if(Z && !Z.has_turned && !Z.revived && C.stat == DEAD)
-				Z.wake_zombie()
+				if(istype(C.loc, /obj/structure/closet/dirthole) || istype(C.loc, /obj/structure/closet/crate/coffin))
+					if(amount > 3 MINUTES)
+						Z.wake_zombie()
+				else
+					Z.wake_zombie()
 
 	var/findonerotten = FALSE
 	var/shouldupdate = FALSE
@@ -64,22 +70,21 @@
 					B.rotted = TRUE
 					findonerotten = TRUE
 					shouldupdate = TRUE
-					C.change_stat("constitution", -8, "rottenlimbs")
+					C.change_stat(STATKEY_CON, -8)
 			else
 				if(amount > 45 MINUTES)
 					if(!is_zombie)
 						B.skeletonize()
 						if(C.dna && C.dna.species)
 							C.dna.species.species_traits |= NOBLOOD
-						C.change_stat("constitution", -99, "skeletonized")
+						C.change_stat(STATKEY_CON, -99)
 						shouldupdate = TRUE
 				else
 					findonerotten = TRUE
-
 	if(findonerotten)
 		var/turf/open/T = C.loc
-		if(istype(T))
-			T.pollute_turf(/datum/pollutant/rot, 50)
+		if(istype(T) && amount < 16 MINUTES && !(FACTION_MATTHIOS in C.faction))
+			T.pollute_turf(/datum/pollutant/rot, 9)
 			if(soundloop && soundloop.stopped && !is_zombie)
 				soundloop.start()
 		else
@@ -108,14 +113,29 @@
 		if(soundloop && soundloop.stopped)
 			soundloop.start()
 		var/turf/open/T = get_turf(L)
-		if(istype(T))
-			T.pollute_turf(/datum/pollutant/rot, 50)
+		if(istype(T)  && amount < 16 MINUTES && !(FACTION_MATTHIOS in L.faction))
+			T.pollute_turf(/datum/pollutant/rot, 9)
 	if(amount > 20 MINUTES)
 		qdel(R)
 		return L.dust(drop_items=TRUE)
 
 /datum/component/rot/gibs
-	amount = MIASMA_GIBS_MOLES
+	amount = 0.005
+
+/datum/component/rot/stinky_person
+	soundloop = null
+	var/static/list/clean_moodlets = list(/datum/stressevent/clean, /datum/stressevent/clean_plus)
+
+/datum/component/rot/stinky_person/process()
+	..()
+	var/mob/living/L = parent
+	var/turf/open/T = L.loc
+	if(istype(T))
+		if(iscarbon(L))
+			var/mob/living/carbon/stinky = L
+			for(clean_moodlets in stinky.positive_stressors)
+				return
+		T.pollute_turf(/datum/pollutant/rot, 0.25)
 
 /datum/looping_sound/fliesloop
 	mid_sounds = list('sound/misc/fliesloop.ogg')

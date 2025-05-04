@@ -1,9 +1,9 @@
 /obj/item/storage
 	name = "storage"
-	icon = 'icons/obj/storage.dmi'
 	w_class = WEIGHT_CLASS_NORMAL
 	var/rummage_if_nodrop = TRUE
 	var/component_type = /datum/component/storage/concrete
+	var/list/populate_contents = list()
 
 /obj/item/storage/get_dumping_location(obj/item/storage/source,mob/user)
 	return src
@@ -13,7 +13,8 @@
 	PopulateContents()
 
 /obj/item/storage/ComponentInitialize()
-	AddComponent(component_type)
+	if(component_type)
+		AddComponent(component_type)
 
 /obj/item/storage/AllowDrop()
 	return FALSE
@@ -39,6 +40,13 @@
 //Cyberboss says: "USE THIS TO FILL IT, NOT INITIALIZE OR NEW"
 
 /obj/item/storage/proc/PopulateContents()
+	for(var/path in populate_contents)
+		var/obj/item/new_item = new path(loc)
+		if(!SEND_SIGNAL(src, COMSIG_TRY_STORAGE_INSERT, new_item, null, TRUE, TRUE))
+			new_item.inventory_flip(null, TRUE)
+			if(!SEND_SIGNAL(src, COMSIG_TRY_STORAGE_INSERT, new_item, null, TRUE, TRUE))
+				testing("Deleting:[new_item] from [src]")
+				qdel(new_item)
 
 /obj/item/storage/proc/emptyStorage()
 	var/datum/component/storage/ST = GetComponent(/datum/component/storage)

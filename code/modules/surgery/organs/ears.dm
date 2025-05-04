@@ -5,6 +5,7 @@
 	zone = BODY_ZONE_PRECISE_EARS
 	slot = ORGAN_SLOT_EARS
 	gender = PLURAL
+	visible_organ = TRUE
 
 	healing_factor = STANDARD_ORGAN_HEALING
 	decay_factor = STANDARD_ORGAN_DECAY
@@ -29,7 +30,7 @@
 
 /obj/item/organ/ears/Insert(mob/living/carbon/M, special, drop_if_replaced)
 	. = ..()
-	for(var/datum/wound/facial/ears/ear_wound as anything in M.get_wounds())
+	for(var/datum/wound/facial/ears/ear_wound in M.get_wounds())
 		qdel(ear_wound)
 
 /obj/item/organ/ears/on_life()
@@ -100,22 +101,6 @@
 	icon_state = "kitty"
 	damage_multiplier = 2
 
-/obj/item/organ/ears/cat/Insert(mob/living/carbon/human/H, special = 0, drop_if_replaced = TRUE)
-	..()
-	if(istype(H))
-		color = H.hair_color
-		H.dna.species.mutant_bodyparts |= "ears"
-		H.dna.features["ears"] = "Cat"
-		H.update_body()
-
-/obj/item/organ/ears/cat/Remove(mob/living/carbon/human/H,  special = 0)
-	..()
-	if(istype(H))
-		color = H.hair_color
-		H.dna.features["ears"] = "None"
-		H.dna.species.mutant_bodyparts -= "ears"
-		H.update_body()
-
 /obj/item/organ/ears/penguin
 	name = "penguin ears"
 	desc = ""
@@ -138,22 +123,3 @@
 	desc = ""
 	damage_multiplier = 0.1 //STRONK
 	bang_protect = 1 //Fear me weaklings.
-
-/obj/item/organ/ears/cybernetic
-	name = "cybernetic ears"
-	icon_state = "ears-c"
-	desc = ""
-	damage_multiplier = 0.9
-	organ_flags = ORGAN_SYNTHETIC
-
-/obj/item/organ/ears/cybernetic/upgraded
-	name = "upgraded cybernetic ears"
-	icon_state = "ears-c-u"
-	desc = ""
-	damage_multiplier = 0.5
-
-/obj/item/organ/ears/cybernetic/emp_act(severity)
-	. = ..()
-	if(. & EMP_PROTECT_SELF)
-		return
-	damage += 40/severity

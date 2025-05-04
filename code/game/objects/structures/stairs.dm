@@ -12,8 +12,14 @@
 	icon_state = "stairs"
 	anchored = TRUE
 	layer = 2
-	obj_flags = CAN_BE_HIT
+	obj_flags = CAN_BE_HIT | IGNORE_SINK
 	nomouseover = TRUE
+	var/should_sink = FALSE
+
+/obj/structure/stairs/Initialize(mapload)
+	. = ..()
+	if(should_sink)
+		obj_flags &= ~IGNORE_SINK
 
 /obj/structure/stairs/stone
 	name = "stone stairs"
@@ -61,7 +67,7 @@
 	GLOB.lordcolor -= src
 
 
-/obj/structure/stairs/OnCrafted(dirin)
+/obj/structure/stairs/OnCrafted(dirin, mob/user)
 	dir = dirin
 	var/turf/partner = get_step_multiz(get_turf(src), UP)
 	partner = get_step(partner, dirin)
@@ -72,7 +78,8 @@
 		stairs.dir = dir
 	. = ..()
 
-/obj/structure/stairs/d/OnCrafted(dirin)
+/obj/structure/stairs/d/OnCrafted(dirin, mob/user)
+	SHOULD_CALL_PARENT(FALSE)
 	dir = turn(dirin, 180)
 	var/turf/partner = get_step_multiz(get_turf(src), DOWN)
 	partner = get_step(partner, dirin)
@@ -81,9 +88,11 @@
 		if(!stairs)
 			stairs = new /obj/structure/stairs(partner)
 		stairs.dir = dir
+	add_abstract_elastic_data(ELASCAT_CRAFTING, "[name]", 1)
 	return
 
-/obj/structure/stairs/stone/d/OnCrafted(dirin)
+/obj/structure/stairs/stone/d/OnCrafted(dirin, mob/user)
+	SHOULD_CALL_PARENT(FALSE)
 	dir = turn(dirin, 180)
 	var/turf/partner = get_step_multiz(get_turf(src), DOWN)
 	partner = get_step(partner, dirin)
@@ -92,6 +101,7 @@
 		if(!stairs)
 			stairs = new /obj/structure/stairs/stone(partner)
 		stairs.dir = dir
+	add_abstract_elastic_data(ELASCAT_CRAFTING, "[name]", 1)
 	return
 
 /obj/structure/stairs/Initialize(mapload)
@@ -162,7 +172,9 @@
 		L.stop_pulling()
 		pulling.forceMove(newtarg)
 		L.start_pulling(pulling, supress_message = TRUE)
-		if(was_pulled_buckled) // Assume this was a fireman carry since piggybacking is not a thing
-			var/mob/living/pulled_mob = pulling
-			pulled_mob.grippedby(L, TRUE)
-			L.buckle_mob(pulling, TRUE, TRUE, 90, 0, 0)
+		if(was_pulled_buckled)
+			var/mob/living/M = pulling
+			if(M.mobility_flags & MOBILITY_STAND)	// piggyback carry
+				L.buckle_mob(pulling, TRUE, TRUE, FALSE, 0, 0)
+			else				// fireman carry
+				L.buckle_mob(pulling, TRUE, TRUE, 90, 0, 0)

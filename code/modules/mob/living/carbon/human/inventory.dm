@@ -34,8 +34,6 @@
 			return beltl
 		if(SLOT_BELT_R)
 			return beltr
-		if(SLOT_GLASSES)
-			return glasses
 		if(SLOT_GLOVES)
 			return gloves
 		if(SLOT_HEAD)
@@ -86,7 +84,6 @@
 		head,
 		wear_mask,
 		wear_neck,
-		glasses,
 		ears,
 		mouth,
 		)
@@ -128,19 +125,6 @@
 
 			ears = I
 			update_inv_ears()
-		if(SLOT_GLASSES)
-			glasses = I
-			var/obj/item/clothing/glasses/G = I
-			if(G.glass_colour_type)
-				update_glasses_color(G, 1)
-			if(G.tint)
-				update_tint()
-			if(G.vision_correction)
-				clear_fullscreen("nearsighted")
-				clear_fullscreen("eye_damage")
-			if(G.vision_flags || G.darkness_view || G.invis_override || G.invis_view || !isnull(G.lighting_alpha))
-				update_sight()
-			update_inv_glasses()
 		if(SLOT_GLOVES)
 
 			gloves = I
@@ -265,20 +249,6 @@
 		gloves = null
 		if(!QDELETED(src))
 			update_inv_gloves()
-	else if(I == glasses)
-		glasses = null
-		var/obj/item/clothing/glasses/G = I
-		if(G.glass_colour_type)
-			update_glasses_color(G, 0)
-		if(G.tint)
-			update_tint()
-		if(G.vision_correction)
-			if(HAS_TRAIT(src, TRAIT_NEARSIGHT))
-				overlay_fullscreen("nearsighted", /atom/movable/screen/fullscreen/impaired, 1)
-		if(G.vision_flags || G.darkness_view || G.invis_override || G.invis_view || !isnull(G.lighting_alpha))
-			update_sight()
-		if(!QDELETED(src))
-			update_inv_glasses()
 	else if(I == ears)
 		ears = null
 		if(!QDELETED(src))
@@ -291,9 +261,6 @@
 		if(beltr || beltl)
 			dropItemToGround(beltr, TRUE, silent = FALSE)
 			dropItemToGround(beltl, TRUE, silent = FALSE)
-		var/obj/item/storage/S = I
-		if(istype(S))
-			S.emptyStorage()
 		belt = null
 		if(!QDELETED(src))
 			update_inv_belt()
@@ -346,7 +313,7 @@
 		if(!QDELETED(src))
 			update_inv_mouth()
 	check_armor_class()
-
+	update_reflection()
 //	if(!QDELETED(src))
 //		if(I.eweight)
 //			encumbrance -= I.eweight
@@ -355,7 +322,7 @@
 
 /mob/living/carbon/human/wear_mask_update(obj/item/I, toggle_off = 1)
 	if((I.flags_inv & (HIDEHAIR|HIDEFACIALHAIR)) || (initial(I.flags_inv) & (HIDEHAIR|HIDEFACIALHAIR)))
-		update_hair()
+		update_body()
 	if(I.flags_inv & HIDEEYES)
 		update_inv_glasses()
 	check_armor_class()
@@ -363,11 +330,11 @@
 
 /mob/living/carbon/human/head_update(obj/item/I, forced)
 	if((I.flags_inv & (HIDEHAIR|HIDEFACIALHAIR)) || forced)
-		update_hair()
+		update_body()
 	else
 		var/obj/item/clothing/C = I
 		if(istype(C) && C.dynamic_hair_suffix)
-			update_hair()
+			update_body()
 	if(I.flags_inv & HIDEEYES || forced)
 		update_inv_glasses()
 	if(I.flags_inv & HIDEEARS || forced)

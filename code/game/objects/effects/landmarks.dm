@@ -80,7 +80,7 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark)
 /obj/effect/landmark/start/adventurerlate
 	name = "Adventurerlate"
 	icon_state = "arrow"
-	jobspawn_override = list("Drifter", "Pilgrim", "Adventurer")
+	jobspawn_override = list("Pilgrim", "Adventurer")
 	delete_after_roundstart = FALSE
 
 /obj/effect/landmark/start/vagrantlate
@@ -110,18 +110,14 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark)
 /obj/effect/landmark/start/combatlate
 	name = "Combatlate"
 	icon_state = "arrow"
-	jobspawn_override = list("Drifter", "Pilgrim", "Adventurer", "Mercenary")
+	jobspawn_override = list( "Pilgrim", "Adventurer", "Mercenary")
 	delete_after_roundstart = FALSE
 
 /obj/effect/landmark/start/lord
-	name = "King"
+	name = "Monarch"
 	icon_state = "arrow"
 
-/obj/effect/landmark/start/knight
-	name = "Knight"
-	icon_state = "arrow"
-
-/obj/effect/landmark/start/sheriff
+/obj/effect/landmark/start/captain
 	name = "Captain"
 	icon_state = "arrow"
 
@@ -133,16 +129,24 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark)
 	name = "Court Magician"
 	icon_state = "arrow"
 
+/obj/effect/landmark/start/courtphys
+	name = "Court Physician"
+	icon_state = "arrow"
+
 /obj/effect/landmark/start/guardsman
-	name = "Garrison Guard"
+	name = "City Watchmen"
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/manorguardsman
-	name = "Royal Guard"
+	name = "Royal Knight"
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/veteran
 	name = "Veteran"
+	icon_state = "arrow"
+
+/obj/effect/landmark/start/jailor
+	name = "Jailor"
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/dungeoneer
@@ -150,24 +154,38 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark)
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/watchman
-	name = "Garrison Archer"
+	name = "Men-at-arms"
+	icon_state = "arrow"
+
+/obj/effect/landmark/start/gatemaster
+	name = "Gatemaster"
+	icon_state = "arrow"
+
+/obj/effect/landmark/start/forestwarden
+	name = "Forest Warden"
+	icon_state = "arrow"
+
+/obj/effect/landmark/start/forestguard
+	name = "Forest Guard"
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/villager
 	name = "Towner"
 	icon_state = "arrow"
+	jobspawn_override = list("Fisher","Noble","Hunter","Lumberjack","Miner","Bard","Carpenter","Cheesemaker")
+
+/obj/effect/landmark/start/cheesemaker
+	name = "Cheesemaker"
+	icon_state = "arrow"
 
 /obj/effect/landmark/start/woodsman
-	name = "Mayor"
+	name = "Town Elder"
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/priest
 	name = "Priest"
 	icon_state = "arrow"
 
-/obj/effect/landmark/start/cleric
-	name = "Cleric"
-	icon_state = "arrow"
 
 /obj/effect/landmark/start/monk
 	name = "Acolyte"
@@ -186,7 +204,7 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark)
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/nightman
-	name = "Niteman"
+	name = "Apothecary"
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/nightmaiden
@@ -198,11 +216,11 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark)
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/grabber
-	name = "Grabber"
+	name = "Stevedore"
 	icon_state = "arrow"
 
-/obj/effect/landmark/start/barkeep //Go figure someone breaks something
-	name = "Innkeep"
+/obj/effect/landmark/start/shophand
+	name = "Shophand"
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/innkeep
@@ -231,9 +249,14 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark)
 
 /obj/effect/landmark/start/artificer
 	name = "Artificer"
+	icon_state = "arrow"
 
 /obj/effect/landmark/start/scribe
 	name = "Scribe"
+	icon_state = "arrow"
+
+/obj/effect/landmark/start/matron
+	name = "Matron"
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/farmer
@@ -249,19 +272,35 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark)
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/gravedigger
-	name = "Gravedigger"
+	name = "Gravetender"
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/mercenary
 	name = "Mercenary"
 	icon_state = "arrow"
 
+/obj/effect/landmark/start/minor_noble
+	name = "Noble"
+	icon_state = "arrow"
+
+/obj/effect/landmark/start/miner
+	name = "Miner"
+	icon_state = "arrow"
+
+/obj/effect/landmark/start/carpenter
+	name = "Carpenter"
+	icon_state = "arrow"
+
+/obj/effect/landmark/start/bard
+	name = "Bard"
+	icon_state = "arrow"
+
 /obj/effect/landmark/start/vagrant
 	name = "Beggar"
 	icon_state = "arrow"
 
-/obj/effect/landmark/start/lady
-	name = "Queen"
+/obj/effect/landmark/start/consort
+	name = "Consort"
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/prince
@@ -278,6 +317,10 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark)
 
 /obj/effect/landmark/start/hand
 	name = "Hand"
+	icon_state = "arrow"
+
+/obj/effect/landmark/start/courtagent
+	name = "Court Agent"
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/hunter
@@ -304,6 +347,9 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark)
 	name = "Feldsher"
 	icon_state = "arrow"
 
+/obj/effect/landmark/start/gaffer
+	name = "Gaffer"
+	icon_state = "arrow"
 //yrf
 
 /obj/effect/landmark/start/squire
@@ -311,11 +357,23 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark)
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/wapprentice
-	name = "Magician's Apprentice"
+	name = "Magician Apprentice"
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/servant
 	name = "Servant"
+	icon_state = "arrow"
+
+/obj/effect/landmark/start/tapster
+	name = "Tapster"
+	icon_state = "arrow"
+
+/obj/effect/landmark/start/matron_assistant
+	name = "Matron Assistant"
+	icon_state = "arrow"
+
+/obj/effect/landmark/start/gaffer_assistant
+	name = "Ring Servant"
 	icon_state = "arrow"
 
 /obj/effect/landmark/start/churchling
@@ -330,6 +388,9 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark)
 	name = "Smithy Apprentice"
 	icon_state = "arrow"
 
+/obj/effect/landmark/start/innkeep_son
+	name = "Innkeepers Son"
+	icon_state = "arrow"
 
 /obj/effect/landmark/start/evilskeleton	// Trying to make EVIL SKELTON actually spawn
 	name = "Skeleton"
@@ -341,14 +402,35 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark)
 //Antagonist spawns
 
 /obj/effect/landmark/start/bandit
-	name = "bandit"
+	name = "Bandit"
 	icon = 'icons/mob/landmarks.dmi'
 	icon_state = "arrow"
+	jobspawn_override = list("Bandit")
+	delete_after_roundstart = FALSE
 
 /obj/effect/landmark/start/bandit/Initialize()
 	. = ..()
 	GLOB.bandit_starts += loc
 
+/obj/effect/landmark/start/lich
+	name = "Lich"
+	icon = 'icons/mob/landmarks.dmi'
+	icon_state = "arrow"
+	jobspawn_override = list("Lich")
+	delete_after_roundstart = FALSE
+
+/obj/effect/landmark/start/bandit/Initialize()
+	. = ..()
+	GLOB.lich_starts += loc
+
+/obj/effect/landmark/admin
+	name = "admin"
+	icon = 'icons/mob/landmarks.dmi'
+	icon_state = "arrow"
+
+/obj/effect/landmark/admin/Initialize()
+	. = ..()
+	GLOB.admin_warp += loc
 
 /obj/effect/landmark/start/delf
 	name = "delf"
@@ -438,6 +520,16 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark/start/new_player)
 	ruin_template = null
 	. = ..()
 
+/// Marks the bottom left of the testing zone.
+/// In landmarks.dm and not unit_test.dm so it is always active in the mapping tools.
+/obj/effect/landmark/unit_test_bottom_left
+	name = "unit test zone bottom left"
+
+/// Marks the top right of the testing zone.
+/// In landmarks.dm and not unit_test.dm so it is always active in the mapping tools.
+/obj/effect/landmark/unit_test_top_right
+	name = "unit test zone top right"
+
 //Underworld landmark
 
 /obj/effect/landmark/underworld
@@ -451,9 +543,16 @@ INITIALIZE_IMMEDIATE(/obj/effect/landmark/start/new_player)
 
 /obj/effect/landmark/underworld_spawnpoint/Initialize(mapload)
 	SHOULD_CALL_PARENT(FALSE)
-	GLOB.underworldcoinspawns += loc
+	GLOB.underworldspiritspawns += loc
 	return INITIALIZE_HINT_QDEL
 
+/obj/effect/landmark/underworld_pull_location
+	name = "coin pull teleport zone"
+
+/obj/effect/landmark/underworld_pull_location/Initialize()
+	SHOULD_CALL_PARENT(FALSE)
+	GLOB.underworld_coinpull_locs += loc
+	return INITIALIZE_HINT_QDEL
 
 /obj/effect/landmark/death_arena
 	name = "Death arena spawn 1"

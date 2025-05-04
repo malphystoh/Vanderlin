@@ -23,8 +23,8 @@
 			return
 		else
 			user.resist_grab()
-	if(!user.has_hand_for_held_index(user.active_hand_index, TRUE)) //we obviously have a hadn, but we need to check for fingers/prosthetics
-		to_chat(user, "<span class='warning'>I can't move the fingers.</span>")
+	if(!user.has_hand_for_held_index(user.active_hand_index, TRUE)) //we obviously have a hand, but we need to check for fingers/prosthetics
+		to_chat(user, "<span class='warning'>I can't move the fingers of my [user.active_hand_index == 1 ? "left" : "right"] hand.</span>")
 		return
 	if(!istype(src, /obj/item/grabbing))
 		if(HAS_TRAIT(user, TRAIT_CHUNKYFINGERS))
@@ -64,12 +64,19 @@
 	return FALSE
 
 /obj/attackby(obj/item/I, mob/living/user, params)
+	if(!user.cmode)
+		if(user.try_recipes(src, I, user))
+			user.changeNext_move(CLICK_CD_FAST)
+			return TRUE
+
 	if(I.obj_flags_ignore)
 		return I.attack_obj(src, user)
 	else
 		return ..() || ((obj_flags & CAN_BE_HIT) && I.attack_obj(src, user))
 
 /turf/attackby(obj/item/I, mob/living/user, params)
+	if(liquids && I.heat)
+		hotspot_expose(I.heat)
 	return ..() || (max_integrity && I.attack_turf(src, user))
 
 /mob/living/attackby(obj/item/I, mob/living/user, params)
@@ -80,17 +87,30 @@
 		adf = round(adf * 1.4)
 	if(istype(user.rmb_intent, /datum/rmb_intent/swift))
 		adf = round(adf * 0.6)
+
+	for(var/obj/item/clothing/worn_thing in get_equipped_items(include_pockets = TRUE))//checks clothing worn by src.
+	// Things that are supposed to be worn, being held = cannot block
+		if(isclothing(worn_thing))
+			if(worn_thing in held_items)
+				continue
+		// Things that are supposed to be held, being worn = cannot block
+		else if(!(worn_thing in held_items))
+			continue
+		worn_thing.hit_response(src, user) //checks if clothing has hit response. Refer to Items.dm
+
 	user.changeNext_move(adf)
 	return I.attack(src, user)
 
 /mob/living
 	var/tempatarget = null
 	var/pegleg = 0			//Handles check & slowdown for peglegs. Fuckin' bootleg, literally, but hey it at least works.
+	var/pet_passive = FALSE
 
 /obj/item/proc/attack(mob/living/M, mob/living/user)
 	if(SEND_SIGNAL(src, COMSIG_ITEM_ATTACK, M, user) & COMPONENT_ITEM_NO_ATTACK)
 		return FALSE
-	SEND_SIGNAL(user, COMSIG_MOB_ITEM_ATTACK, M, user)
+	if(SEND_SIGNAL(user, COMSIG_MOB_ITEM_ATTACK, M, src))
+		return FALSE
 	if(item_flags & NOBLUDGEON)
 		return FALSE
 
@@ -115,8 +135,6 @@
 //		user.emote("attackgrunt")
 	var/datum/intent/cached_intent = user.used_intent
 	if(user.used_intent.swingdelay)
-		if(!user.used_intent.noaa)
-			user.do_attack_animation(M, visual_effect_icon = user.used_intent.animname)
 		sleep(user.used_intent.swingdelay)
 	if(user.a_intent != cached_intent)
 		return
@@ -130,13 +148,12 @@
 		return
 	if((M.mobility_flags & MOBILITY_STAND))
 		if(M.checkmiss(user))
-			if(!user.used_intent.swingdelay)
-				user.do_attack_animation(M, visual_effect_icon = user.used_intent.animname)
 			return
 	if(istype(user.rmb_intent, /datum/rmb_intent/strong))
 		user.adjust_stamina(10)
 	if(istype(user.rmb_intent, /datum/rmb_intent/swift))
 		user.adjust_stamina(10)
+	var/turf/turf_before = get_turf(M)
 	if(M.checkdefense(user.used_intent, user))
 		if(M.d_intent == INTENT_PARRY)
 			if(!M.get_active_held_item() && !M.get_inactive_held_item()) //we parried with a bracer, redirect damage
@@ -155,9 +172,16 @@
 				add_fingerprint(user)
 		if(M.d_intent == INTENT_DODGE)
 			if(!user.used_intent.swingdelay)
-				user.do_attack_animation(M, visual_effect_icon = user.used_intent.animname)
+				if(get_dist(get_turf(user), get_turf(M)) <= user.used_intent.reach)
+					user.do_attack_animation(turf_before, visual_effect_icon = user.used_intent.animname)
+				else
+					user.do_attack_animation(get_ranged_target_turf(user, get_dir(user, M), 1), visual_effect_icon = user.used_intent.animname)
 		return
-
+	if(!user.used_intent.noaa)
+		if(get_dist(get_turf(user), get_turf(M)) <= user.used_intent.reach)
+			user.do_attack_animation(M, visual_effect_icon = user.used_intent.animname)
+		else
+			user.do_attack_animation(get_ranged_target_turf(user, get_dir(user, M), 1), visual_effect_icon = user.used_intent.animname)
 	if(user.zone_selected == BODY_ZONE_PRECISE_R_INHAND)
 		var/offh = 0
 		var/obj/item/W = M.held_items[1]
@@ -246,7 +270,7 @@
 	if(istype(user.rmb_intent, /datum/rmb_intent/strong))
 		used_str++
 	if(istype(user.rmb_intent, /datum/rmb_intent/weak))
-		used_str--
+		used_str /= 2
 	//Your max STR is 20.
 	used_str = CLAMP(used_str, 1, 20)
 	if(used_str >= 11)
@@ -269,7 +293,7 @@
 				if(BCLASS_CUT)
 					var/mob/living/lumberjacker = user
 					var/lumberskill = lumberjacker.mind.get_skill_level(/datum/skill/labor/lumberjacking)
-					if(!I.remove_bintegrity(1))
+					if(!I.remove_bintegrity(1, user))
 						dullfactor = 0.2
 					else
 						dullfactor = 0.45 + (lumberskill * 0.15)
@@ -277,13 +301,13 @@
 					cont = TRUE
 				if(BCLASS_CHOP)
 					//Additional damage for axes against trees.
-					if(istype(I, /obj/item/rogueweapon))
-						var/obj/item/rogueweapon/R = I
+					if(istype(I, /obj/item/weapon))
+						var/obj/item/weapon/R = I
 						if(R.axe_cut)
 							//Yes i know its cheap to just make it a flat plus.
 							newforce = newforce + R.axe_cut
 							testing("newforcewood+[R.axe_cut]")
-					if(!I.remove_bintegrity(1))
+					if(!I.remove_bintegrity(1, user))
 						dullfactor = 0.2
 					else
 						dullfactor = 1.5
@@ -297,6 +321,9 @@
 				if(BCLASS_SMASH)
 					dullfactor = 1.5
 					cont = TRUE
+				if(BCLASS_DRILL)
+					dullfactor = 10
+					cont = TRUE
 				if(BCLASS_PICK)
 					dullfactor = 1.5
 					cont = TRUE
@@ -305,17 +332,20 @@
 		if(DULLING_BASHCHOP) //structures that can be attacked by clubs also (doors fences etc)
 			switch(user.used_intent.blade_class)
 				if(BCLASS_CUT)
-					if(!I.remove_bintegrity(1))
+					if(!I.remove_bintegrity(1, user))
 						dullfactor = 0.8
 					cont = TRUE
 				if(BCLASS_CHOP)
-					if(!I.remove_bintegrity(1))
+					if(!I.remove_bintegrity(1, user))
 						dullfactor = 0.8
 					else
 						dullfactor = 1.5
 					cont = TRUE
 				if(BCLASS_SMASH)
 					dullfactor = 1.5
+					cont = TRUE
+				if(BCLASS_DRILL)
+					dullfactor = 10
 					cont = TRUE
 				if(BCLASS_BLUNT)
 					cont = TRUE
@@ -330,15 +360,15 @@
 			if(!(user.mobility_flags & MOBILITY_STAND))
 				to_chat(user, span_warning("I need to stand up to get a proper swing."))
 				return 0
-			if(user.used_intent.blade_class != BCLASS_PICK)
+			if(user.used_intent.blade_class != BCLASS_PICK && user.used_intent.blade_class != BCLASS_DRILL)
 				return 0
 			var/mob/living/miner = user
 			//Mining Skill force multiplier.
 			var/mineskill = miner.mind.get_skill_level(/datum/skill/labor/mining)
 			newforce = newforce * (8+(mineskill*1.5))
 			// Pick quality multiplier. Affected by smithing, or material of the pick.
-			if(istype(I, /obj/item/rogueweapon/pick))
-				var/obj/item/rogueweapon/pick/P = I
+			if(istype(I, /obj/item/weapon/pick))
+				var/obj/item/weapon/pick/P = I
 				newforce *= P.pickmult
 			shake_camera(user, 1, 0.1)
 			miner.mind.adjust_experience(/datum/skill/labor/mining, (miner.STAINT*0.2))
@@ -356,9 +386,11 @@
 	newforce = (newforce * user.used_intent.damfactor) * dullfactor
 	if(user.used_intent.get_chargetime() && user.client?.chargedprog < 100)
 		newforce = newforce * round(user.client?.chargedprog / 100, 0.1)
-	newforce = round(newforce, 1)
+	// newforce = round(newforce, 1)
 	if(!(user.mobility_flags & MOBILITY_STAND))
 		newforce *= 0.5
+	if(user.has_status_effect(/datum/status_effect/divine_strike))
+		newforce += 5
 	// newforce is rounded upto the nearest intiger.
 	newforce = round(newforce,1)
 	//This is returning the maximum of the arguments meaning this is to prevent negative values.
@@ -430,42 +462,6 @@
 		return "body"
 
 /obj/item/proc/funny_attack_effects(mob/living/target, mob/living/user, nodmg)
-	if(is_silver)
-		if(world.time < src.last_used + 120)
-			to_chat(user, span_notice("The silver effect is on cooldown."))
-			return
-
-		if(ishuman(target) && target.mind)
-			var/mob/living/carbon/human/s_user = user
-			var/mob/living/carbon/human/H = target
-			var/datum/antagonist/werewolf/W = H.mind.has_antag_datum(/datum/antagonist/werewolf/)
-			var/datum/antagonist/vampirelord/lesser/V = H.mind.has_antag_datum(/datum/antagonist/vampirelord/lesser)
-			var/datum/antagonist/vampirelord/V_lord = H.mind.has_antag_datum(/datum/antagonist/vampirelord/)
-			if(V)
-				if(V.disguised)
-					H.visible_message("<font color='white'>The silver weapon weakens the curse temporarily!</font>")
-					to_chat(H, span_userdanger("I'm hit by my BANE!"))
-					H.apply_status_effect(/datum/status_effect/debuff/silver_curse)
-					src.last_used = world.time
-				else
-					H.visible_message("<font color='white'>The silver weapon weakens the curse temporarily!</font>")
-					to_chat(H, span_userdanger("I'm hit by my BANE!"))
-					H.apply_status_effect(/datum/status_effect/debuff/silver_curse)
-					src.last_used = world.time
-			if(V_lord)
-				if(V_lord.vamplevel < 4 && !V)
-					H.visible_message("<font color='white'>The silver weapon weakens the curse temporarily!</font>")
-					to_chat(H, span_userdanger("I'm hit by my BANE!"))
-					H.apply_status_effect(/datum/status_effect/debuff/silver_curse)
-					src.last_used = world.time
-				if(V_lord.vamplevel == 4 && !V)
-					to_chat(s_user, "<font color='red'> The silver weapon fails!</font>")
-					H.visible_message(H, span_userdanger("This feeble metal can't hurt me, I AM ANCIENT!"))
-			if(W && W.transformed == TRUE)
-				H.visible_message("<font color='white'>The silver weapon weakens the curse temporarily!</font>")
-				to_chat(H, span_userdanger("I'm hit by my BANE!"))
-				H.apply_status_effect(/datum/status_effect/debuff/silver_curse)
-				src.last_used = world.time
 	return
 
 /mob/living/attacked_by(obj/item/I, mob/living/user)
@@ -521,7 +517,10 @@
 			if(istype(user.rmb_intent, /datum/rmb_intent/swift))
 				adf = round(adf * 0.6)
 			user.changeNext_move(adf)
-			user.do_attack_animation(target, visual_effect_icon = user.used_intent.animname)
+			if(get_dist(get_turf(user), get_turf(target)) <= user.used_intent.reach)
+				user.do_attack_animation(target, visual_effect_icon = user.used_intent.animname)
+			else
+				user.do_attack_animation(get_ranged_target_turf(user, get_dir(user, target), 1), visual_effect_icon = user.used_intent.animname)
 			playsound(get_turf(src), pick(swingsound), 100, FALSE, -1)
 			user.aftermiss()
 		if(!proximity_flag && ismob(target) && !user.used_intent?.noaa) //this block invokes miss cost clicking on seomone who isn't adjacent to you
@@ -531,7 +530,10 @@
 			if(istype(user.rmb_intent, /datum/rmb_intent/swift))
 				adf = round(adf * 0.6)
 			user.changeNext_move(adf)
-			user.do_attack_animation(target, visual_effect_icon = user.used_intent.animname)
+			if(get_dist(get_turf(user), get_turf(target)) <= user.used_intent.reach)
+				user.do_attack_animation(target, visual_effect_icon = user.used_intent.animname)
+			else
+				user.do_attack_animation(get_ranged_target_turf(user, get_dir(user, target), 1), visual_effect_icon = user.used_intent.animname)
 			playsound(get_turf(src), pick(swingsound), 100, FALSE, -1)
 			user.aftermiss()
 
@@ -556,11 +558,8 @@
 	var/message_hit_area = ""
 	if(hit_area)
 		message_hit_area = " in the [hit_area]"
-	var/attack_message = "[src] is [message_verb][message_hit_area] with [I]!"
-	var/attack_message_local = "I'm [message_verb][message_hit_area] with [I]!"
-	if(user in viewers(src, null))
-		attack_message = "[user] [message_verb] [src][message_hit_area] with [I]!"
-		attack_message_local = "[user] [message_verb] me[message_hit_area] with [I]!"
+	var/attack_message = "[user] [message_verb] [src][message_hit_area] with [I]!"
+	var/attack_message_local = "[user] [message_verb] me[message_hit_area] with [I]!"
 	visible_message("<span class='danger'>[attack_message][next_attack_msg.Join()]</span>",\
 		"<span class='danger'>[attack_message_local][next_attack_msg.Join()]</span>", null, COMBAT_MESSAGE_RANGE)
 	next_attack_msg.Cut()

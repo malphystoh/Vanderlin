@@ -1,6 +1,207 @@
 #define POPCOUNT_SURVIVORS "survivors"					//Not dead at roundend
 #define POPCOUNT_ESCAPEES "escapees"					//Not dead and on centcom/shuttles marked as escaped
-#define POPCOUNT_SHUTTLE_ESCAPEES "shuttle_escapees" 	//Emergency shuttle only.
+
+// General statistics
+
+#define STATS_MOAT_FALLERS "moat_fallers"
+#define STATS_ANKLES_BROKEN "ankles_broken"
+#define STATS_PEOPLE_SMITTEN "people_smitten"
+#define STATS_TRIUMPHS_AWARDED "triumphs_awarded"
+#define STATS_TRIUMPHS_STOLEN "triumphs_stolen"
+#define STATS_PRAYERS_MADE "prayers_made"
+#define STATS_KISSES_MADE "kisses_made"
+#define STATS_SKILLS_LEARNED "skills_learned"
+#define STATS_DEADITES_ALIVE "deadites_alive"
+#define STATS_KLEPTOMANIACS "kleptomaniacs"
+
+// Influence related statistics
+
+// Psydon
+#define STATS_HUMEN_DEATHS "humen_deaths"
+#define STATS_ALIVE_TIEFLINGS "alive_tieflings"
+
+// Astrata
+#define STATS_LAWS_AND_DECREES_MADE "laws_and_decrees_made"
+#define STATS_ALIVE_NOBLES "alive_nobles"
+#define STATS_NOBLE_DEATHS "noble_deaths"
+#define STATS_ASTRATA_REVIVALS "astrata_revivals"
+#define STATS_TAXES_COLLECTED "taxes_collected"
+
+// Noc
+#define STATS_BOOKS_PRINTED "books_printed"
+#define STATS_LITERACY_TAUGHT "literacy_taught"
+#define STATS_ILLITERATES "illiterates"
+#define STATS_SKILLS_DREAMED "skills_dreamed"
+#define STATS_MANA_SPENT "mana_spent"
+
+// Necra
+#define STATS_DEATHS "deaths"
+#define STATS_GRAVES_CONSECRATED "graves_consecrated"
+#define STATS_GRAVES_ROBBED "graves_robbed"
+#define STATS_DEADITES_KILLED "deadites_killed"
+#define STATS_VAMPIRES_KILLED "vampires_killed"
+
+// Pestra
+#define STATS_POTIONS_BREWED "potions_brewed"
+#define STATS_WOUNDS_SEWED "wounds_healed"
+#define STATS_SOULS_REINCARNATED "souls_reincarnated"
+#define STATS_ANIMALS_BRED "animals_bred"
+#define STATS_FOOD_ROTTED "food_rotted"
+
+// Dendor
+#define STATS_TREES_CUT "trees_cut"
+#define STATS_PLANTS_HARVESTED "plants_harvested"
+#define STATS_WEREVOLVES "werevolves"
+#define STATS_DENDOR_SACRIFICES "dendor_sacrifices"
+#define STATS_FOREST_DEATHS "forest_deaths"
+
+// Ravox
+#define STATS_COMBAT_SKILLS "combat_skills"
+#define STATS_PARRIES "parries"
+#define STATS_WARCRIES "warcries"
+#define STATS_YIELDS "yields"
+#define STATS_UNDERWORLD_DUELS "underworld_duels"
+
+// Xylix
+#define STATS_LAUGHS_MADE "laughs_made"
+#define STATS_GAMES_RIGGED "games_rigged"
+#define STATS_PEOPLE_MOCKED "people_mocked"
+#define STATS_CRITS_MADE "crits_made"
+#define STATS_SONGS_PLAYED "songs_played"
+
+// Malum
+#define STATS_MASTERWORKS_FORGED "masterworks_forged"
+#define STATS_ROCKS_MINED "ores_mined"
+#define STATS_CRAFT_SKILLS "craft_skills"
+#define STATS_BEARDS_SHAVED "beards_shaved"
+#define STATS_BLACKSTEEL_SMELTED "blacksteel_smelted"
+
+// Abyssor
+#define STATS_WATER_CONSUMED "water_consumed"
+#define STATS_FISH_CAUGHT "fish_caught"
+#define STATS_ABYSSOR_REMEMBERED "abyssor_remembered"
+#define STATS_LEECHES_EMBEDDED "leeches_embedded"
+#define STATS_PEOPLE_DROWNED "people_drowned"
+
+// Eora
+#define STATS_PARENTS "parents"
+#define STATS_MARRIAGES "marriages"
+#define STATS_HUGS_MADE "hugs_made"
+#define STATS_CLINGY_PEOPLE "clingy_people"
+#define STATS_PACIFISTS "pacifists"
+
+// Zizo
+#define STATS_ZIZO_PRAISED "zizo_praised"
+#define STATS_DEADITES_WOKEN_UP "deadites_woken_up"
+#define STATS_CLERGY_DEATHS "priest_deaths"
+#define STATS_TORTURES "tortures"
+
+// Graggar
+#define STATS_BLOOD_SPILT "blood_spilt"
+#define STATS_ORGANS_EATEN "organs_eaten"
+#define STATS_PEOPLE_GIBBED "people_gibbed"
+#define STATS_ASSASSINATIONS "assassinations"
+#define STATS_LIMBS_BITTEN "limbs_bitten"
+
+// Baotha
+#define STATS_DRUGS_SNORTED "drugs_snorted"
+#define STATS_ALCOHOL_CONSUMED "alcohol_consumed"
+#define STATS_ALCOHOLICS "alcoholics"
+#define STATS_JUNKIES "junkies"
+#define STATS_LUXURIOUS_FOOD_EATEN "luxurious_food_eaten"
+
+// Matthios
+#define STATS_ITEMS_PICKPOCKETED "items_pickpocketed"
+#define STATS_SHRINE_VALUE "shrine_value"
+#define STATS_GREEDY_PEOPLE "greedy_people"
+#define STATS_DODGES "dodges"
+#define STATS_LOCKS_PICKED "locks_picked"
+
+GLOBAL_LIST_INIT(vanderlin_round_stats, list(
+	STATS_DEATHS = 0,
+	STATS_NOBLE_DEATHS = 0,
+	STATS_MOAT_FALLERS = 0,
+	STATS_ANKLES_BROKEN = 0,
+	STATS_PEOPLE_SMITTEN = 0,
+	STATS_BLOOD_SPILT = 0,
+	STATS_PEOPLE_GIBBED = 0,
+	STATS_TRIUMPHS_AWARDED = 0,
+	STATS_TRIUMPHS_STOLEN = 0,
+	STATS_DRUGS_SNORTED = 0,
+	STATS_BEARDS_SHAVED = 0,
+	STATS_TREES_CUT = 0,
+	STATS_PRAYERS_MADE = 0,
+	STATS_FISH_CAUGHT = 0,
+	STATS_ITEMS_PICKPOCKETED = 0,
+	STATS_MASTERWORKS_FORGED = 0,
+	STATS_TAXES_COLLECTED = 0,
+	STATS_ORGANS_EATEN = 0,
+	STATS_KISSES_MADE = 0,
+	STATS_LAUGHS_MADE = 0,
+	STATS_GRAVES_CONSECRATED = 0,
+	STATS_POTIONS_BREWED = 0,
+	STATS_ASTRATA_REVIVALS = 0,
+	STATS_PLANTS_HARVESTED = 0,
+	STATS_LAWS_AND_DECREES_MADE = 0,
+	STATS_ALIVE_NOBLES = 0,
+	STATS_BOOKS_PRINTED = 0,
+	STATS_LITERACY_TAUGHT = 0,
+	STATS_ILLITERATES = 0,
+	STATS_SKILLS_LEARNED = 0,
+	STATS_GRAVES_ROBBED = 0,
+	STATS_DEADITES_KILLED = 0,
+	STATS_VAMPIRES_KILLED = 0,
+	STATS_WOUNDS_SEWED = 0,
+	STATS_SOULS_REINCARNATED = 0,
+	STATS_ANIMALS_BRED = 0,
+	STATS_WEREVOLVES = 0,
+	STATS_DENDOR_SACRIFICES = 0,
+	STATS_COMBAT_SKILLS = 0,
+	STATS_PARRIES = 0,
+	STATS_WARCRIES = 0,
+	STATS_YIELDS = 0,
+	STATS_GAMES_RIGGED = 0,
+	STATS_PEOPLE_MOCKED = 0,
+	STATS_CRITS_MADE = 0,
+	STATS_ROCKS_MINED = 0,
+	STATS_CRAFT_SKILLS = 0,
+	STATS_ABYSSOR_REMEMBERED = 0,
+	STATS_LEECHES_EMBEDDED = 0,
+	STATS_MARRIAGES = 0,
+	STATS_HUGS_MADE = 0,
+	STATS_CLINGY_PEOPLE = 0,
+	STATS_ZIZO_PRAISED = 0,
+	STATS_DEADITES_ALIVE = 0,
+	STATS_CLERGY_DEATHS = 0,
+	STATS_ASSASSINATIONS = 0,
+	STATS_ALCOHOL_CONSUMED = 0,
+	STATS_ALCOHOLICS = 0,
+	STATS_JUNKIES = 0,
+	STATS_SHRINE_VALUE = 0,
+	STATS_GREEDY_PEOPLE = 0,
+	STATS_KLEPTOMANIACS = 0,
+	STATS_HUMEN_DEATHS = 0,
+	STATS_PARENTS = 0,
+	STATS_SKILLS_DREAMED = 0,
+	STATS_ALIVE_TIEFLINGS = 0,
+	STATS_PEOPLE_DROWNED = 0,
+	STATS_MANA_SPENT = 0,
+	STATS_WATER_CONSUMED  = 0,
+	STATS_LIMBS_BITTEN = 0,
+	STATS_UNDERWORLD_DUELS = 0,
+	STATS_LOCKS_PICKED = 0,
+	STATS_SONGS_PLAYED = 0,
+	STATS_FOOD_ROTTED = 0,
+	STATS_BLACKSTEEL_SMELTED = 0,
+	STATS_PACIFISTS = 0,
+	STATS_FOREST_DEATHS = 0,
+	STATS_TORTURES = 0,
+	STATS_LUXURIOUS_FOOD_EATEN = 0,
+	STATS_DEADITES_WOKEN_UP = 0,
+	STATS_DODGES = 0,
+))
+
+GLOBAL_LIST_EMPTY(patron_follower_counts)
 
 /datum/controller/subsystem/ticker/proc/gather_roundend_feedback()
 	gather_antag_data()
@@ -8,10 +209,6 @@
 	var/list/file_data = list("escapees" = list("humans" = list(), "silicons" = list(), "others" = list(), "npcs" = list()), "abandoned" = list("humans" = list(), "silicons" = list(), "others" = list(), "npcs" = list()), "ghosts" = list(), "additional data" = list())
 	var/num_survivors = 0
 	var/num_escapees = 0
-	var/num_shuttle_escapees = 0
-	var/list/area/shuttle_areas
-	if(SSshuttle && SSshuttle.emergency)
-		shuttle_areas = SSshuttle.emergency.shuttle_areas
 	for(var/mob/m in GLOB.mob_list)
 		var/escaped
 		var/category
@@ -30,16 +227,14 @@
 				if(ishuman(L))
 					var/mob/living/carbon/human/H = L
 					category = "humans"
-					mob_data += list("job" = H.mind.assigned_role, "species" = H.dna.species.name)
+					mob_data += list("job" = H.mind.assigned_role.title, "species" = H.dna.species.name)
 			else
 				category = "others"
 				mob_data += list("typepath" = m.type)
 		if(!escaped)
-			if(EMERGENCY_ESCAPED_OR_ENDGAMED && (m.onCentCom() || m.onSyndieBase()))
+			if((m.onCentCom()))
 				escaped = "escapees"
 				num_escapees++
-				if(shuttle_areas[get_area(m)])
-					num_shuttle_escapees++
 			else
 				escaped = "abandoned"
 		if(!m.mind && (!ishuman(m)))
@@ -66,7 +261,6 @@
 	. = list()
 	.[POPCOUNT_SURVIVORS] = num_survivors
 	.[POPCOUNT_ESCAPEES] = num_escapees
-	.[POPCOUNT_SHUTTLE_ESCAPEES] = num_shuttle_escapees
 
 /datum/controller/subsystem/ticker/proc/gather_antag_data()
 	var/team_gid = 1
@@ -100,6 +294,8 @@
 /mob/proc/do_game_over()
 	if(SSticker.current_state != GAME_STATE_FINISHED)
 		return
+	status_flags |= GODMODE
+	ai_controller?.set_ai_status(AI_STATUS_OFF)
 	if(client)
 		client.show_game_over()
 
@@ -115,9 +311,6 @@
 	if(ishostile(src))
 		var/mob/living/simple_animal/hostile/H = src
 		H.LoseTarget()
-	if(ishuman(src))
-		var/mob/living/carbon/human/H = src
-		H.mode = AI_OFF
 	if(client)
 		client.verbs += /client/proc/lobbyooc
 		client.verbs += /client/proc/commendsomeone
@@ -138,7 +331,9 @@
 
 	log_game("The round has ended.")
 
-	to_chat(world, "<BR><BR><BR><span class='reallybig'>So ends this tale of Roguetown.</span>")
+	INVOKE_ASYNC(world, TYPE_PROC_REF(/world, flush_byond_tracy))
+
+	to_chat(world, "<BR><BR><BR><span class='reallybig'>So ends this tale of Vanderlin.</span>")
 	get_end_reason()
 
 	var/list/key_list = list()
@@ -169,9 +364,9 @@
 
 	to_chat(world, "Round ID: [GLOB.rogue_round_id]")
 
-	SSvote.initiate_vote("map", "Psydon")
-
 	sleep(5 SECONDS)
+
+	//TODO: use build_roundend_report()
 
 	gamemode_report()
 
@@ -179,33 +374,11 @@
 
 	players_report()
 
-	stats_report()
-
-//	for(var/client/C in GLOB.clients)
-//		if(!C.credits)
-//			C.RollCredits()
-//		C.playtitlemusic(40)
-
-//	var/popcount = gather_roundend_feedback()
-//	display_report(popcount)
+	SSvote.initiate_vote("map", "Psydon")
 
 	CHECK_TICK
 
-//	// Add AntagHUD to everyone, see who was really evil the whole time!
-//	for(var/datum/atom_hud/antag/H in GLOB.huds)
-//		for(var/m in GLOB.player_list)
-//			var/mob/M = m
-//			H.add_hud_to(M)
-
-	CHECK_TICK
-
-	//Set news report and mode result
-//	mode.set_round_result()
-
-//	send2irc("Server", "Round just ended.")
-
-//	if(length(CONFIG_GET(keyed_list/cross_server)))
-//		send_news_report()
+	SSgamemode.store_roundend_data()
 
 	CHECK_TICK
 
@@ -230,44 +403,38 @@
 
 	CHECK_TICK
 	SSdbcore.SetRoundEnd()
-	//Collects persistence features
-	if(mode.allow_persistence_save)
-		SSpersistence.CollectData()
+	SSpersistence.CollectData()
 
 	//stop collecting feedback during grifftime
 	SSblackbox.Seal()
 
 	sleep(10 SECONDS)
 	ready_for_reboot = TRUE
+	SSplexora.roundended()
 	standard_reboot()
 
 /datum/controller/subsystem/ticker/proc/get_end_reason()
 	var/end_reason
 
-	if(istype(SSticker.mode, /datum/game_mode/chaosmode))
-		var/datum/game_mode/chaosmode/C = SSticker.mode
-		if(C.check_for_lord)
-			if(!C.check_for_lord())
-				end_reason = pick("Without a Monarch, they were doomed to become slaves of Zizo.",
-								"Without a Monarch, they were doomed to be eaten by nite creachers.",
-								"Without a Monarch, they were doomed to become victims of Gehenna.",
-								"Without a Monarch, they were doomed to enjoy a mass-suicide.",
-								"Without a Monarch, the Lich made them his playthings.",
-								"Without a Monarch, some jealous rival reigned in tyranny.",
-								"Without a Monarch, the town was abandoned.")
-//		if(C.not_enough_players)
-//			end_reason = "The town was abandoned."
+	if(!check_for_lord(TRUE)) //TRUE forces the check, otherwise it will autofail.
+		end_reason = pick("Without a Monarch, they were doomed to become slaves of Zizo.",
+						"Without a Monarch, they were doomed to be eaten by nite creachers.",
+						"Without a Monarch, they were doomed to become victims of Gehenna.",
+						"Without a Monarch, they were doomed to enjoy a mass-suicide.",
+						"Without a Monarch, the Lich made them his playthings.",
+						"Without a Monarch, some jealous rival reigned in tyranny.",
+						"Without a Monarch, the town was abandoned.")
 
-		if(C.vampire_werewolf() == "vampire")
-			end_reason = "When the Vampires finished sucking the town dry, they moved on to the next one."
-		if(C.vampire_werewolf() == "werewolf")
-			end_reason = "The Werevolves formed an unholy clan, marauding Rockhill until the end of its daes."
+	if(vampire_werewolf() == "vampire")
+		end_reason = "When the Vampires finished sucking the town dry, they moved on to the next one."
+	if(vampire_werewolf() == "werewolf")
+		end_reason = "The Werevolves formed an unholy clan, marauding Rockhill until the end of its daes."
 
-		if(C.cultascended)
-			end_reason = "ZIZOZIZOZIZOZIZO"
+	if(SSmapping.retainer.cult_ascended)
+		end_reason = "ZIZOZIZOZIZOZIZO"
 
-		if(C.headrebdecree)
-			end_reason = "The peasant rebels took control of the throne, hail the new community!"
+	if(SSmapping.retainer.head_rebel_decree)
+		end_reason = "The peasant rebels took control of the throne, hail the new community!"
 
 
 	if(end_reason)
@@ -276,12 +443,11 @@
 		to_chat(world, "<span class='big bold'>The town has managed to survive another week.</span>")
 
 /datum/controller/subsystem/ticker/proc/gamemode_report()
+	//TODO: This is a copypaste of antag_report(), this should be deleted
 	var/list/all_teams = list()
 	var/list/all_antagonists = list()
 
 	for(var/datum/team/A in GLOB.antagonist_teams)
-		if(!A.members)
-			continue
 		all_teams |= A
 
 	for(var/datum/antagonist/A in GLOB.antagonists)
@@ -290,10 +456,15 @@
 		all_antagonists |= A
 
 	for(var/datum/team/T in all_teams)
-		T.roundend_report()
-		for(var/datum/antagonist/X in all_antagonists)
-			if(X.get_team() == T)
-				all_antagonists -= X
+		//check if we should show the team
+		if(!T.show_roundend_report)
+			continue
+
+		for(var/datum/mind/member_mind as anything in T.members)
+			if(!isnull(member_mind.antag_datums))
+				all_antagonists -= member_mind.antag_datums
+
+		to_chat(world, T.roundend_report())
 		CHECK_TICK
 
 	var/currrent_category
@@ -322,46 +493,15 @@
 
 	return
 
-/datum/controller/subsystem/ticker/proc/stats_report()
-	var/list/shit = list()
-	shit += "<br><span class='bold'>Δ--------------------Δ</span><br>"
-	shit += "<br><font color='#9b6937'><span class='bold'>Deaths:</span></font> [deaths]"
-	shit += "<br><font color='#825b1c'><span class='bold'>Moat Fallers:</span></font> [moatfallers]"
-	shit += "<br><font color='#700000'><span class='bold'>Ankles Broken:</span></font> [holefall]"
-	shit += "<br><font color='#ffee00'><span class='bold'>People Smiten:</span></font> [pplsmited]"
-	shit += "<br><font color='#af2323'><span class='bold'>Blood spilt:</span></font> [round(blood_lost / 100, 1)]L"
-	shit += "<br><font color='#af2323'><span class='bold'>People Gibbed:</span></font> [gibbs]"
-	shit += "<br><font color='#36959c'><span class='bold'>TRIUMPH(s) Awarded:</span></font> [tri_gained]"
-	shit += "<br><font color='#a02fa4'><span class='bold'>TRIUMPH(s) Stolen:</span></font> [tri_lost * -1]"
-	shit += "<br><font color='#f200ff'><span class='bold'>Drugs Snorted:</span></font> [snort]"
-	shit += "<br><font color='#0f555c'><span class='bold'>Beards Shaved:</span></font> [beardshavers]"
-//	if(cuckers.len)
-//		shit += "<br><font color='#4e488a'><span class='bold'>Adulterers:</span></font> "
-//		for(var/x in cuckers.len)
-//			shit += "[x]"
-	if(GLOB.confessors.len)
-		shit += "<br><font color='#93cac7'><span class='bold'>Confessors:</span></font> "
-		for(var/x in GLOB.confessors)
-			shit += "[x]"
-	shit += "<br><br><span class='bold'>∇--------------------∇</span>"
-	to_chat(world, "[shit.Join()]")
-	return
-
 /datum/controller/subsystem/ticker/proc/standard_reboot()
 	if(ready_for_reboot)
-		if(mode.station_was_nuked)
-			Reboot("Station destroyed by Nuclear Device.", "nuke")
-		else
-			Reboot("Round ended.", "proper completion")
+		Reboot("Round ended.", "proper completion")
 	else
 		CRASH("Attempted standard reboot without ticker roundend completion")
 
 //Common part of the report
 /datum/controller/subsystem/ticker/proc/build_roundend_report()
 	var/list/parts = list()
-
-	//Gamemode specific things. Should be empty most of the time.
-	parts += mode.special_report()
 
 	CHECK_TICK
 
@@ -378,7 +518,7 @@
 
 /datum/controller/subsystem/ticker/proc/survivor_report(popcount)
 	var/list/parts = list()
-	var/station_evacuated = EMERGENCY_ESCAPED_OR_ENDGAMED
+	var/station_evacuated = round_end
 
 	if(GLOB.round_id)
 		var/statspage = CONFIG_GET(string/roundstatsurl)
@@ -390,7 +530,6 @@
 		parts+= "[FOURSPACES]Total Population: <B>[total_players]</B>"
 		if(station_evacuated)
 			parts += "<BR>[FOURSPACES]Evacuation Rate: <B>[popcount[POPCOUNT_ESCAPEES]] ([PERCENT(popcount[POPCOUNT_ESCAPEES]/total_players)]%)</B>"
-			parts += "[FOURSPACES](on emergency shuttle): <B>[popcount[POPCOUNT_SHUTTLE_ESCAPEES]] ([PERCENT(popcount[POPCOUNT_SHUTTLE_ESCAPEES]/total_players)]%)</B>"
 		parts += "[FOURSPACES]Survival Rate: <B>[popcount[POPCOUNT_SURVIVORS]] ([PERCENT(popcount[POPCOUNT_SURVIVORS]/total_players)]%)</B>"
 		if(SSblackbox.first_death)
 			var/list/ded = SSblackbox.first_death
@@ -399,13 +538,6 @@
 			//ignore this comment, it fixes the broken sytax parsing caused by the " above
 			else
 				parts += "[FOURSPACES]<i>Nobody died this shift!</i>"
-	if(istype(SSticker.mode, /datum/game_mode/dynamic))
-		var/datum/game_mode/dynamic/mode = SSticker.mode
-		parts += "[FOURSPACES]Threat level: [mode.threat_level]"
-		parts += "[FOURSPACES]Threat left: [mode.threat]"
-		parts += "[FOURSPACES]Executed rules:"
-		for(var/datum/dynamic_ruleset/rule in mode.executed_rules)
-			parts += "[FOURSPACES][FOURSPACES][rule.ruletype] - <b>[rule.name]</b>: -[rule.cost + rule.scaled_times * rule.scaling_cost] threat"
 	return parts.Join("<br>")
 
 /client/proc/roundend_report_file()
@@ -426,7 +558,6 @@
 	else
 		content = file2text(filename)
 	roundend_report.set_content(content)
-	roundend_report.stylesheets = list()
 //	roundend_report.add_stylesheet("roundend", 'html/browser/roundend.css')
 //	roundend_report.add_stylesheet("font-awesome", 'html/font-awesome/css/all.min.css')
 	roundend_report.open(FALSE)
@@ -436,13 +567,9 @@
 	var/mob/M = C.mob
 	if(M.mind && !isnewplayer(M))
 		if(M.stat != DEAD && !isbrain(M))
-			if(EMERGENCY_ESCAPED_OR_ENDGAMED)
-				if(!M.onCentCom() && !M.onSyndieBase())
-					parts += "<div class='panel stationborder'>"
-					parts += "<span class='marooned'>I managed to survive, but were marooned on [station_name()]...</span>"
-				else
-					parts += "<div class='panel greenborder'>"
-					parts += "<span class='greentext'>I managed to survive the events on [station_name()] as [M.real_name].</span>"
+			if(round_end)
+				parts += "<div class='panel greenborder'>"
+				parts += "<span class='greentext'>I managed to survive the events on [station_name()] as [M.real_name].</span>"
 			else
 				parts += "<div class='panel greenborder'>"
 				parts += "<span class='greentext'>I managed to survive the events on [station_name()] as [M.real_name].</span>"
@@ -484,21 +611,24 @@
 	var/list/all_teams = list()
 	var/list/all_antagonists = list()
 
-	for(var/datum/team/A in GLOB.antagonist_teams)
-		if(!A.members)
-			continue
-		all_teams |= A
+	for(var/datum/team/team as anything in GLOB.antagonist_teams)
+		all_teams |= team
 
-	for(var/datum/antagonist/A in GLOB.antagonists)
-		if(!A.owner)
+	for(var/datum/antagonist/antagonist as anything in GLOB.antagonists)
+		if(!antagonist.owner)
 			continue
-		all_antagonists |= A
+		all_antagonists |= antagonist
 
-	for(var/datum/team/T in all_teams)
-		result += T.roundend_report()
-		for(var/datum/antagonist/X in all_antagonists)
-			if(X.get_team() == T)
-				all_antagonists -= X
+	for(var/datum/team/active_team as anything in all_teams)
+		//check if we should show the team
+		if(!active_team.show_roundend_report)
+			continue
+
+		for(var/datum/mind/member_mind as anything in active_team.members)
+			if(!isnull(member_mind.antag_datums))
+				all_antagonists -= member_mind.antag_datums
+
+		result += active_team.roundend_report()
 		result += " "//newline between teams
 		CHECK_TICK
 
@@ -507,18 +637,18 @@
 
 	sortTim(all_antagonists, GLOBAL_PROC_REF(cmp_antag_category))
 
-	for(var/datum/antagonist/A in all_antagonists)
-		if(!A.show_in_roundend)
+	for(var/datum/antagonist/antagonist as anything in all_antagonists)
+		if(antagonist.show_in_roundend)
 			continue
-		if(A.roundend_category != currrent_category)
+		if(antagonist.roundend_category != currrent_category)
 			if(previous_category)
 				result += previous_category.roundend_report_footer()
 				result += "</div>"
 			result += "<div class='panel redborder'>"
-			result += A.roundend_report_header()
-			currrent_category = A.roundend_category
-			previous_category = A
-		result += A.roundend_report()
+			result += antagonist.roundend_report_header()
+			currrent_category = antagonist.roundend_category
+			previous_category = antagonist
+		result += antagonist.roundend_report()
 		result += "<br><br>"
 		CHECK_TICK
 
@@ -536,12 +666,14 @@
 	var/datum/action/report/R = new
 	C.player_details.player_actions += R
 	R.Grant(C.mob)
-	to_chat(C,"<a href='?src=[REF(R)];report=1'>Show roundend report again</a>")
+	to_chat(C,"<a href='byond://?src=[REF(R)];report=1'>Show roundend report again</a>")
 
 /datum/controller/subsystem/ticker/proc/give_show_playerlist_button(client/C)
 	set waitfor = 0
-	to_chat(C,"<a href='?src=[C];playerlistrogue=1'>* SHOW PLAYER LIST *</a>")
-	to_chat(C,"<a href='?src=[C];commendsomeone=1'>* Commend a Character *</a>")
+	to_chat(C,"<a href='byond://?src=[C];playerlist=1'>* SHOW PLAYER LIST *</a>")
+	to_chat(C,"<a href='byond://?src=[C];commendsomeone=1'>* Commend a Character *</a>")
+	to_chat(C,"<a href='byond://?src=[C];viewstats=1'>* View Statistics *</a>")
+	C.show_round_stats()
 	C.commendation_popup()
 
 /datum/action/report
@@ -564,38 +696,27 @@
 
 /proc/printplayer(datum/mind/ply, fleecheck)
 	var/jobtext = ""
-	if(ply.assigned_role)
-		jobtext = " the <b>[ply.assigned_role]</b>"
-	var/usede = ply.key
-	if(ply.key)
-		usede = ckey(ply.key)
-		if(ckey(ply.key) in GLOB.anonymize)
-//			if(check_whitelist(ckey(ply.key)))
-			usede = get_fake_key(ckey(ply.key))
+	if(ply.assigned_role && ply.current)
+		jobtext = " the <b>[ply.assigned_role.get_informed_title(ply.current)]</b>"
+	var/usede = get_display_ckey(ply.key)
 	var/text = "<b>[usede]</b> was <b>[ply.name]</b>[jobtext] and"
 	if(ply.current)
 		if(ply.current.real_name != ply.name)
-			text += " <span class='redtext'>died</span>"
+			text += span_redtext(" died.")
 		else
 			if(ply.current.stat == DEAD)
-				text += " <span class='redtext'>died</span>"
+				text += span_redtext(" died.")
 			else
-				text += " <span class='greentext'>survived</span>"
-//		if(fleecheck)
-//			var/turf/T = get_turf(ply.current)
-//			if(!T || !is_station_level(T.z))
-//				text += " while <span class='redtext'>fleeing the station</span>"
-//		if(ply.current.real_name != ply.name)
-//			text += " as <b>[ply.current.real_name]</b>"
-	to_chat(world, "[text]")
+				text += span_greentext(" survived.")
+	return text
 
-/proc/printplayerlist(list/players,fleecheck)
+/proc/printplayerlist(list/datum/mind/players,fleecheck)
 	var/list/parts = list()
 
-	parts += "<ul class='playerlist'>"
+	//parts += "<ul class='playerlist'>"
 	for(var/datum/mind/M in players)
-		parts += "<li>[printplayer(M,fleecheck)]</li>"
-	parts += "</ul>"
+		parts += printplayer(M,fleecheck)//"<li>[printplayer(M,fleecheck)]</li>"
+	//parts += "</ul>"
 	return parts.Join()
 
 

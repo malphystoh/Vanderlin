@@ -97,11 +97,13 @@
 		mob.ghostize()
 		return FALSE
 #endif
-		if(world.time > mob.mob_timers["lastdied"] + 60 SECONDS)
+		if(MOBTIMER_FINISHED(mob, MT_LASTDIED, 60 SECONDS))
 			mob.ghostize()
 		else
 			if(!world.time%5)
 				to_chat(src, "<span class='warning'>My spirit hasn't manifested yet.</span>")
+		return FALSE
+	if(SEND_SIGNAL(mob, COMSIG_MOB_CLIENT_PRE_LIVING_MOVE, n, direct) & COMSIG_MOB_CLIENT_BLOCK_PRE_LIVING_MOVE)
 		return FALSE
 	if(mob.force_moving)
 		return FALSE
@@ -162,15 +164,29 @@
 			if(L.m_intent == MOVE_INTENT_RUN && L.sprinted_tiles > 0)
 				L.toggle_rogmove_intent(MOVE_INTENT_WALK)
 
+	var/old_direct = mob.dir
+
 	. = ..()
 
 	if((direct & (direct - 1)) && mob.loc == n) //moved diagonally successfully
 		add_delay *= 2
-	mob.set_glide_size(DELAY_TO_GLIDE_SIZE(add_delay))
+
+	var/after_glide = 0
+	if(visual_delay)
+		after_glide = visual_delay
+	else
+		after_glide = DELAY_TO_GLIDE_SIZE(add_delay)
+
+	mob.set_glide_size(after_glide)
+
 	move_delay += add_delay
 	if(.) // If mob is null here, we deserve the runtime
 		if(mob.throwing)
 			mob.throwing.finalize(FALSE)
+
+		// At this point we've moved the client's attached mob. This is one of the only ways to guess that a move was done
+		// as a result of player input and not because they were pulled or any other magic.
+		SEND_SIGNAL(mob, COMSIG_MOB_CLIENT_MOVED, direct, old_direct)
 
 	var/atom/movable/P = mob.pulling
 	if(P)
@@ -183,22 +199,24 @@
 			if(P.facepull)
 				mob.setDir(turn(mob.dir, 180))
 	if(mob.used_intent?.movement_interrupt && mob.atkswinging == "left" && charging)
-		to_chat(src, "<span class='warning'>I lost my concentration!</span>")
-		mob.stop_attack(FALSE)
-		mob.changeNext_move(CLICK_CD_MELEE)
+		if(mob.cast_move < mob.used_intent?.move_limit)
+			to_chat(src, "<span class='warning'>I am starting to lose focus!</span>")
+			mob.cast_move++
+		else
+			to_chat(src, "<span class='warning'>I lost my concentration!</span>")
+			mob.stop_attack(FALSE)
+			mob.changeNext_move(CLICK_CD_MELEE)
+			mob.cast_move = 0
 	if(mob.mmb_intent?.movement_interrupt && mob.atkswinging == "middle" && charging)
-		to_chat(src, "<span class='warning'>I lost my concentration!</span>")
-		mob.stop_attack(FALSE)
-		mob.changeNext_move(CLICK_CD_MELEE)
+		if(mob.cast_move < mob.used_intent?.move_limit)
+			to_chat(src, "<span class='warning'>I am starting to lose focus!</span>")
+			mob.cast_move++
+		else
+			to_chat(src, "<span class='warning'>I lost my concentration!</span>")
+			mob.stop_attack(FALSE)
+			mob.changeNext_move(CLICK_CD_MELEE)
+			mob.cast_move = 0
 
-	for(var/datum/browser/X in open_popups)
-		if(!X.no_close_movement)
-	//		var/datum/browser/popup = new(mob, X, "", 5, 5)
-	//		popup.set_content()
-	//		popup.open()
-	//		popup.close()
-			mob << browse(null, "window=[X.window_id]")
-			open_popups -= X
 /**
  * Checks to see if you're being grabbed and if so attempts to break it
  *
@@ -224,6 +242,12 @@
 //			return mob.resist_grab(1)
 			move_delay = world.time + 10
 			to_chat(src, "<span class='warning'>I can't move!</span>")
+			return TRUE
+	var/mob/living/simple_animal/bound = mob.pulling
+	if(istype(bound))
+		if(bound?.binded)
+			move_delay = world.time + 10
+			to_chat(src, span_warning("[bound] is bound in a summoning circle. I can't move them!"))
 			return TRUE
 
 /**
@@ -395,7 +419,7 @@
 /**
  * Hidden verb to set the target zone of a mob to the head
  *
- * (bound to 8) - repeated presses toggles through head - eyes - mouth
+ * (bound to 8) - repeated presses toggles through head - eyes - nose - mouth
  */
 /client/verb/body_toggle_head()
 	set name = "body-toggle-head"
@@ -409,6 +433,8 @@
 		if(BODY_ZONE_HEAD)
 			next_in_line = BODY_ZONE_PRECISE_R_EYE
 		if(BODY_ZONE_PRECISE_R_EYE)
+			next_in_line = BODY_ZONE_PRECISE_NOSE
+		if(BODY_ZONE_PRECISE_NOSE)
 			next_in_line = BODY_ZONE_PRECISE_MOUTH
 		else
 			next_in_line = BODY_ZONE_HEAD
@@ -416,8 +442,27 @@
 	var/atom/movable/screen/zone_sel/selector = mob.hud_used.zone_select
 	selector.set_selected_zone(next_in_line, mob)
 
-/client/verb/body_toggle_eye_nose()
-	set name = "body-toggle-eye-nose"
+///Hidden verb to target the neck, bound to 7
+/client/verb/body_neck()
+	set name = "body-neck"
+	set hidden = 1
+
+	if(!check_has_body_select())
+		return
+
+	var/next_in_line
+	switch(mob.zone_selected)
+		if(BODY_ZONE_PRECISE_NECK)
+			next_in_line = BODY_ZONE_PRECISE_MOUTH
+		else
+			next_in_line = BODY_ZONE_PRECISE_NECK
+
+	var/atom/movable/screen/zone_sel/selector = mob.hud_used.zone_select
+	selector.set_selected_zone(next_in_line, mob)
+
+///Hidden verb to target the eyes, bound to 9
+/client/verb/body_eyes()
+	set name = "body_eyes"
 	set hidden = 1
 
 	if(!check_has_body_select())
@@ -426,26 +471,9 @@
 	var/next_in_line
 	switch(mob.zone_selected)
 		if(BODY_ZONE_PRECISE_R_EYE)
-			next_in_line = BODY_ZONE_PRECISE_NOSE
+			next_in_line = BODY_ZONE_PRECISE_L_EYE
 		else
 			next_in_line = BODY_ZONE_PRECISE_R_EYE
-
-	var/atom/movable/screen/zone_sel/selector = mob.hud_used.zone_select
-	selector.set_selected_zone(next_in_line, mob)
-
-/client/verb/body_toggle_mouth_ears()
-	set name = "body-toggle-mouth-ears"
-	set hidden = 1
-
-	if(!check_has_body_select())
-		return
-
-	var/next_in_line
-	switch(mob.zone_selected)
-		if(BODY_ZONE_PRECISE_MOUTH)
-			next_in_line = BODY_ZONE_PRECISE_EARS
-		else
-			next_in_line = BODY_ZONE_PRECISE_MOUTH
 
 	var/atom/movable/screen/zone_sel/selector = mob.hud_used.zone_select
 	selector.set_selected_zone(next_in_line, mob)
@@ -580,15 +608,15 @@
 
 //* Updates a mob's sneaking status, rendering them invisible or visible in accordance to their status. TODO:Fix people bypassing the sneak fade by turning, and add a proc var to have a timer after resetting visibility.
 /mob/living/update_sneak_invis(reset = FALSE) //Why isn't this in mob/living/living_movements.dm? Why, I'm glad you asked!
-	if(!reset && world.time < mob_timers[MT_INVISIBILITY]) // Check if the mob is affected by the invisibility spell
+	if(!reset && HAS_TRAIT(src, TRAIT_IMPERCEPTIBLE)) // Check if the mob is affected by the invisibility spell
 		rogue_sneaking = TRUE
 		return
 	var/turf/T = get_turf(src)
-	var/light_amount = T.get_lumcount()
+	var/light_amount = T?.get_lumcount()
 	var/used_time = 50
 
 	if(rogue_sneaking) //If sneaking, check if they should be revealed
-		if((stat > SOFT_CRIT) || IsSleeping() || (world.time < mob_timers[MT_FOUNDSNEAK] + 30 SECONDS) || !T || reset || (m_intent != MOVE_INTENT_SNEAK) || light_amount >= rogue_sneaking_light_threshhold)
+		if((stat > SOFT_CRIT) || IsSleeping() || !MOBTIMER_FINISHED(src, MT_FOUNDSNEAK, 30 SECONDS) || !T || reset || (m_intent != MOVE_INTENT_SNEAK) || light_amount >= rogue_sneaking_light_threshhold)
 			used_time = round(clamp((50 - (used_time*1.75)), 5, 50),1)
 			animate(src, alpha = initial(alpha), time =	used_time) //sneak skill makes you reveal slower but not as drastic as disappearing speed
 			spawn(used_time) regenerate_icons()
@@ -601,10 +629,6 @@
 			spawn(used_time + 5) regenerate_icons()
 			rogue_sneaking = TRUE
 	return
-/*
-	if(world.time < mob_timers[MT_INVISIBILITY]) // Check if the mob is affected by the invisibility spell
-		alpha = 0
-		return */
 
 /mob/proc/toggle_rogmove_intent(intent, silent = FALSE)
 	// If we're becoming sprinting from non-sprinting, reset the counter
@@ -625,7 +649,8 @@
 					return
 				if(ishuman(L))
 					var/mob/living/carbon/human/H = L
-					if(!H.check_armor_skill())
+					if(H.get_encumbrance() >= 0.7)
+						to_chat(H, span_info("Your armor is too heavy to run in!"))
 						return
 			m_intent = MOVE_INTENT_RUN
 	if(hud_used && hud_used.static_inventory)
@@ -634,58 +659,15 @@
 	if(!silent)
 		playsound_local(src, 'sound/misc/click.ogg', 100)
 
-/mob/living/proc/check_armor_skill()
-	return TRUE
-
-/mob/living/carbon/human/check_armor_skill()
-	if(worn_armor_class == AC_HEAVY)
-		if(!HAS_TRAIT(src, TRAIT_HEAVYARMOR))
-			return FALSE
-	if(worn_armor_class == AC_MEDIUM)
-		if(!HAS_TRAIT(src, TRAIT_HEAVYARMOR))
-			if(!HAS_TRAIT(src, TRAIT_MEDIUMARMOR))
-				return FALSE
-	return TRUE
-
-/mob/living/proc/check_armor_weight()
-	return "Light"
-
-/mob/living/carbon/human/check_armor_weight() // Get the heaviest shirt/armor the mob is wearing.
-	var/heaviest = "Light"
-	if(istype(src.wear_armor, /obj/item/clothing))
-		var/obj/item/clothing/CL = src.wear_armor
-		if(CL.armor_class == AC_HEAVY && (heaviest == "Light" || heaviest == "Medium"))
-			heaviest = "Heavy"
-		if(CL.armor_class == AC_MEDIUM && heaviest == "Light")
-			heaviest = "Medium"
-	if(istype(src.wear_shirt, /obj/item/clothing))
-		var/obj/item/clothing/CL = src.wear_shirt
-		if(CL.armor_class == AC_HEAVY && (heaviest == "Light" || heaviest == "Medium"))
-			heaviest = "Heavy"
-		if(CL.armor_class == AC_MEDIUM && heaviest == "Light")
-			heaviest = "Medium"
-	return heaviest
-
-/mob/living/proc/check_dodge_skill()
-	return TRUE
-
-/mob/living/carbon/human/check_dodge_skill()
-	if(!HAS_TRAIT(src, TRAIT_DODGEEXPERT))
-		return FALSE
-	if(worn_armor_class == AC_HEAVY)
-		return FALSE
-	if(worn_armor_class == AC_MEDIUM)
-		return FALSE
-	return TRUE
-
 /mob/proc/toggle_eye_intent(mob/user) //clicking the fixeye button either makes you fixeye or clears your target
 	if(fixedeye)
 		fixedeye = 0
 		if(!tempfixeye)
-			nodirchange = FALSE
+			atom_flags &= ~NO_DIR_CHANGE
 	else
 		fixedeye = 1
-		nodirchange = TRUE
+		atom_flags |= NO_DIR_CHANGE
+
 	for(var/atom/movable/screen/eye_intent/eyet in hud_used.static_inventory)
 		eyet.update_icon(src)
 	playsound_local(src, 'sound/misc/click.ogg', 100)

@@ -1,3 +1,5 @@
+//the way this file is organized is also cursed! Enjoy
+
 /mob/living/carbon/human
 	/// List of curses on this mob
 	var/list/curses = list()
@@ -12,10 +14,11 @@
 /datum/curse/proc/on_death()
 	return
 
-/datum/curse/proc/on_gain(mob/living/carbon/human/owner)
+/datum/curse/proc/on_gain(mob/living/carbon/human/owner, silent = FALSE)
 	ADD_TRAIT(owner, trait, TRAIT_CURSE)
-	to_chat(owner, span_userdanger("Something is wrong... I feel cursed."))
-	to_chat(owner, span_danger(description))
+	if(!silent)
+		to_chat(owner, span_userdanger("Something is wrong... I feel cursed."))
+		to_chat(owner, span_danger(description))
 	owner.playsound_local(get_turf(owner), 'sound/misc/cursed.ogg', 80, FALSE, pressure_affected = FALSE)
 	return
 
@@ -31,12 +34,12 @@
 		var/datum/curse/C = curse
 		C.on_life(src)
 
-/mob/living/carbon/human/proc/add_curse(datum/curse/C)
+/mob/living/carbon/human/proc/add_curse(datum/curse/C, silent = FALSE)
 	if(is_cursed(C))
 		return FALSE
 	C = new C()
 	curses += C
-	C.on_gain(src)
+	C.on_gain(src, silent)
 	return TRUE
 
 /mob/living/carbon/human/proc/remove_curse(datum/curse/C)
@@ -114,6 +117,11 @@
 	trait = TRAIT_ZIZO_CURSE
 	var/atom/movable/screen/fullscreen/maniac/hallucinations
 
+/datum/curse/schizophrenic //zizo curse but without the jumpscares and meta hallucinations
+	name = "Schizophrenic"
+	description = "I can see and hear things others cannot."
+	trait = TRAIT_SCHIZO_FLAW
+
 /datum/curse/graggar
 	name = "Graggar's Curse"
 	description = "I am engulfed by unspeakable rage. I cannot stop myself from harming others. When that's not an option, my rage is directed inward."
@@ -162,10 +170,11 @@
 //////////////////////
 /datum/curse/pestra/on_life(mob/living/carbon/human/owner)
 	. = ..()
-	if(owner.mob_timers["pestra_curse"])
-		if(world.time < owner.mob_timers["pestra_curse"] + rand(30,60)SECONDS)
-			return
-	owner.mob_timers["pestra_curse"] = world.time
+	if(!MOBTIMER_FINISHED(owner, MT_CURSE_PESTRA, rand(30, 60) SECONDS)) //this isn't how mob timers work
+		return
+
+	MOBTIMER_SET(owner, MT_CURSE_PESTRA)
+
 	var/effect = rand(1, 4)
 	switch(effect)
 		if(1)
@@ -182,20 +191,19 @@
 
 /datum/curse/baotha/on_life(mob/living/carbon/human/owner)
 	. = ..()
-	if(owner.mob_timers["baotha_curse"])
-		if(world.time < owner.mob_timers["baotha_curse"] + rand(15,60)SECONDS)
-			return
-	owner.mob_timers["baotha_curse"] = world.time
+	if(!MOBTIMER_FINISHED(owner, MT_CURSE_BAOTHA, rand(15, 60) SECONDS)) //this isn't how mob timers work
+		return
+
+	MOBTIMER_SET(owner, MT_CURSE_BAOTHA)
 
 	owner.reagents.add_reagent(/datum/reagent/druqks, 3)
 
 /datum/curse/graggar/on_life(mob/living/carbon/human/owner)
 	. = ..()
-	if(owner.mob_timers["graggar_curse"])
-		if(world.time < owner.mob_timers["graggar_curse"] + rand(15,60)SECONDS)
-			return
+	if(!MOBTIMER_FINISHED(owner, MT_CURSE_GRAGGAR, rand(15, 60) SECONDS)) //this isn't how mob timers work
+		return
 
-	owner.mob_timers["graggar_curse"] = world.time
+	MOBTIMER_SET(owner, MT_CURSE_GRAGGAR)
 	for(var/mob/living/carbon/human in view(1, owner))
 		owner.emote("rage")
 		human.attacked_by(owner.get_active_held_item(), owner)
@@ -207,8 +215,15 @@
 	. = ..()
 	handle_maniac_visions(owner, hallucinations)
 	handle_maniac_hallucinations(owner)
-	handle_maniac_floors(owner)
+	//handle_maniac_floors(owner)
 	handle_maniac_walls(owner)
+
+/datum/curse/schizophrenic/on_life(mob/living/carbon/human/owner)
+	. = ..()
+	if(prob(0.5))
+		INVOKE_ASYNC(owner, GLOBAL_PROC_REF(handle_maniac_mob_hallucination), owner)
+	else if(prob(2))
+		INVOKE_ASYNC(owner, GLOBAL_PROC_REF(handle_maniac_object_hallucination), owner)
 
 // cursed_freak_out() is freak_out() without stress adjustments
 // bandaid deserves a second look
@@ -219,11 +234,11 @@
 	emote("scream", forced=TRUE)
 
 /mob/living/carbon/cursed_freak_out()
-	if(mob_timers["freakout"])
-		if(world.time < mob_timers["freakout"] + 10 SECONDS)
-			flash_fullscreen("stressflash")
-			return
-	mob_timers["freakout"] = world.time
+	if(!MOBTIMER_FINISHED(src, MT_FREAKOUT, 10 SECONDS))
+		flash_fullscreen("stressflash")
+		return
+		
+	MOBTIMER_SET(src, MT_FREAKOUT)
 	shake_camera(src, 1, 3)
 	flash_fullscreen("stressflash")
 	changeNext_move(CLICK_CD_EXHAUSTED)

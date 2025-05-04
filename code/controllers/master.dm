@@ -9,7 +9,7 @@
 
 //This is the ABSOLUTE ONLY THING that should init globally like this
 //2019 update: the failsafe,config and Global controllers also do it
-GLOBAL_REAL(Master, /datum/controller/master) = new
+GLOBAL_REAL(Master, /datum/controller/master)
 
 //THIS IS THE INIT ORDER
 //Master -> SSPreInit -> GLOB -> world -> config -> SSInit -> Failsafe
@@ -61,6 +61,8 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	//current tick limit, assigned before running a subsystem.
 	//used by CHECK_TICK as well so that the procs subsystems call can obey that SS's tick limits
 	var/static/current_ticklimit = TICK_LIMIT_RUNNING
+
+	var/static/initialized_all = FALSE
 
 /datum/controller/master/New()
 	if(!config)
@@ -190,7 +192,7 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 //#ifndef TESTSERVER
 //	var/thing_done = FALSE
 //#endif
-
+	#ifndef LOWMEMORYMODE
 	current_ticklimit = CONFIG_GET(number/tick_limit_mc_init)
 	for (var/datum/controller/subsystem/SS in subsystems)
 		if (SS.flags & SS_NO_INIT)
@@ -198,21 +200,34 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 		SS.Initialize(REALTIMEOFDAY)
 		CHECK_TICK
 	current_ticklimit = TICK_LIMIT_RUNNING
+	#else
+	current_ticklimit = CONFIG_GET(number/tick_limit_mc_init)
+	for (var/datum/controller/subsystem/SS in subsystems)
+		if (SS.flags & SS_NO_INIT)
+			continue
+		if(SS.lazy_load)
+			continue
+		SS.Initialize(REALTIMEOFDAY)
+		CHECK_TICK
+	current_ticklimit = TICK_LIMIT_RUNNING
+	#endif
 	var/time = (REALTIMEOFDAY - start_timeofday) / 10
 
 	var/msg = "Initializations complete within [time] second[time == 1 ? "" : "s"]!"
 
-#ifdef TESTING
 	to_chat(world, "<span class='boldannounce'>[msg]</span>")
-#endif
 	log_world(msg)
+
+	SSplexora.serverinitdone(time)
 
 	if (!current_runlevel)
 		SetRunLevel(1)
 
 	setup_cargo_boat()
 	// Sort subsystems by display setting for easy access.
+	#ifndef LOWMEMORYMODE
 	sortTim(subsystems, GLOBAL_PROC_REF(cmp_subsystem_display))
+	#endif
 	// Set world options.
 	world.change_fps(CONFIG_GET(number/fps))
 	var/initialized_tod = REALTIMEOFDAY
@@ -226,6 +241,10 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	initializations_finished_with_no_players_logged_in = initialized_tod < REALTIMEOFDAY - 10
 	// Loop.
 	Master.StartProcessing(0)
+	SSgamemode.handle_picking_storyteller()
+	#ifdef LOWMEMORYMODE
+	low_memory_force_start()
+	#endif
 
 /datum/controller/master/proc/SetRunLevel(new_runlevel)
 	var/old_runlevel = current_runlevel
@@ -258,6 +277,27 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 // Main loop.
 /datum/controller/master/proc/Loop()
 	. = -1
+	#ifdef LOWMEMORYMODE
+	if(!initialized_all)
+		var/total_count = length(subsystems)
+		for (var/datum/controller/subsystem/SS in subsystems)
+			if(SS.initialized)
+				total_count--
+				continue
+			if (SS.flags & SS_NO_INIT)
+				total_count--
+				continue
+			if(!SS.lazy_load)
+				total_count--
+				continue
+			SS.Initialize(REALTIMEOFDAY)
+			CHECK_TICK
+			total_count--
+		if(total_count <= 0)
+			initialized_all = TRUE
+			sortTim(subsystems, GLOBAL_PROC_REF(cmp_subsystem_display))
+	#endif
+
 	//Prep the loop (most of this is because we want MC restarts to reset as much state as we can, and because
 	//	local vars rock
 
@@ -285,7 +325,7 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 			if(ss_runlevels & GLOB.bitflags[I])
 				while(runlevel_sorted_subsystems.len < I)
 					runlevel_sorted_subsystems += list(list())
-				runlevel_sorted_subsystems[I] += SS
+				runlevel_sorted_subsystems[I] |= SS
 				added_to_any = TRUE
 		if(!added_to_any)
 			WARNING("[SS.name] subsystem is not SS_NO_FIRE but also does not have any runlevels set!")
@@ -425,7 +465,8 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 			continue
 		if ((SS_flags & (SS_TICKER|SS_KEEP_TIMING)) == SS_KEEP_TIMING && SS.last_fire + (SS.wait * 0.75) > world.time)
 			continue
-		SS.enqueue()
+		if(!SS.enqueue())
+			return FALSE
 	. = 1
 
 
@@ -594,6 +635,8 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	log_world("MC: SoftReset: Finished.")
 	. = 1
 
+	for(var/datum/controller/subsystem/ss in subsystems) //this is incase a runlevel error occurs, we don't want random shit being left queued up since if a queue ends up half parsed.
+		ss.state = SS_IDLE
 
 
 /datum/controller/master/stat_entry()
@@ -627,3 +670,8 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 		processing = CONFIG_GET(number/mc_tick_rate/base_mc_tick_rate)
 	else if (client_count > CONFIG_GET(number/mc_tick_rate/high_pop_mc_mode_amount))
 		processing = CONFIG_GET(number/mc_tick_rate/high_pop_mc_tick_rate)
+
+/datum/controller/master/proc/OnConfigLoad()
+	for (var/thing in subsystems)
+		var/datum/controller/subsystem/SS = thing
+		SS.OnConfigLoad()

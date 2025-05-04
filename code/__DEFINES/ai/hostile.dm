@@ -33,8 +33,15 @@
 
 ///Basic Mob Keys
 
+///Tipped blackboards
+///Bool that means a basic mob will start reacting to being tipped in it's planning
+#define BB_BASIC_MOB_TIP_REACTING "BB_basic_tip_reacting"
+///the motherfucker who tipped us
+#define BB_BASIC_MOB_TIPPER "BB_basic_tip_tipper"
+
 ///Targetting subtrees
 #define BB_TARGETED_ACTION "BB_targeted_action"
+#define BB_BASIC_MOB_PRIORITY_TARGETS "BB_basic_priority_targets"
 #define BB_BASIC_MOB_CURRENT_TARGET "BB_basic_current_target"
 #define BB_BASIC_MOB_CURRENT_TARGET_HIDING_LOCATION "BB_basic_current_target_hiding_location"
 #define BB_TARGETTING_DATUM "targetting_datum"
@@ -44,6 +51,12 @@
 #define BB_BASIC_MOB_EQUIPMENT_TARGET "BB_equipment_target"
 #define BB_BASIC_MOB_NEED_EQUIP "BB_needs_to_equip"
 #define BB_BASIC_MOB_UNEQUIPPED_WEAPON "BB_unequipped_weapon"
+/// Key for the minimum status at which we want to target mobs (does not need to be specified if CONSCIOUS)
+#define BB_TARGET_MINIMUM_STAT "BB_target_minimum_stat"
+/// Flag for whether to target only wounded mobs
+#define BB_TARGET_WOUNDED_ONLY "BB_target_wounded_only"
+/// What typepath the holding object targeting strategy should look for
+#define BB_TARGET_HELD_ITEM "BB_target_held_item"
 
 ///list of foods this mob likes
 #define BB_BASIC_FOODS "BB_basic_foods"
@@ -51,6 +64,7 @@
 
 /// Flag to set on or off if you want your mob to prioritise running away
 #define BB_BASIC_MOB_FLEEING "BB_basic_fleeing"
+#define BB_BASIC_MOB_NEXT_FLEEING "BB_nex_flee"
 
 ///List of mobs who have damaged us
 #define BB_BASIC_MOB_RETALIATE_LIST "BB_basic_mob_shitlist"

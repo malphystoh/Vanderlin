@@ -30,7 +30,7 @@
 		return 0
 
 	if(myPath.len <= 0)
-		myPath = get_path_to(src, get_turf(target), /turf/proc/Distance, MAX_RANGE_FIND + 1, 250,1)
+		myPath = get_path_to(src, get_turf(target), /turf/proc/Distance3D, MAX_RANGE_FIND + 1, 250,1)
 
 	if(myPath)
 		if(myPath.len > 0)
@@ -53,8 +53,6 @@
 	if(!(mobility_flags & MOBILITY_FLAGS_INTERACTION))
 		return 1
 	if(health <= 0 && checkDead)
-		return 1
-	if(IsUnconscious())
 		return 1
 	if(IsStun() || IsParalyzed())
 		return 1
@@ -284,7 +282,7 @@
 	return IsStandingStill()
 
 /mob/living/carbon/monkey/proc/pickpocket(mob/M)
-	if(do_mob(src, M, MONKEY_ITEM_SNATCH_DELAY) && pickupTarget)
+	if(do_after(src, MONKEY_ITEM_SNATCH_DELAY, M) && pickupTarget)
 		for(var/obj/item/I in M.held_items)
 			if(I == pickupTarget)
 				M.visible_message("<span class='danger'>[src] snatches [pickupTarget] from [M].</span>", "<span class='danger'>[src] snatched [pickupTarget]!</span>")

@@ -37,12 +37,13 @@
 	var/anchorable = TRUE
 	var/icon_welded = "welded"
 	var/keylock = FALSE
-	var/lockhash
 	var/lockid = null
 	var/masterkey = FALSE
 	throw_speed = 1
 	throw_range = 1
 	anchored = FALSE
+	/// true whenever someone with the strong pull component is dragging this, preventing opening
+	// var/strong_grab = FALSE
 
 /obj/structure/closet/pre_sell()
 	open()
@@ -54,24 +55,6 @@
 	. = ..()
 	update_icon()
 	PopulateContents()
-
-	if(lockhash)
-		GLOB.lockhashes += lockhash
-	else if(keylock)
-		if(lockid)
-			if(GLOB.lockids[lockid])
-				lockhash = GLOB.lockids[lockid]
-			else
-				lockhash = rand(1000,9999)
-				while(lockhash in GLOB.lockhashes)
-					lockhash = rand(1000,9999)
-				GLOB.lockhashes += lockhash
-				GLOB.lockids[lockid] = lockhash
-		else
-			lockhash = rand(1000,9999)
-			while(lockhash in GLOB.lockhashes)
-				lockhash = rand(1000,9999)
-			GLOB.lockhashes += lockhash
 
 //USE THIS TO FILL IT, NOT INITIALIZE OR NEW
 /obj/structure/closet/proc/PopulateContents()
@@ -129,6 +112,9 @@
 		if(user)
 			to_chat(user, "<span class='warning'>Locked.</span>" )
 		return FALSE
+	// if(strong_grab && pulledby != user)
+	// 	to_chat(user, span_danger("[pulledby] has an incredibly strong grip on [src], preventing it from opening."))
+	// 	return FALSE
 //	var/turf/T = get_turf(src)
 //	for(var/mob/living/L in T)
 //		if(L.anchored || horizontal && L.mob_size > MOB_SIZE_TINY && L.density)
@@ -259,7 +245,7 @@
 /obj/structure/closet/attackby(obj/item/W, mob/user, params)
 	if(user in src)
 		return
-	if(istype(W, /obj/item/roguekey) || istype(W, /obj/item/keyring))
+	if(istype(W, /obj/item/key) || istype(W, /obj/item/storage/keyring))
 		trykeylock(W, user)
 		return
 	if(istype(W, /obj/item/lockpick))
@@ -267,8 +253,7 @@
 		return
 	if(src.tool_interact(W,user))
 		return 1 // No afterattack
-	else
-		return ..()
+	return ..()
 
 /obj/structure/closet/proc/trykeylock(obj/item/I, mob/user)
 	if(opened)
@@ -279,29 +264,33 @@
 	if(broken)
 		to_chat(user, "<span class='warning'>The lock is broken.</span>")
 		return
-	if(istype(I,/obj/item/keyring))
-		var/obj/item/keyring/R = I
-		if(!R.keys.len)
+	if(istype(I,/obj/item/storage/keyring))
+		var/obj/item/storage/keyring/R = I
+		if(!R.contents.len)
 			return
-		var/list/keysy = shuffle(R.keys.Copy())
-		for(var/obj/item/roguekey/K in keysy)
-			if(user.cmode)
-				if(!do_after(user, 10, TRUE, src))
-					break
-			if(K.lockhash == lockhash)
+		for(var/obj/item/key/K as anything in shuffle(R.contents.Copy()))
+			var/combat = user.cmode
+			if(combat && !do_after(user, 1 SECONDS, src))
+				rattle()
+				break
+			if(K.lockid == lockid)
 				togglelock(user)
 				break
-			else
-				if(user.cmode)
-					playsound(src, 'sound/foley/doors/lockrattle.ogg', 100)
+			if(combat)
+				rattle()
 		return
-	else
-		var/obj/item/roguekey/K = I
-		if(K.lockhash == lockhash)
-			togglelock(user)
-			return
-		else
-			playsound(src, 'sound/foley/doors/lockrattle.ogg', 100)
+	var/obj/item/key/K = I
+	if(K.lockid != lockid)
+		rattle()
+		return
+	togglelock(user)
+
+/obj/structure/closet/proc/rattle()
+	playsound(src, 'sound/foley/doors/lockrattle.ogg', 100)
+	var/oldx = pixel_x
+	animate(src, pixel_x = oldx+1, time = 0.5)
+	animate(pixel_x = oldx-1, time = 0.5)
+	animate(pixel_x = oldx, time = 0.5)
 
 /obj/structure/closet/proc/trypicklock(obj/item/I, mob/user)
 	if(opened)
@@ -340,7 +329,7 @@
 
 
 		while(!QDELETED(I) &&(lockprogress < locktreshold))
-			if(!do_after(user, picktime, target = src))
+			if(!do_after(user, picktime, src))
 				break
 			if(prob(pickchance))
 				lockprogress += moveup
@@ -351,9 +340,9 @@
 					var/boon = L.mind.get_learning_boon(/datum/skill/misc/lockpicking)
 					L.mind.adjust_experience(/datum/skill/misc/lockpicking, amt2raise * boon)
 				if(lockprogress >= locktreshold)
-					to_chat(user, "<span class='deadsay'>The locking mechanism gives.</span>")
+					to_chat(user, "<span class='deadsay'>The locking mechanism gives way.</span>")
 					togglelock(user)
-					break
+					return
 				else
 					continue
 			else
@@ -361,7 +350,6 @@
 				I.take_damage(1, BRUTE, "blunt")
 				to_chat(user, "<span class='warning'>Clack.</span>")
 				continue
-		return
 
 /obj/structure/closet/proc/tool_interact(obj/item/W, mob/user)//returns TRUE if attackBy call shouldnt be continued (because tool was used/closet was of wrong type), FALSE if otherwise
 	. = FALSE
@@ -388,22 +376,21 @@
 	if(!isturf(O.loc))
 		return
 
-	var/actuallyismob = 0
+	var/actuallyismob = FALSE
 	if(isliving(O))
-		actuallyismob = 1
+		actuallyismob = TRUE
 	else if(!isitem(O))
 		return
 	var/turf/T = get_turf(src)
-	var/list/targets = list(O, src)
 	add_fingerprint(user)
 	user.visible_message("<span class='warning'>[user] [actuallyismob ? "tries to ":""]stuff [O] into [src].</span>", \
 						"<span class='warning'>I [actuallyismob ? "try to ":""]stuff [O] into [src].</span>", \
 						"<span class='hear'>I hear clanging.</span>")
 	if(actuallyismob)
-		if(do_after_mob(user, targets, 40))
-			user.visible_message("<span class='notice'>[user] stuffs [O] into [src].</span>", \
-								"<span class='notice'>I stuff [O] into [src].</span>", \
-								"<span class='hear'>I hear a loud bang.</span>")
+		if(do_after(user, 4 SECONDS, O))
+			user.visible_message(span_notice("[user] stuffs [O] into [src]."), \
+								span_notice("I stuff [O] into [src]."), \
+								span_hear("I hear a loud bang."))
 			O.forceMove(T)
 			close()
 	else
@@ -430,10 +417,6 @@
 	toggle(user)
 
 /obj/structure/closet/attack_paw(mob/user)
-	return attack_hand(user)
-
-// tk grab then use on self
-/obj/structure/closet/attack_self_tk(mob/user)
 	return attack_hand(user)
 
 /obj/structure/closet/verb/verb_toggleopen()
@@ -482,50 +465,24 @@
 	broken = TRUE //applies to secure lockers only
 	open()
 
-/obj/structure/closet/proc/togglelock(mob/living/user, silent)
+/obj/structure/closet/proc/togglelock(mob/living/user)
+	if(opened)
+		return
 	user.changeNext_move(CLICK_CD_MELEE)
 	if(locked)
 		user.visible_message("<span class='warning'>[user] unlocks [src].</span>", \
 			"<span class='notice'>I unlock [src].</span>")
 		playsound(src, 'sound/foley/doors/lock.ogg', 100)
-		locked = 0
+		locked = FALSE
 	else
 		user.visible_message("<span class='warning'>[user] locks [src].</span>", \
 			"<span class='notice'>I lock [src].</span>")
 		playsound(src, 'sound/foley/doors/lock.ogg', 100)
-		locked = 1
-
-/obj/structure/closet/emag_act(mob/user)
-	if(secure && !broken)
-		user.visible_message("<span class='warning'>Sparks fly from [src]!</span>",
-						"<span class='warning'>I scramble [src]'s lock, breaking it open!</span>",
-						"<span class='hear'>I hear a faint electrical spark.</span>")
-		playsound(src, "sparks", 50, TRUE)
-		broken = TRUE
-		locked = FALSE
-		update_icon()
+		locked = TRUE
 
 /obj/structure/closet/get_remote_view_fullscreens(mob/user)
 	if(user.stat == DEAD || !(user.sight & (SEEOBJS|SEEMOBS)))
 		user.overlay_fullscreen("remote_view", /atom/movable/screen/fullscreen/impaired, 1)
-
-/obj/structure/closet/emp_act(severity)
-	. = ..()
-	if(. & EMP_PROTECT_SELF)
-		return
-	if (!(. & EMP_PROTECT_CONTENTS))
-		for(var/obj/O in src)
-			O.emp_act(severity)
-	if(secure && !broken && !(. & EMP_PROTECT_SELF))
-		if(prob(50 / severity))
-			locked = !locked
-			update_icon()
-		if(prob(20 / severity) && !opened)
-			if(!locked)
-				open()
-			else
-				req_access = list()
-				req_access += pick(get_all_accesses())
 
 /obj/structure/closet/contents_explosion(severity, target)
 	for(var/atom/A in contents)

@@ -92,10 +92,9 @@
 //old slots
 #define SLOT_BACK			21
 #define SLOT_BELT			22
-#define SLOT_GLASSES		23
-#define SLOT_L_STORE		24
-#define SLOT_R_STORE		25
-#define SLOT_S_STORE		26
+#define SLOT_L_STORE		23
+#define SLOT_R_STORE		24
+#define SLOT_S_STORE		25
 #define SLOT_GENERC_DEXTROUS_STORAGE	26
 
 #define SLOTS_AMT			28 // Keep this up to date!
@@ -163,6 +162,7 @@
 #define HIDENECK		(1<<10)
 #define HIDEBOOB		(1<<11)
 #define HIDEBELT		(1<<12)
+#define HIDETAIL		(1<<13)
 
 //blocking_behavior var on clothing items
 #define BLOCKBOOTS		(1<<0)
@@ -225,15 +225,10 @@
 //flags for alternate styles: These are hard sprited so don't set this if you didn't put the effort in
 #define NORMAL_STYLE		0
 #define ALT_STYLE			1
-#define DIGITIGRADE_STYLE 	2
 
 //flags for outfits that have mutantrace variants (try not to use this): Currently only needed if you're trying to add tight fitting bootyshorts
 #define NO_MUTANTRACE_VARIATION		0
 #define MUTANTRACE_VARIATION		1
-
-#define NOT_DIGITIGRADE				0
-#define FULL_DIGITIGRADE			1
-#define SQUISHED_DIGITIGRADE		2
 
 //flags for covering body parts
 #define GLASSESCOVERSEYES	(1<<0)

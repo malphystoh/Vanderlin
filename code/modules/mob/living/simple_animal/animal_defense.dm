@@ -1,7 +1,7 @@
 
 
 /mob/living/simple_animal/attack_hand(mob/living/carbon/human/M)
-	..()
+	. = ..()
 	switch(M.used_intent.type)
 		if(INTENT_HELP)
 			if (health > 0)
@@ -12,8 +12,8 @@
 			return TRUE
 
 		if(INTENT_GRAB)
-			if(!M.has_hand_for_held_index(M.active_hand_index, TRUE)) //we obviously have a hadn, but we need to check for fingers/prosthetics
-				to_chat(M, "<span class='warning'>I can't move the fingers.</span>")
+			if(!M.has_hand_for_held_index(M.active_hand_index, TRUE)) //we obviously have a hand, but we need to check for fingers/prosthetics
+				to_chat(M, "<span class='warning'>I can't move the fingers of my [M.active_hand_index == 1 ? "left" : "right"] hand.</span>")
 				return
 			grabbedby(M)
 			return TRUE
@@ -40,7 +40,7 @@
 		if(INTENT_DISARM)
 			var/mob/living/carbon/human/user = M
 			var/mob/living/simple_animal/target = src
-			if(!(user.mobility_flags & MOBILITY_STAND) || user.IsKnockdown())
+			if(HAS_TRAIT(src, TRAIT_FLOORED))
 				return FALSE
 			if(user == target)
 				return FALSE
@@ -160,7 +160,7 @@
 	if(HAS_TRAIT(user, TRAIT_PACIFISM))
 		to_chat(user, "<span class='warning'>I don't want to harm [target]!</span>")
 		return FALSE
-	if(user.IsKnockdown())
+	if(HAS_TRAIT(src, TRAIT_FLOORED))
 		return FALSE
 	if(user == target)
 		return FALSE
@@ -173,7 +173,6 @@
 		to_chat(user, "<span class='warning'>I'm too close to get a good kick in.</span>")
 		return FALSE
 	else
-		user.do_attack_animation(target, ATTACK_EFFECT_DISARM)
 		playsound(target, 'sound/combat/hits/kick/kick.ogg', 100, TRUE, -1)
 
 		var/shove_dir = get_dir(user.loc, target.loc)
@@ -205,11 +204,6 @@
 	else
 		apply_damage(damage, damagetype, null, getarmor(null, armorcheck))
 		return TRUE
-
-/mob/living/simple_animal/bullet_act(obj/projectile/Proj)
-	apply_damage(Proj.damage, Proj.damage_type)
-	Proj.on_hit(src)
-	return BULLET_ACT_HIT
 
 /mob/living/simple_animal/ex_act(severity, target, epicenter, devastation_range, heavy_impact_range, light_impact_range, flame_range)
 	..()

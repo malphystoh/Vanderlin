@@ -10,7 +10,7 @@
 	if(!language)
 		return
 	if(wear_neck)
-		if(istype(wear_neck, /obj/item/clothing/neck/roguetown/talkstone))
+		if(istype(wear_neck, /obj/item/clothing/neck/talkstone))
 			return TRUE
 	if(!has_language(language))
 		if(has_flaw(/datum/charflaw/paranoid))
@@ -100,8 +100,6 @@
 	. = ..()
 	if(.) //No need to run through all of this if it's already true.
 		return
-	if(isclothing(glasses) && (glasses.clothing_flags & SCAN_REAGENTS))
-		return TRUE
 	if(isclothing(head) && (head.clothing_flags & SCAN_REAGENTS))
 		return TRUE
 	if(isclothing(wear_mask) && (wear_mask.clothing_flags & SCAN_REAGENTS))
@@ -121,11 +119,40 @@
 	if(used_str <= 9)
 		damage = max(damage - (damage * ((10 - used_str) * 0.1)), 1)
 
+	var/obj/item/bodypart/BP = has_hand_for_held_index(used_hand)
+	if(istype(BP))
+		damage *= BP.punch_modifier
+
 	if(mind)
 		if(mind.has_antag_datum(/datum/antagonist/werewolf))
 			return 30
 
 	return damage
+
+/// Fully randomizes everything in the character.
+// Reflect changes in [datum/preferences/proc/randomise_appearance_prefs]
+/mob/living/carbon/human/proc/randomize_human_appearance(randomise_flags = ALL)
+	if(randomise_flags & RANDOMIZE_SPECIES)
+		set_species(GLOB.species_list[pick(GLOB.roundstart_races)], FALSE)
+	var/datum/species/species = dna.species
+	if(randomise_flags & RANDOMIZE_GENDER)
+		gender = species.sexes ? pick(MALE, FEMALE) : PLURAL
+	if(randomise_flags & RANDOMIZE_AGE)
+		age = pick(species.possible_ages)
+	if(randomise_flags & RANDOMIZE_NAME)
+		real_name = species.random_name(gender, TRUE)
+	if(randomise_flags & RANDOMIZE_UNDERWEAR)
+		underwear = species.random_underwear(gender)
+
+	if(randomise_flags & RANDOMIZE_UNDERWEAR_COLOR)
+		underwear_color = random_short_color()
+	if(randomise_flags & RANDOMIZE_UNDERSHIRT)
+		undershirt = random_undershirt(gender)
+	if(randomise_flags & RANDOMIZE_SKIN_TONE)
+		var/list/skin_list = species.get_skin_list()
+		skin_tone = skin_list[pick(skin_list)]
+	if(randomise_flags & RANDOMIZE_FEATURES)
+		dna.features = random_features()
 
 /*
 * Family Tree subsystem helpers
@@ -137,13 +164,14 @@
 /mob/living/carbon/human/proc/RomanticPartner(mob/living/carbon/human/H)
 	if(!ishuman(H))
 		return
-	if(spouse_name == H.real_name)
+	if(spouse_mob == H)
 		return TRUE
 
 /mob/living/carbon/human/proc/IsWedded(mob/living/carbon/human/wedder)
-	if(spouse_name)
+	if(spouse_mob)
 		return TRUE
 
+//Instead of putting the spouse variable everywhere its all funneled through this proc.
 /mob/living/carbon/human/proc/MarryTo(mob/living/carbon/human/spouse)
 	if(!ishuman(spouse))
 		return
@@ -154,21 +182,31 @@
 		groommale = TRUE
 	if(spouse.gender == MALE)
 		bridemale = TRUE
-	spouse_name = spouse.real_name
-	spouse.spouse_name = real_name
+	spouse_mob = spouse
+	spouse.spouse_mob = src
 	//If the bride is male then we assign her status in the family as father.
-	if(family_datum)
-		if(family_datum.patriarch == src || family_datum.matriarch == src)
-			family_datum.TransferFamilies(spouse, bridemale ? FAMILY_FATHER : FAMILY_MOTHER)
-			return
-		else
-			family_datum.TransferFamilies(spouse, FAMILY_INLAW)
-	if(brides_family)
-		if(brides_family.patriarch == spouse || brides_family.matriarch == spouse)
-			brides_family.TransferFamilies(spouse, groommale ? FAMILY_FATHER : FAMILY_MOTHER)
-			return
-		else
-			family_datum.TransferFamilies(spouse, FAMILY_INLAW)
+	//Im going to use this wacky tech to shorten the code. -IP
+	var/checkgender = bridemale
+	var/datum/heritage/checkfamdat = family_datum
+	var/mob/living/carbon/human/who_we_check1 = src
+	var/mob/living/carbon/human/who_we_transfer = spouse
+	for(var/cycle = 1 to 2)
+		//If cycle one is done then run again but with cycle 2 variables.
+		if(cycle == 2)
+			checkgender = groommale
+			checkfamdat = brides_family
+			who_we_check1 = spouse
+			who_we_transfer = src
+		//Do we have a family datum?
+		if(checkfamdat)
+			//Is the person being checked the patriarch or the matriarch? If not assign the person being transfered as a inlaw.
+			if(checkfamdat.patriarch == who_we_check1 || checkfamdat.matriarch == who_we_check1)
+				checkfamdat.TransferFamilies(who_we_transfer, checkgender ? FAMILY_FATHER : FAMILY_MOTHER)
+				break
+			else
+				checkfamdat.TransferFamilies(who_we_transfer, FAMILY_INLAW)
+				break
+	return checkfamdat
 
 //Perspective stranger looks at --> src
 /mob/living/carbon/human/proc/ReturnRelation(mob/living/carbon/human/stranger)

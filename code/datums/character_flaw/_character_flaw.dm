@@ -6,6 +6,7 @@ GLOBAL_LIST_INIT(character_flaws, list(
 	"Junkie"=/datum/charflaw/addiction/junkie,
 	"Cyclops (R)"=/datum/charflaw/noeyer,
 	"Cyclops (L)"=/datum/charflaw/noeyel,
+	"Tongueless"=/datum/charflaw/tongueless,
 	"Greedy"=/datum/charflaw/greedy,
 	"Narcoleptic"=/datum/charflaw/narcoleptic,
 	"Masochist"=/datum/charflaw/masochist,
@@ -18,9 +19,9 @@ GLOBAL_LIST_INIT(character_flaws, list(
 	"Fire Servant"=/datum/charflaw/addiction/pyromaniac,
 	"Thief-Borne"=/datum/charflaw/addiction/kleptomaniac,
 	"Pain Freek"=/datum/charflaw/addiction/masochist,
+	"Hunted"=/datum/charflaw/hunted,
 	"Random Flaw or No Flaw"=/datum/charflaw/randflaw,
-	"Guaranteed No Flaw (3 TRI)"=/datum/charflaw/noflaw,
-	"Hunted"=/datum/charflaw/hunted))
+	"Guaranteed No Flaw (3 TRI)"=/datum/charflaw/noflaw,))
 
 /datum/charflaw
 	var/name
@@ -129,7 +130,7 @@ GLOBAL_LIST_INIT(character_flaws, list(
 	var/mob/living/carbon/human/H = user
 	if(H.wear_mask)
 		if(isclothing(H.wear_mask))
-			if(istype(H.wear_mask, /obj/item/clothing/mask/rogue/spectacles))
+			if(istype(H.wear_mask, /obj/item/clothing/face/spectacles))
 				var/obj/item/I = H.wear_mask
 				if(!I.obj_broken)
 					return
@@ -139,7 +140,7 @@ GLOBAL_LIST_INIT(character_flaws, list(
 /datum/status_effect/debuff/badvision
 	id = "badvision"
 	alert_type = null
-	effectedstats = list("perception" = -20, "speed" = -5,"fortune" = -20)
+	effectedstats = list(STATKEY_PER = -20, STATKEY_SPD = -5, STATKEY_LCK = -20)
 	duration = 100
 
 /datum/charflaw/badsight/on_mob_creation(mob/user)
@@ -148,9 +149,9 @@ GLOBAL_LIST_INIT(character_flaws, list(
 		return
 	var/mob/living/carbon/human/H = user
 	if(!H.wear_mask)
-		H.equip_to_slot_or_del(new /obj/item/clothing/mask/rogue/spectacles(H), SLOT_WEAR_MASK)
+		H.equip_to_slot_or_del(new /obj/item/clothing/face/spectacles(H), SLOT_WEAR_MASK)
 	else
-		new /obj/item/clothing/mask/rogue/spectacles(get_turf(H))
+		new /obj/item/clothing/face/spectacles(get_turf(H))
 
 /datum/charflaw/paranoid
 	name = "Paranoid"
@@ -249,7 +250,7 @@ GLOBAL_LIST_INIT(character_flaws, list(
 		return
 	var/mob/living/carbon/human/H = user
 	if(!H.wear_mask)
-		H.equip_to_slot_or_del(new /obj/item/clothing/mask/rogue/eyepatch(H), SLOT_WEAR_MASK)
+		H.equip_to_slot_or_del(new /obj/item/clothing/face/eyepatch(H), SLOT_WEAR_MASK)
 	var/obj/item/bodypart/head/head = H.get_bodypart(BODY_ZONE_HEAD)
 	head?.add_wound(/datum/wound/facial/eyes/right/permanent)
 	H.update_fov_angles()
@@ -264,7 +265,7 @@ GLOBAL_LIST_INIT(character_flaws, list(
 		return
 	var/mob/living/carbon/human/H = user
 	if(!H.wear_mask)
-		H.equip_to_slot_or_del(new /obj/item/clothing/mask/rogue/eyepatch/left(H), SLOT_WEAR_MASK)
+		H.equip_to_slot_or_del(new /obj/item/clothing/face/eyepatch/left(H), SLOT_WEAR_MASK)
 	var/obj/item/bodypart/head/head = H.get_bodypart(BODY_ZONE_HEAD)
 	head?.add_wound(/datum/wound/facial/eyes/left/permanent)
 	H.update_fov_angles()
@@ -283,7 +284,7 @@ GLOBAL_LIST_INIT(character_flaws, list(
 				return
 			var/mob/living/carbon/human/H = user
 			if(!H.wear_mask)
-				H.equip_to_slot_or_del(new /obj/item/clothing/mask/rogue/eyepatch/left(H), SLOT_WEAR_MASK)
+				H.equip_to_slot_or_del(new /obj/item/clothing/face/eyepatch/left(H), SLOT_WEAR_MASK)
 			var/obj/item/bodypart/head/head = H.get_bodypart(BODY_ZONE_HEAD)
 			head?.add_wound(/datum/wound/facial/eyes/left/permanent)
 			H.update_fov_angles()
@@ -294,14 +295,28 @@ GLOBAL_LIST_INIT(character_flaws, list(
 				return
 			var/mob/living/carbon/human/H = user
 			if(!H.wear_mask)
-				H.equip_to_slot_or_del(new /obj/item/clothing/mask/rogue/eyepatch(H), SLOT_WEAR_MASK)
+				H.equip_to_slot_or_del(new /obj/item/clothing/face/eyepatch(H), SLOT_WEAR_MASK)
 			var/obj/item/bodypart/head/head = H.get_bodypart(BODY_ZONE_HEAD)
 			head?.add_wound(/datum/wound/facial/eyes/right/permanent)
 			H.update_fov_angles()
 
+/datum/charflaw/tongueless
+	name = "Tongueless"
+	desc = "I was too annoying. (Being mute is not an excuse to forego roleplay. Use of custom emotes is recommended.)"
+
+/datum/charflaw/tongueless/on_mob_creation(mob/user)
+	..()
+	if(!ishuman(user))
+		return
+	var/mob/living/carbon/human/H = user
+	var/obj/item/bodypart/head/head = H.get_bodypart(BODY_ZONE_HEAD)
+	head?.add_wound(/datum/wound/facial/tongue/permanent)
+
 /datum/charflaw/hunted
 	name = "Hunted"
-	desc = "Something in my past has made me a target. I'm always looking over my shoulder."
+	desc = "Something in my past has made me a target. I'm always looking over my shoulder.	\
+	THIS IS A DIFFICULT FLAW, YOU WILL BE HUNTED AND HAVE ASSASINATION ATTEMPTS MADE AGAINST YOU WITHOUT ANY ESCALATION. \
+	EXPECT A MORE DIFFICULT EXPERIENCE. PLAY AT YOUR OWN RISK."
 	var/logged = FALSE
 
 /datum/charflaw/hunted/flaw_on_life(mob/user)
@@ -316,7 +331,7 @@ GLOBAL_LIST_INIT(character_flaws, list(
 
 /datum/charflaw/greedy
 	name = "Greedy"
-	desc = "I can't get enough of mammons, I need more and more! I've also become good at knowing how much things are worth"
+	desc = "I can't get enough of mammons, I need more and more!"
 	var/last_checked_mammons = 0
 	var/required_mammons = 0
 	var/next_mammon_increase = 0
@@ -327,7 +342,6 @@ GLOBAL_LIST_INIT(character_flaws, list(
 /datum/charflaw/greedy/on_mob_creation(mob/user)
 	next_mammon_increase = world.time + rand(15 MINUTES, 25 MINUTES)
 	last_passed_check = world.time
-	ADD_TRAIT(user, TRAIT_SEEPRICES, "[type]")
 
 /datum/charflaw/greedy/flaw_on_life(mob/user)
 	if(!first_tick)
@@ -505,10 +519,10 @@ GLOBAL_LIST_INIT(character_flaws, list(
 			return MASO_THRESHOLD_FOUR
 
 /proc/get_mammons_in_atom(atom/movable/movable)
-	var/static/list/coins_types = typecacheof(/obj/item/roguecoin)
+	var/static/list/coins_types = typecacheof(/obj/item/coin)
 	var/mammons = 0
 	if(coins_types[movable.type])
-		var/obj/item/roguecoin/coin = movable
+		var/obj/item/coin/coin = movable
 		mammons += coin.quantity * coin.sellprice
 	for(var/atom/movable/content in movable.contents)
 		mammons += get_mammons_in_atom(content)

@@ -8,10 +8,11 @@ SUBSYSTEM_DEF(mobs)
 	var/list/currentrun = list()
 	var/static/list/clients_by_zlevel[][]
 	var/static/list/dead_players_by_zlevel[][] = list(list()) // Needs to support zlevel 1 here, MaxZChanged only happens when z2 is created and new_players can login before that.
+	var/static/list/camera_players_by_zlevel[][] = list(list()) // Needs to support zlevel 1 here, MaxZChanged only happens when z2 is created and new_players can login before that.
 	var/static/list/cubemonkeys = list()
-	var/list/dead_mobs = list()
-	var/amt2process = 5
 
+	var/static/list/matthios_mobs = list()
+	var/list/matthios = list()
 
 /datum/controller/subsystem/mobs/stat_entry()
 	..("P:[GLOB.mob_living_list.len]")
@@ -25,26 +26,25 @@ SUBSYSTEM_DEF(mobs)
 		clients_by_zlevel[clients_by_zlevel.len] = list()
 		dead_players_by_zlevel.len++
 		dead_players_by_zlevel[dead_players_by_zlevel.len] = list()
+		camera_players_by_zlevel.len++
+		camera_players_by_zlevel[camera_players_by_zlevel.len] = list()
 
 /datum/controller/subsystem/mobs/proc/MaxZDec()
 	if (!islist(clients_by_zlevel))
 		clients_by_zlevel = new /list(world.maxz,0)
 		dead_players_by_zlevel = new /list(world.maxz,0)
+		camera_players_by_zlevel = new /list(world.maxz,0)
 	while (clients_by_zlevel.len > world.maxz)
 		clients_by_zlevel.len--
-//		clients_by_zlevel[clients_by_zlevel.len] = list()
 		dead_players_by_zlevel.len--
-//		dead_players_by_zlevel[dead_players_by_zlevel.len] = list()
+		camera_players_by_zlevel.len--
 
 
 /datum/controller/subsystem/mobs/fire(resumed = 0)
 	var/seconds = wait * 0.1
 	if (!resumed)
 		src.currentrun = GLOB.mob_living_list.Copy()
-
-	var/createnewdm = FALSE
-	if(!dead_mobs.len)
-		createnewdm = TRUE
+		src.currentrun -= matthios_mobs
 
 	//cache for sanic speed (lists are references anyways)
 	var/list/currentrun = src.currentrun
@@ -56,22 +56,24 @@ SUBSYSTEM_DEF(mobs)
 			GLOB.mob_living_list.Remove(L)
 			continue
 		if(L.stat == DEAD)
-			if(createnewdm)
-				dead_mobs |= L
+			L.DeadLife()
 		else
 			L.Life(seconds, times_fired)
 		if (MC_TICK_CHECK)
 			return
 
-	var/ye = 0
-	while(dead_mobs.len)
-		if(ye > amt2process)
-			return
-		ye++
-		var/mob/living/L = dead_mobs[dead_mobs.len]
-		dead_mobs.len--
+	if(!length(matthios))
+		matthios = matthios_mobs.Copy()
+
+	while(matthios.len)
+		var/mob/living/L = matthios[matthios.len]
+		matthios.len--
 		if(!L || QDELETED(L))
+			GLOB.mob_living_list.Remove(L)
 			continue
-		L.DeadLife()
-		if (MC_TICK_CHECK)
+		if(L.stat == DEAD)
+			L.DeadLife()
+		else
+			L.Life(seconds, times_fired)
+		if (TICK_CHECK_LOW)
 			return

@@ -8,7 +8,7 @@
 	bodyparts = list(/obj/item/bodypart/chest/goblin, /obj/item/bodypart/head/goblin, /obj/item/bodypart/l_arm/goblin,
 					/obj/item/bodypart/r_arm/goblin, /obj/item/bodypart/r_leg/goblin, /obj/item/bodypart/l_leg/goblin)
 	rot_type = /datum/component/rot/corpse/goblin
-	var/gob_outfit = /datum/outfit/job/roguetown/npc/goblin
+	var/gob_outfit = /datum/outfit/job/npc/goblin
 	ambushable = FALSE
 	base_intents = list(INTENT_HELP, INTENT_DISARM, INTENT_GRAB, /datum/intent/unarmed/claw)
 	a_intent = INTENT_HELP
@@ -19,12 +19,15 @@
 	vitae_pool = 250 // Small, frail creechers with not so much vitality to gain from.
 
 /mob/living/carbon/human/species/goblin/npc
-	aggressive=1
-	mode = AI_IDLE
+	ai_controller = /datum/ai_controller/human_npc
 	dodgetime = 30 //they can dodge easily, but have a cooldown on it
 	flee_in_pain = TRUE
 
 	wander = FALSE
+
+/mob/living/carbon/human/species/rousman/npc/Initialize()
+	. = ..()
+	AddComponent(/datum/component/combat_noise, list("laugh" = 2))
 
 /mob/living/carbon/human/species/goblin/npc/ambush
 	simpmob_attack = 35
@@ -32,7 +35,7 @@
 	wander = TRUE
 	attack_speed = 2
 
-/mob/living/carbon/human/species/goblin/hell
+/mob/living/carbon/human/species/goblin/npc/hell
 	name = "hell goblin"
 	race = /datum/species/goblin/hell
 
@@ -108,9 +111,12 @@
 /obj/item/bodypart/head/goblin/skeletonize()
 	. = ..()
 	icon_state = "goblin_skel_head"
-	sellprice = 2
+	if(headprice)
+		headprice = 2
 
-
+/obj/item/bodypart/head/goblin/drop_organs(mob/user, violent_removal)
+	. = ..()
+	sellprice = 0
 
 /datum/species/goblin
 	name = "goblin"
@@ -171,7 +177,7 @@
 	apply_overlay(BODY_LAYER)
 	dna.species.update_damage_overlays()
 
-/mob/living/carbon/human/species/goblin/proc/update_wearable()
+/mob/living/carbon/human/proc/update_wearable()
 	remove_overlay(ARMOR_LAYER)
 
 	var/list/standing = list()
@@ -189,6 +195,7 @@
 
 	apply_overlay(ARMOR_LAYER)
 
+
 /mob/living/carbon/human/species/goblin/update_inv_head()
 	update_wearable()
 /mob/living/carbon/human/species/goblin/update_inv_armor()
@@ -201,34 +208,31 @@
 	. = ..()
 	addtimer(CALLBACK(src, PROC_REF(after_creation)), 1 SECONDS)
 
-/mob/living/carbon/human/species/goblin/handle_combat()
-	if(mode == AI_HUNT)
-		if(prob(2))
-			emote("laugh")
-	. = ..()
-
 /mob/living/carbon/human/species/goblin/after_creation()
 	..()
 	gender = MALE
 	if(src.dna && src.dna.species)
 		src.dna.species.soundpack_m = new /datum/voicepack/goblin()
 		src.dna.species.soundpack_f = new /datum/voicepack/goblin()
-		var/obj/item/headdy = get_bodypart("head")
+		var/obj/item/bodypart/head/headdy = get_bodypart("head")
 		if(headdy)
 			headdy.icon = 'icons/roguetown/mob/monster/goblins.dmi'
 			headdy.icon_state = "[src.dna.species.id]_head"
-			headdy.sellprice = rand(7,20)
+			headdy.headprice = rand(7,20)
 	var/obj/item/organ/eyes/eyes = src.getorganslot(ORGAN_SLOT_EYES)
 	if(eyes)
 		eyes.Remove(src,1)
 		QDEL_NULL(eyes)
 	eyes = new /obj/item/organ/eyes/night_vision/nightmare
 	eyes.Insert(src)
+	for(var/slot in internal_organs_slot)
+		var/obj/item/organ/organ = internal_organs_slot[slot]
+		organ.sellprice = 5
 	src.underwear = "Nude"
 	if(src.charflaw)
 		QDEL_NULL(src.charflaw)
 	update_body()
-	faction = list("orcs")
+	faction = list(FACTION_ORCS)
 	name = "goblin"
 	real_name = "goblin"
 	ADD_TRAIT(src, TRAIT_NOMOOD, TRAIT_GENERIC)
@@ -244,10 +248,14 @@
 
 /datum/component/rot/corpse/goblin/process()
 	var/amt2add = 10 //1 second
+	var/time_elapsed = last_process ? (world.time - last_process)/10 : 1
 	if(last_process)
 		amt2add = ((world.time - last_process)/10) * amt2add
 	last_process = world.time
 	amount += amt2add
+	if(has_world_trait(/datum/world_trait/pestra_mercy))
+		amount -= 5 * time_elapsed
+
 	var/mob/living/carbon/C = parent
 	if(!C)
 		qdel(src)
@@ -266,10 +274,10 @@
 			if(!B.rotted)
 				B.rotted = TRUE
 				should_update = TRUE
-			if(B.rotted)
+			if(B.rotted && amount < 16 MINUTES && !(FACTION_MATTHIOS in C.faction))
 				var/turf/open/T = C.loc
 				if(istype(T))
-					T.pollute_turf(/datum/pollutant/rot, 10)
+					T.pollute_turf(/datum/pollutant/rot, 4)
 	if(should_update)
 		if(amount > 20 MINUTES)
 			C.update_body()
@@ -285,14 +293,14 @@
 ////
 ///
 
-/datum/outfit/job/roguetown/npc/goblin/pre_equip(mob/living/carbon/human/H)
+/datum/outfit/job/npc/goblin/pre_equip(mob/living/carbon/human/H)
 	..()
-	H.TOTALSTR = rand(6, 10)
-	H.TOTALPER = rand(5, 10)
-	H.TOTALINT = rand(1, 4)
-	H.TOTALCON = rand(4, 8)
-	H.TOTALEND = rand(8, 12)
-	H.TOTALSPD = rand(8, 14)
+	H.base_strength = rand(6, 10)
+	H.base_perception = rand(5, 10)
+	H.base_intelligence = rand(1, 4)
+	H.base_constitution = rand(4, 8)
+	H.base_endurance = rand(8, 12)
+	H.base_speed = rand(8, 14)
 	if(is_species(H, /datum/species/goblin/hell))
 		H.STASTR += 6
 		H.STACON += 6
@@ -313,50 +321,50 @@
 	var/loadout = rand(1,5)
 	switch(loadout)
 		if(1) //tribal spear
-			r_hand = /obj/item/rogueweapon/polearm/spear/stone
-			armor = /obj/item/clothing/suit/roguetown/armor/leather/hide/goblin
+			r_hand = /obj/item/weapon/polearm/spear/stone
+			armor = /obj/item/clothing/armor/leather/hide/goblin
 		if(2) //tribal axe
-			r_hand = /obj/item/rogueweapon/axe/stone
-			armor = /obj/item/clothing/suit/roguetown/armor/leather/hide/goblin
+			r_hand = /obj/item/weapon/axe/stone
+			armor = /obj/item/clothing/armor/leather/hide/goblin
 		if(3) //tribal club
-			r_hand = /obj/item/rogueweapon/mace/woodclub
-			armor = /obj/item/clothing/suit/roguetown/armor/leather/hide/goblin
+			r_hand = /obj/item/weapon/mace/woodclub
+			armor = /obj/item/clothing/armor/leather/hide/goblin
 			if(prob(10))
-				head = /obj/item/clothing/head/roguetown/helmet/leather/goblin
+				head = /obj/item/clothing/head/helmet/leather/goblin
 		if(4) //lightly armored sword/flail/daggers
 			H.simpmob_attack += 25
 			H.simpmob_defend += 10
 			if(prob(50))
-				r_hand = /obj/item/rogueweapon/sword/iron
+				r_hand = /obj/item/weapon/sword/iron
 			else
-				r_hand = /obj/item/rogueweapon/mace/spiked
+				r_hand = /obj/item/weapon/mace/spiked
 			if(prob(30))
-				l_hand = /obj/item/rogueweapon/shield/wood
+				l_hand = /obj/item/weapon/shield/wood
 			if(prob(23))
-				r_hand = /obj/item/rogueweapon/knife/stone
-				l_hand = /obj/item/rogueweapon/knife/stone
-			armor = /obj/item/clothing/suit/roguetown/armor/leather/goblin
+				r_hand = /obj/item/weapon/knife/stone
+				l_hand = /obj/item/weapon/knife/stone
+			armor = /obj/item/clothing/armor/leather/goblin
 			if(prob(80))
-				head = /obj/item/clothing/head/roguetown/helmet/leather/goblin
+				head = /obj/item/clothing/head/helmet/leather/goblin
 		if(5) //heavy armored sword/flail/shields
 			H.simpmob_attack += 45
 			H.simpmob_defend += 25
 			ADD_TRAIT(src, TRAIT_HEAVYARMOR, TRAIT_GENERIC)
 			if(prob(30))
-				armor = /obj/item/clothing/suit/roguetown/armor/cuirass/iron/goblin
+				armor = /obj/item/clothing/armor/cuirass/iron/goblin
 			else
-				armor = /obj/item/clothing/suit/roguetown/armor/leather/goblin
+				armor = /obj/item/clothing/armor/leather/goblin
 			if(prob(80))
-				head = /obj/item/clothing/head/roguetown/helmet/goblin
+				head = /obj/item/clothing/head/helmet/goblin
 			else
-				head = /obj/item/clothing/head/roguetown/helmet/leather/goblin
+				head = /obj/item/clothing/head/helmet/leather/goblin
 			if(prob(50))
-				r_hand = /obj/item/rogueweapon/sword/iron
+				r_hand = /obj/item/weapon/sword/iron
 			else
-				r_hand = /obj/item/rogueweapon/mace/spiked
+				r_hand = /obj/item/weapon/mace/spiked
 			if(prob(20))
-				r_hand = /obj/item/rogueweapon/flail
-			l_hand = /obj/item/rogueweapon/shield/wood
+				r_hand = /obj/item/weapon/flail
+			l_hand = /obj/item/weapon/shield/wood
 
 
 ////

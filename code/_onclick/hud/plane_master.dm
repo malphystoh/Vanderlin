@@ -66,6 +66,7 @@
 	plane = GAME_PLANE
 	appearance_flags = PLANE_MASTER //should use client color
 	blend_mode = BLEND_OVERLAY
+	render_target = GAME_PLANE_RENDER_TARGET
 
 /atom/movable/screen/plane_master/game_world/backdrop(mob/mymob)
 	filters = list()
@@ -106,10 +107,52 @@
 
 /atom/movable/screen/plane_master/lighting/Initialize()
 	. = ..()
-	filters += filter(type="alpha", render_source = EMISSIVE_RENDER_TARGET, flags = MASK_INVERSE)
-	filters += filter(type="alpha", render_source = EMISSIVE_UNBLOCKABLE_RENDER_TARGET, flags = MASK_INVERSE)
+	filters += filter(type="alpha", render_source=EMISSIVE_RENDER_TARGET, flags=MASK_INVERSE)
+	filters += filter(type="alpha", render_source=EMISSIVE_UNBLOCKABLE_RENDER_TARGET, flags=MASK_INVERSE)
 	filters += filter(type="alpha", render_source = O_LIGHTING_VISUAL_RENDER_TARGET, flags = MASK_INVERSE)
 
+
+/**
+ * Things placed on this mask the lighting plane. Doesn't render directly.
+ *
+ * Gets masked by blocking plane. Use for things that you want blocked by
+ * mobs, items, etc.
+ */
+/atom/movable/screen/plane_master/emissive
+	name = "emissive plane master"
+	plane = EMISSIVE_PLANE
+	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	render_target = EMISSIVE_RENDER_TARGET
+
+/atom/movable/screen/plane_master/emissive/Initialize()
+	. = ..()
+	filters += filter(type="alpha", render_source=EMISSIVE_BLOCKER_RENDER_TARGET, flags=MASK_INVERSE)
+
+/**
+ * Things placed on this always mask the lighting plane. Doesn't render directly.
+ *
+ * Always masks the light plane, isn't blocked by anything. Use for on mob glows,
+ * magic stuff, etc.
+ */
+
+/atom/movable/screen/plane_master/emissive_unblockable
+	name = "unblockable emissive plane master"
+	plane = EMISSIVE_UNBLOCKABLE_PLANE
+	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	render_target = EMISSIVE_UNBLOCKABLE_RENDER_TARGET
+
+/**
+ * Things placed on this layer mask the emissive layer. Doesn't render directly
+ *
+ * You really shouldn't be directly using this, use atom helpers instead
+ */
+/atom/movable/screen/plane_master/emissive_blocker
+	name = "emissive mob plane master"
+	plane = EMISSIVE_BLOCKER_PLANE
+	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	render_target = EMISSIVE_BLOCKER_RENDER_TARGET
+
+///Contains space parallax
 /atom/movable/screen/plane_master/parallax
 	name = "parallax plane master"
 //	screen_loc = "CENTER-2"
@@ -204,6 +247,13 @@
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 	blend_mode = BLEND_MULTIPLY
 
+/atom/movable/screen/plane_master/fog_cutter
+	name = "fog cutting plane master"
+	layer = O_LIGHTING_VISUAL_LAYER
+	plane = PLANE_FOG_CUTTER
+	render_target = FOG_RENDER_TARGET
+	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	blend_mode = BLEND_MULTIPLY
 
 //Contains all weather overlays
 /atom/movable/screen/plane_master/weather_overlay
@@ -260,3 +310,55 @@
 	blend_mode = BLEND_MULTIPLY
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 	render_target = SUNLIGHTING_RENDER_TARGET
+
+/atom/movable/screen/plane_master/leylines
+	name = "leyline plane master"
+//	screen_loc = "CENTER-2"
+	plane = PLANE_LEYLINES
+	appearance_flags = PLANE_MASTER //should use client colorSTRATEGY_PLANE
+	blend_mode = BLEND_OVERLAY
+	//render_target = GAME_PLANE_RENDER_TARGET
+
+/atom/movable/screen/plane_master/leylines/backdrop(mob/mymob)
+	. = ..()
+	if(!isliving(mymob) && mymob.client?.toggled_leylines)
+		alpha = 255
+	else if(!HAS_TRAIT(mymob, TRAIT_SEE_LEYLINES))
+		alpha = 0
+	else
+		alpha = 255
+
+
+/atom/movable/screen/plane_master/stategy_plane
+	name = "stategy plane master"
+//	screen_loc = "CENTER-2"
+	plane = STRATEGY_PLANE
+	appearance_flags = PLANE_MASTER //should use client color
+	blend_mode = BLEND_OVERLAY
+	//render_target = GAME_PLANE_RENDER_TARGET
+
+/atom/movable/screen/plane_master/stategy_plane/backdrop(mob/mymob)
+	. = ..()
+	if(!isliving(mymob))
+		alpha = 255
+	else if(!iscameramob(mymob))
+		alpha = 0
+	else
+		alpha = 255
+
+//
+/atom/movable/screen/plane_master/reflective
+	name = "reflective plane master"
+	plane = REFLECTION_PLANE
+	appearance_flags = PLANE_MASTER
+	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+
+/atom/movable/screen/plane_master/reflective/Initialize(mapload)
+	. = ..()
+	add_filter("motion_blur", 1.4, motion_blur_filter(y = 0.7))
+	filters += filter(type="alpha", render_source = REFLECTIVE_DISPLACEMENT_PLANE_RENDER_TARGET)
+
+/atom/movable/screen/plane_master/reflective_cutter
+	name = "reflective_cutting_plane"
+	plane = REFLECTIVE_DISPLACEMENT_PLANE
+	render_target = REFLECTIVE_DISPLACEMENT_PLANE_RENDER_TARGET
